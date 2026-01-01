@@ -1,117 +1,89 @@
 <script lang="ts">
-	import { supabase } from '$lib/supabaseClient';
-
-	let job = {
-		job_no: null,
-		job_card_no: null,
-		model_no: null,
-		capacity: null,
-		job_date: null,
-		blank_no: null
-	};
-
-	async function save() {
-		// Validate required fields
-		if (!job.job_no || !job.job_card_no || !job.model_no || !job.capacity || !job.blank_no || !job.job_date) {
-			alert('All fields are required');
-			return;
-		}
-
-		try {
-			const { error } = await supabase.from('trs_prod').insert([
-				{
-					job_no: job.job_no,
-					job_card_no: job.job_card_no,
-					model_no: job.model_no,
-					capacity: job.capacity,
-					blank_no: job.blank_no,
-					job_date: job.job_date
-				}
-			]);
-
-			if (error) alert(error.message);
-			else {
-				alert('Job created successfully');
-				// Reset form
-				job = {
-					job_no: null,
-					job_card_no: null,
-					model_no: null,
-					capacity: null,
-					job_date: null,
-					blank_no: null
-				};
-			}
-		} catch (err) {
-            alert('An unexpected error occurred');
-            console.error(err);
-        }
-	}
+  import { enhance } from "$app/forms";
+  export let form;
+  const dateFields = [
+    ["wiring", "Wiring"],
+    ["tc0", "TC0"],
+    ["cycling", "Cycling"],
+    ["cabling", "Cabling"],
+    ["trimming", "Trimming"],
+    ["black_putty", "Black Putty"],
+    ["bellow_welding", "Bellow Welding"],
+    ["pocket_welding", "Pocket Welding"],
+    ["sealing_side_1", "Sealing Side 1"],
+    ["sealing_side_2", "Sealing Side 2"],
+    ["linearity", "Linearity"],
+    ["tc0_qc", "TC0 QC"],
+    ["tinning", "Tinning"],
+    ["ready_date", "Ready Date"]
+  ];
 </script>
 
-<h1 class="mb-4 text-2xl font-bold">New Job</h1>
-<div class="max-w-md space-y-4">
-	<div>
-		<label for="job_no" class="mb-1 block font-semibold">Job No</label>
-		<input
-			id="job_no"
-			type="text"
-			bind:value={job.job_no}
-			class="w-full rounded border border-gray-300 px-3 py-2"
-		/>
-	</div>
+<div class="max-w-5xl">
+  <h1 class="text-5xl font-medium mb-6">New Job</h1>
 
-	<div>
-		<label for="job_card_no" class="mb-1 block font-semibold">Job Card No</label>
-		<input
-			id="job_card_no"
-			type="number"
-			bind:value={job.job_card_no}
-			class="w-full rounded border border-gray-300 px-3 py-2"
-		/>
-	</div>
+  <form
+    method="POST"
+    use:enhance
+    class="bg-surface rounded-md shadow-card p-6 space-y-8"
+  >
 
-	<div>
-		<label for="model_no" class="mb-1 block font-semibold">Model No</label>
-		<input
-			id="model_no"
-			type="text"
-			bind:value={job.model_no}
-			class="w-full rounded border border-gray-300 px-3 py-2"
-		/>
-	</div>
+    <!-- CORE DETAILS -->
+    <section>
+      <h2 class="text-2xl text-neutral-400 mb-4">Core Details</h2>
+      <div class="grid grid-cols-4 gap-4">
 
-	<div>
-		<label for="capacity" class="mb-1 block font-semibold">Capacity</label>
-		<input
-			id="capacity"
-			type="number"
-			bind:value={job.capacity}
-			class="w-full rounded border border-gray-300 px-3 py-2"
-		/>
-	</div>
+        <label for="job_date" class="text-xl text-neutral-400 col-span-full">Job Date *</label>
+        <input type="date" name="job_date" required class="input w-full bg-surface2 text-neutral-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        <input name="job_no" placeholder="Job No *" required class="input w-full bg-surface2 text-neutral-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        <input name="model_no" placeholder="Model No *" required class="input w-full bg-surface2 text-neutral-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        <input name="job_card_no" type="number" placeholder="Job Card No" class="input w-full bg-surface2 text-neutral-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
 
-	<div>
-		<label for="blank_no" class="mb-1 block font-semibold">Blank No</label>
-		<input
-			id="blank_no"
-			type="number"
-			bind:value={job.blank_no}
-			class="w-full rounded border border-gray-300 px-3 py-2"
-		/>
-	</div>
+        <input name="blank_no" placeholder="Blank No (7 digits) *"
+               inputmode="numeric" pattern="\d{7}" required class="input w-full bg-surface2 text-neutral-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
 
-	<div>
-		<label for="job_date" class="mb-1 block font-semibold">Job Date</label>
-		<input
-			id="job_date"
-			type="date"
-			bind:value={job.job_date}
-			class="w-full rounded border border-gray-300 px-3 py-2"
-		/>
-	</div>
+        <input name="serial_no" placeholder="Serial No (6 digits)"
+               inputmode="numeric" pattern="\d{6}" class="input w-full bg-surface2 text-neutral-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
 
-	<button on:click={save} class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-		Save Job
-	</button>
+        <input name="customer" placeholder="Customer" class="input w-full bg-surface2 text-neutral-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary col-span-2" />
+
+      </div>
+    </section>
+
+    <!-- PROCESS DATES -->
+    <section>
+      <h2 class="text-base text-neutral-400 mb-4">Process Dates</h2>
+      <div class="grid grid-cols-10 gap-4">
+
+        {#each dateFields as [field, label]}
+        <label for={field} class="text-xs text-neutral-400">{label}</label>
+          <input type="date" id={field} name={field} class="input w-full bg-surface2 text-neutral-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary col-span-2" />
+        {/each}
+
+      </div>
+    </section>
+
+    <!-- REMARKS -->
+    <section>
+      <h2 class="text-sm text-neutral-400 mb-4">Remarks</h2>
+      <textarea name="remarks" rows="3" class="input w-full"></textarea>
+    </section>
+
+    <!-- FEEDBACK -->
+    {#if form?.error}
+      <p class="text-danger text-sm">{form.error}</p>
+    {/if}
+    {#if form?.success}
+      <p class="text-success text-sm">Job created successfully</p>
+    {/if}
+
+    <!-- ACTIONS -->
+    <div class="flex justify-end gap-2">
+      <a href="/" class="px-4 py-2 rounded-md bg-surface2">Cancel</a>
+      <button class="px-4 py-2 rounded-md bg-primary font-medium">
+        Create Job
+      </button>
+    </div>
+
+  </form>
 </div>
