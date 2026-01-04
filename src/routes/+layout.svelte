@@ -1,24 +1,34 @@
 <script lang="ts">
 	import './layout.css';
 	import "../app.css"
-	import favicon from '$lib/assets/favicon.svg';
+	import logo from '$lib/assets/ipa_logo.png';
 
 	let { children } = $props();
 </script>
 
-<div class="min-h-screen grid grid-cols-[220px_1fr] bg-neutral-950 text-neutral-200">
+<svelte:head>
+	<title>TRS - Job Management</title>
 
-  <aside class="bg-surface shadow-card p-4">
-    <h1 class="text-xl font-medium mb-6">TRS</h1>
+  	<meta name="description" content="Internal job and blank tracking system for IPA manufacturing." />
+  	<meta name="theme-color" content="#0f172a" />
 
-    <nav class="space-y-1">
-      <a href="/" class="block px-3 py-2 rounded-md hover:bg-surface2">
+	<link rel="icon" type="image/png" href={logo} />
+</svelte:head>
+
+<div class="min-h-screen grid grid-cols-[250px_1fr] bg-neutral-950 text-neutral-200">
+
+  <aside class="bg-neutral-900 text-neutral-400 shadow-card p-4 font-medium">
+    <img src={logo} alt="IPA LOGO" class="mb-4 mx-auto"/>
+	<h1 class="text-4xl mb-6 text-center">Transducer</h1>
+
+    <nav class="space-y-1" aria-label="Main Navigation">
+      <a href="/" class="text-xl block px-3 py-2 rounded-md hover:bg-neutral-600">
         Dashboard
       </a>
-      <a href="/trs/new" class="block px-3 py-2 rounded-md hover:bg-surface2">
+      <a href="/trs/new" class="text-xl block px-3 py-2 rounded-md hover:bg-neutral-600">
         New Job
       </a>
-      <a href="/trs/update" class="block px-3 py-2 rounded-md hover:bg-surface2">
+      <a href="/trs/update" class="text-xl block px-3 py-2 rounded-md hover:bg-neutral-600">
         Update Job
       </a>
     </nav>

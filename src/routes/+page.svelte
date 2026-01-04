@@ -7,17 +7,17 @@
 <!-- KPI SECTION -->
 <section class="kpi-grid">
   <div class="kpi dispatched">
-    <h3>Dispatched</h3>
+    <h1>Dispatched</h1>
     <p>{data.dispatched}</p>
   </div>
 
   <div class="kpi ready">
-    <h3>Ready</h3>
+    <h1>Ready</h1>
     <p>{data.ready}</p>
   </div>
 
   <div class="kpi inprocess">
-    <h3>In Process</h3>
+    <h1>In Process</h1>
     <p>{data.inProcess}</p>
   </div>
 </section>

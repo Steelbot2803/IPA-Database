@@ -28,8 +28,12 @@ export const actions = {
       .eq("blank_no", f.blank_no)
       .maybeSingle();
 
-    if (existing) {
-      return fail(400, { error: "Blank No already exists" });
+    const allowDuplicate = f.allow_duplicate_blank === "on";
+
+    if (existing && !allowDuplicate) {
+      return fail(400, {
+        error: "Blank No already exists. Enable override to proceed."
+      });
     }
 
     /* ---------- INSERT ---------- */
@@ -56,7 +60,8 @@ export const actions = {
       linearity: f.linearity || null,
       tc0_qc: f.tc0_qc || null,
       tinning: f.tinning || null,
-      ready_date: f.ready_date || null
+      ready_date: f.ready_date || null,
+      dispatch_date: f.dispatch_date || null
     });
 
     if (error) {
