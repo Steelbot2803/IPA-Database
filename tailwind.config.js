@@ -5,8 +5,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        surface: '#1e1e1e',
-        surface2: '#252525',
         primary: '#3f51b5',
         success: '#4caf50',
         warning: '#ff9800',

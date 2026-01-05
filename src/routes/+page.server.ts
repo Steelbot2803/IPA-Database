@@ -18,14 +18,14 @@ export async function load() {
     supabase
       .from("trs_prod_status_view")
       .select("*", { count: "exact", head: true })
-      .eq("derived_status", "IN PROCESS"),
+      .eq("derived_status", "IN-PROCESS"),
   ]);
 
   /* ---------- RECENT 10 ENTRIES ---------- */
 
   const { data: recentJobs } = await supabase
     .from("trs_prod_status_view")
-    .select("blank_no, status, updated_at")
+    .select("job_no, model_no, blank_no, derived_status, updated_at")
     .order("updated_at", { ascending: false })
     .limit(10);
 

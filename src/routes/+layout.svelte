@@ -7,11 +7,9 @@
 </script>
 
 <svelte:head>
-	<title>TRS - Job Management</title>
-
-  	<meta name="description" content="Internal job and blank tracking system for IPA manufacturing." />
-  	<meta name="theme-color" content="#0f172a" />
-
+  <title>TRS Dashboard</title>
+  <meta name="description" content="Job management system for Transducer" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/png" href={logo} />
 </svelte:head>
 
@@ -19,7 +17,7 @@
 
   <aside class="bg-neutral-900 text-neutral-400 shadow-card p-4 font-medium">
     <img src={logo} alt="IPA LOGO" class="mb-4 mx-auto"/>
-	<h1 class="text-4xl mb-6 text-center">Transducer</h1>
+	  <h1 class="text-4xl mb-6 text-center">Transducer</h1>
 
     <nav class="space-y-1" aria-label="Main Navigation">
       <a href="/" class="text-xl block px-3 py-2 rounded-md hover:bg-neutral-600">
@@ -30,6 +28,9 @@
       </a>
       <a href="/trs/update" class="text-xl block px-3 py-2 rounded-md hover:bg-neutral-600">
         Update Job
+      </a>
+      <a href="/trs/db" class="text-xl block px-3 py-2 rounded-md hover:bg-neutral-600">
+        Job Database
       </a>
     </nav>
   </aside>
