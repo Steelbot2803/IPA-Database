@@ -20,7 +20,7 @@
 	];
 </script>
 
-<div class="w-full">
+<div class="w-full space-y-6">
 	<h1 class="mb-6 text-5xl font-medium text-neutral-400">New Job</h1>
 
 	<form method="POST" use:enhance class="bg-surface shadow-card space-y-8 rounded-md p-6">
@@ -151,22 +151,31 @@
 		</section>
 
 		<!-- FEEDBACK -->
-		{#if form?.error}
-			<p class="text-danger text-xl">{form.error}</p>
-		{/if}
-		{#if form?.success}
-			<p class="text-success text-xl">Job created successfully</p>
+		{#if form?.error || form?.success}
+			<div class="fixed top-8 right-12 z-50 flex max-w-base flex-col gap-2">
+				{#if form?.error}
+					<p class="rounded-md bg-red-800 px-4 py-3 shadow-lg text-danger">
+						{form.error}
+					</p>
+				{/if}
+
+				{#if form?.success}
+					<p class="rounded-md bg-green-800 px-4 py-3 shadow-lg text-success">
+						Job created successfully
+					</p>
+				{/if}
+			</div>
 		{/if}
 
 		<!-- ACTIONS -->
 		<div class="flex justify-end gap-2">
-			<a href="/" class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+			<a href="/" class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 cursor-pointer"
 				>Cancel</a
 			>
 			<button
 				type="submit"
 				formaction="?/create"
-				class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+				class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 cursor-pointer"
 			>
 				Create Job
 			</button>

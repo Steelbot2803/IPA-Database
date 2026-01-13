@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-  <title>TRS Dashboard</title>
+  <title>TRS</title>
   <meta name="description" content="Job management system for Transducer" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/png" href={logo} />
@@ -20,17 +20,17 @@
 	  <h1 class="text-4xl mb-6 text-center">Transducer</h1>
 
     <nav class="space-y-1" aria-label="Main Navigation">
-      <a href="/" class="text-xl block px-3 py-2 rounded-md hover:bg-neutral-600">
-        Dashboard
+      <a href="/" class="text-2xl block px-3 py-2 rounded-md hover:bg-neutral-600">
+        | Dashboard
       </a>
-      <a href="/trs/new" class="text-xl block px-3 py-2 rounded-md hover:bg-neutral-600">
-        New Job
+      <a href="/trs/new" class="text-2xl block px-3 py-2 rounded-md hover:bg-neutral-600">
+        | New Job
       </a>
-      <a href="/trs/update" class="text-xl block px-3 py-2 rounded-md hover:bg-neutral-600">
-        Update Job
+      <a href="/trs/update" class="text-2xl block px-3 py-2 rounded-md hover:bg-neutral-600">
+        | Update Job
       </a>
-      <a href="/trs/db" class="text-xl block px-3 py-2 rounded-md hover:bg-neutral-600">
-        Job Database
+      <a href="/trs/db" class="text-2xl block px-3 py-2 rounded-md hover:bg-neutral-600">
+        | Job Database
       </a>
     </nav>
   </aside>
