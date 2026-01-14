@@ -7,6 +7,33 @@
 
 	const PAGE_SIZE = 25;
 	const totalPages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
+
+	const fields: [keyof Job, string][] = [
+		['id', 'ID'],
+		['job_date', 'Job Date'],
+		['job_no', 'Job No'],
+		['job_card_no', 'Job Card No'],
+		['model_no', 'Model No'],
+		['blank_no', 'Blank No'],
+		['serial_no', 'Serial No'],
+		['customer', 'Customer'],
+		['remarks', 'Remarks'],
+		['wiring', 'Wiring'],
+		['tc0', 'TC0'],
+		['cycling', 'Cycling'],
+		['cabling', 'Cabling'],
+		['trimming', 'Trimming'],
+		['black_putty', 'Black Putty'],
+		['bellow_welding', 'Bellow Welding'],
+		['pocket_welding', 'Pocket Welding'],
+		['sealing_side_1', 'Sealing - Side 1'],
+		['sealing_side_2', 'Sealing - Side 2'],
+		['linearity', 'Linearity'],
+		['tc0_qc', 'TC0 QC'],
+		['tinning', 'Tinning'],
+		['ready_date', 'Ready Date'],
+		['dispatch_date', 'Dispatch Date']
+	];
 </script>
 
 <div class="bg-neutral text-neutral-400 w-full space-y-6">
@@ -111,10 +138,10 @@
 			</div>
 
 			<div class="grid grid-cols-12 gap-8 text-xl">
-				{#each Object.entries(selectedJob) as [key, value]}
+				{#each fields as [key, label]}
 					<div class="col-span-4">
-						<p class="text-xl text-neutral-400">{key}</p>
-						<p>{value ?? '—'}</p>
+						<p class="text-xl text-neutral-400">{label}</p>
+						<p>{selectedJob[key] ?? '—'}</p>
 					</div>
 				{/each}
 			</div>
