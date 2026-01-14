@@ -31,7 +31,7 @@ export async function load({ url }) {
 
 		if (columnType === "number") {
 			// numeric equality or partial via text cast
-			query = query.filter(`${column}::text`, "ilike", `%${value}%`);
+			query = query.eq(column, Number(value));
 		} else {
 			query = query.ilike(column, `%${value}%`);
 		}

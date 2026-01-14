@@ -32,7 +32,8 @@
 			placeholder="Search value"
 			class="flex-1 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 w-5/7"
 		/>
-			<button class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-16 py-2 hover:bg-neutral-600"> Apply Filters </button>
+			<button class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-3 hover:bg-neutral-600"> Apply Filter </button>
+			<a href="/trs/db" class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-3 py-3 hover:bg-neutral-600 float-right"> Clear Filter </a>
 	</form>
 
 	<!-- ================= TABLE ================= -->

@@ -141,7 +141,7 @@
 						<input
 							type="date"
 							name="job_date"
-							value={job.job_date}
+							bind:value={job.job_date}
 							disabled
 							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
 						/>
@@ -152,8 +152,7 @@
 						<input
 							type="text"
 							name="job_no"
-							placeholder="Job No *"
-							value={job.job_no}
+							bind:value={job.job_no}
 							disabled
 							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
 						/>
@@ -164,8 +163,7 @@
 						<input
 							type="text"
 							name="model_no"
-							placeholder="Model No *"
-							value={job.model_no}
+							bind:value={job.model_no}
 							disabled
 							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
 						/>
@@ -176,8 +174,7 @@
 						<input
 							name="blank_no"
 							type="number"
-							placeholder="Blank No (7 digits) *"
-							value={job.blank_no}
+							bind:value={job.blank_no}
 							disabled
 							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
 						/>
@@ -194,8 +191,8 @@
 						<input
 							name="job_card_no"
 							type="number"
-							placeholder="Job Card No"
-							value={job.job_card_no}
+							bind:value={job.job_card_no}
+							placeholder={job.job_card_no ? '' : 'Job Card No'}
 							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
 						/>
 					</div>
@@ -205,8 +202,8 @@
 						<input
 							name="serial_no"
 							type="number"
-							placeholder="Serial No (6 digits)"
-							value={job.serial_no}
+							placeholder={job.serial_no ? '' : 'Serial No (6 digits)'}
+							bind:value={job.serial_no}
 							inputmode="numeric"
 							pattern="\d{6}"
 							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
@@ -218,8 +215,8 @@
 						<textarea
 							name="customer"
 							rows="1"
-							placeholder="Customer"
-							value={job.customer}
+							bind:value={job.customer}
+							placeholder={job.customer ? '' : 'Customer'}
 							class="input focus:ring-primary focus:border-primary col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
 						></textarea>
 					</div>
@@ -236,7 +233,8 @@
 							type="date"
 							id={field}
 							name={field}
-							value={job[field] ?? ''}
+							bind:value={job[field]}
+							placeholder={job[field] ? '' : label}
 							class="input focus:ring-primary focus:border-primary col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
 						/>
 					{/each}
