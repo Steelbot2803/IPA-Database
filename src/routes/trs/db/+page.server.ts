@@ -23,7 +23,7 @@ export async function load({ url }) {
 		.from('trs_prod')
 		.select('*', { count: 'exact' })
 		.order('job_date', { ascending: false })
-		.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+/* 		.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1); */
 
 	/* ---------- SINGLE-COLUMN SEARCH ---------- */
 	if (column && value && column in SEARCHABLE_COLUMNS) {
@@ -46,7 +46,7 @@ export async function load({ url }) {
 	return {
 		rows: data ?? [],
 		total: count ?? 0,
-		page,
+		// page,
 		search: {
 			column,
 			value

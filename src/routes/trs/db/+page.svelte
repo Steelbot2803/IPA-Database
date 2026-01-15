@@ -102,7 +102,7 @@
 	</div>
 
 	<!-- ================= PAGINATION ================= -->
-	<div class="flex items-center justify-between">
+	<!-- <div class="flex items-center justify-between">
 		<p class="text-sm text-neutral-400">
 			Page {data.page} of {totalPages}
 		</p>
@@ -126,7 +126,7 @@
 				</a>
 			{/if}
 		</div>
-	</div>
+	</div> -->
 </div>
 
 {#if selectedJob}
