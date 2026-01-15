@@ -6,7 +6,7 @@ export async function load({ url }) {
 	const blank_no = url.searchParams.get("blank_no");
 	const id = url.searchParams.get("id");
 
-	if (!blank_no) {
+	if (!blank_no || Number.isNaN(blank_no)) {
 		return {
 			jobs: [],
 			job: undefined

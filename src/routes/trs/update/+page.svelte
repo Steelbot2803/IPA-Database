@@ -66,7 +66,7 @@
 			name="blank_no"
 			bind:value={blankNo}
 			placeholder="Enter Blank No"
-			class="w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400"
+			class="w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 text-xl focus:ring-primary focus:border-primary focus:outline-none focus:ring-2"
 		/>
 		<button
 			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
@@ -85,7 +85,7 @@
 	{/if}
 
 	<!-- IF DUPLICATE BLANK NO -->
-	{#if data.jobs && data.jobs.length > 1}
+	{#if data.jobs && data.jobs.length >= 1}
 		<div class="bg-surface shadow-card rounded-md p-4">
 			<h2 class="mb-3 text-2xl text-neutral-400">Multiple jobs found — select one</h2>
 			<div class="w-full text-center text-xl text-neutral-400">
