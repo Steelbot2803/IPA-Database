@@ -32,6 +32,8 @@ export async function load({ url }) {
 		if (columnType === "number") {
 			// numeric equality or partial via text cast
 			query = query.eq(column, Number(value));
+		} else if (columnType === "date") {
+			query = query.eq(column, value);
 		} else {
 			query = query.ilike(column, `%${value}%`);
 		}

@@ -3,9 +3,35 @@ import { supabase } from '$lib/supabaseClient';
 
 const isNDigits = (val: string, n: number) => new RegExp(`^\\d{${n}}$`).test(val);
 
+export async function load ({ url }) {
+
+	const blank_no = url.searchParams.get('blank_no');
+
+	if (!blank_no) {
+		return { blank: null };
+	}
+
+	const { data, error } = await supabase
+		.from('blank_stock')
+		.select('*')
+		.eq('blank_no', blank_no)
+		.single();
+
+	if (error) {
+		return { blank: null };
+	}
+
+	return { blank: data };
+};
+
 export const actions = {
 	create: async ({ request }) => {
 		const f = Object.fromEntries(await request.formData());
+		const blank_no = f.blank_no?.toString();
+
+		if (!blank_no) {
+			return fail(400, { error: 'Blank No is required' });
+		}
 
 		/* ---------- REQUIRED FIELDS ---------- */
 		if (!f.job_date || !f.job_no || !f.model_no || !f.blank_no) {
@@ -18,6 +44,17 @@ export const actions = {
 
 		if (f.serial_no && !isNDigits(f.serial_no.toString(), 6)) {
 			return fail(400, { error: 'Serial No must be exactly 6 digits' });
+		}
+
+		const { data: blank, error: stockErr } = await supabase
+			.from('blank_stock')
+			.select('*')
+			.eq('blank_no', blank_no)
+			.order('received_date', { ascending: false })
+			.single();
+
+		if (stockErr || !blank) {
+			return fail(400, { error: 'Blank not available in stock' });
 		}
 
 		/* ---------- DUPLICATE CHECK ---------- */
@@ -36,7 +73,7 @@ export const actions = {
 		}
 
 		/* ---------- INSERT ---------- */
-		const { error } = await supabase.from('trs_prod').insert({
+		const { error:insertError } = await supabase.from('trs_prod').insert({
 			job_date: f.job_date,
 			job_no: f.job_no,
 			model_no: f.model_no,
@@ -64,8 +101,8 @@ export const actions = {
 			dispatch_date: f.dispatch_date || null
 		});
 
-		if (error) {
-			return fail(500, { error: error.message });
+		if (insertError) {
+			return fail(500, { error: insertError.message });
 		}
 
 		return { success: true };
