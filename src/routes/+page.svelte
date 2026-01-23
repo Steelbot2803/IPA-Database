@@ -16,7 +16,7 @@
 
 	<!-- KPI SECTION -->
 	<section class="kpi-grid">
-		<div class="kpi total-jobs w-3/4 mb-4 grid grid-cols-3 gap-4 text-2xl font-medium text-neutral-400">
+		<div class="kpi total-jobs min-w-full mb-4 grid grid-cols-3 gap-4 text-2xl font-medium text-neutral-400">
 			<div class="kpi dispatched rounded-lg p-4 bg-green-900/20 border border-green-600/40">
 				<h3 class="mb-2">Dispatched</h3>
 				<p>{data.dispatched}</p>
@@ -36,8 +36,8 @@
 
 	<!-- RECENT JOBS -->
 	<section>
-		<h2 class="w-3/4 mt-12 mb-4 text-2xl font-medium text-neutral-400 rounded-lg p-4 bg-blue-900/20 border border-blue-600/40">Recent Entries</h2>
-		<div class="w-3/4 text-xl text-neutral-400 rounded-lg p-4 bg-blue-900/20 border border-blue-600/40">
+		<h2 class="min-w-full mt-12 mb-4 text-2xl font-medium text-neutral-400 rounded-lg p-4 bg-blue-900/20 border border-blue-600/40">Recent Entries</h2>
+		<div class="min-w-full text-xl text-neutral-400 rounded-lg p-4 bg-blue-900/20 border border-blue-600/40">
 			<table class="mb-12 w-full border-separate border-spacing-y-2 overflow-x-auto">
 				<thead>
 					<tr class="text-left">
@@ -66,7 +66,7 @@
 	</section>
 	
 	<!-- DUPLICATE BLANK NO -->
-	<section class="w-3/4 danger grid grid-cols-2 xl:grid-cols-2 gap-6 items-stretch">
+	<section class="min-w-full danger grid grid-cols-2 xl:grid-cols-2 gap-6 items-stretch">
 		<h2 class="w-full mt-12 mb-4 text-2xl font-medium text-neutral-400 text-center rounded-lg p-4 bg-purple-900/20 border border-purple-600/40">⚠ Duplicate Blank Numbers</h2>
 		<h2 class="w-full mt-12 mb-4 text-2xl font-medium text-neutral-400 text-center rounded-lg p-4 bg-purple-900/20 border border-purple-600/40">⚠ Duplicate Serial Numbers</h2>
         <div class="w-full text-xl text-neutral-400 text-center rounded-lg p-4 bg-purple-900/20 border border-purple-600/40">

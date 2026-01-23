@@ -57,8 +57,8 @@
 	];
 </script>
 
-<div class="w-full space-y-6">
-	<h1 class="mb-6 text-5xl font-medium text-neutral-400">Update Job</h1>
+<div class="min-w-full space-y-6">
+	<h1 class="mb-6 text-5xl font-medium text-neutral-400">Loadcell Update</h1>
 
 	<!-- SEARCH -->
 	<form method="GET" class="bg-surface shadow-card flex gap-3 rounded-md px-6">
@@ -88,7 +88,7 @@
 	{#if data.jobs && data.jobs.length >= 1}
 		<div class="bg-surface shadow-card rounded-md p-4">
 			<h2 class="mb-3 text-2xl text-neutral-400">Multiple jobs found — select one</h2>
-			<div class="w-full text-center text-xl text-neutral-400">
+			<div class="overflow-x-auto w-full text-center text-xl text-neutral-400">
 				<table class="mb-12 w-full border-separate border-spacing-y-2">
 					<thead class="text-neutral-400">
 						<tr>
