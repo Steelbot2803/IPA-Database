@@ -21,9 +21,9 @@ export async function load({ url }) {
 
 	let query = supabase
 		.from('trs_prod')
-		.select('*', { count: 'exact' })
-		.order('job_date', { ascending: false })
-/* 		.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1); */
+		.select('*')
+		.order('created_at', { ascending: false })
+		.order('updated_at', { ascending: false })
 
 	/* ---------- SINGLE-COLUMN SEARCH ---------- */
 	if (column && value && column in SEARCHABLE_COLUMNS) {
@@ -39,7 +39,7 @@ export async function load({ url }) {
 		}
 	}
 
-	const { data, count, error } = await query;
+	const { data, error } = await query;
 
 	if (error) {
 		console.error(error);
@@ -47,8 +47,6 @@ export async function load({ url }) {
 
 	return {
 		rows: data ?? [],
-		total: count ?? 0,
-		// page,
 		search: {
 			column,
 			value

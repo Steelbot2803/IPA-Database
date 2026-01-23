@@ -3,7 +3,7 @@
 	export let form;
 </script>
 
-<div class="w-full space-y-6">
+<div class="min-w-full space-y-6">
 	<h1 class="mb-6 text-5xl font-medium text-neutral-400">Blank Incoming Entry</h1>
 
 	<form method="POST" use:enhance class="bg-surface shadow-card space-y-8 rounded-md p-6">

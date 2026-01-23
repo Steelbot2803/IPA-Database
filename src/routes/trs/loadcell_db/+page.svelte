@@ -6,7 +6,6 @@
 	let selectedJob: Job = null;
 
 	const PAGE_SIZE = 25;
-	const totalPages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
 
 	const fields: [keyof Job, string][] = [
 		['id', 'ID'],
@@ -53,23 +52,6 @@
 			{/each}
 		</select>
 
-		<!-- {#if data.search.column === "job_date"}
-			<input
-			name="job_date"
-			type="date"
-			value={data.search.value ?? ""}
-			placeholder="Search value"
-			class="flex-1 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 w-5/7"
-			/>
-		{:else}
-			<input
-			name="value"
-			value={data.search.value ?? ""}
-			placeholder="Search value"
-			class="flex-1 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 w-5/7"
-			/>
-		{/if} -->
-
 		<input
 			name="value"
 			value={data.search.value ?? ""}
@@ -99,7 +81,7 @@
 				{#each data.rows as row}
 					<tr class="hover:bg-neutral-600/50">
 						<td>{row.job_date}</td>
-						<td>{row.job_no}</td>
+						<td>{row.job_no ?? "STOCK"}</td>
 						<td>{row.job_card_no ?? '—'}</td>
 						<td>{row.model_no}</td>
 						<td>{row.blank_no}</td>
@@ -117,40 +99,13 @@
 			</tbody>
 		</table>
 	</div>
-
-	<!-- ================= PAGINATION ================= -->
-	<!-- <div class="flex items-center justify-between">
-		<p class="text-sm text-neutral-400">
-			Page {data.page} of {totalPages}
-		</p>
-
-		<div class="flex gap-2">
-			{#if data.page > 1}
-				<a
-					href={`?q=page=${data.page - 1}`}
-					class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-				>
-					Prev
-				</a>
-			{/if}
-
-			{#if data.page < totalPages}
-				<a
-					href={`?q=page=${data.page + 1}`}
-					class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-				>
-					Next
-				</a>
-			{/if}
-		</div>
-	</div> -->
 </div>
 
 {#if selectedJob}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-800/95 p-4 text-neutral-400">
 		<div class="shadow-card w-9/10 max-h-full max-w-full space-y-4 overflow-y-auto rounded-md bg-black p-12">
 			<div class="flex items-center justify-between">
-				<h2 class="text-5xl font-medium">Job Details</h2>
+				<h2 class="text-5xl font-medium">Loadcell Details</h2>
 				<button on:click={() => (selectedJob = null)} class="rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 text-2xl text-neutral-400"> Close </button>
 			</div>
 

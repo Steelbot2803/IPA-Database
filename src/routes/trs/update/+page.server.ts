@@ -48,6 +48,13 @@ export async function load({ url }) {
 		};
 	}
 
+	if (jobs.length === 1) {
+	return {
+		jobs: [],
+		job: jobs[0]
+	};
+}
+
 	return {
         blank_no,
 		jobs,

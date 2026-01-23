@@ -20,9 +20,8 @@ export async function load({ url }) {
 
 	let query = supabase
 		.from('blank_stock')
-		.select('*', { count: 'exact' })
-		.order('received_date', { ascending: false })
-/* 		.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1); */
+		.select('*')
+		.order('created_at', { ascending: false })
 
 	/* ---------- SINGLE-COLUMN SEARCH ---------- */
 	if (column && value && column in SEARCHABLE_COLUMNS) {
@@ -31,12 +30,14 @@ export async function load({ url }) {
 		if (columnType === "number") {
 			// numeric equality or partial via text cast
 			query = query.eq(column, Number(value));
+		}else if (columnType === "date") {
+			query = query.eq(column, value);
 		} else {
 			query = query.ilike(column, `%${value}%`);
 		}
 	}
 
-	const { data, count, error } = await query;
+	const { data, error } = await query;
 
 	if (error) {
 		console.error(error);
@@ -44,8 +45,6 @@ export async function load({ url }) {
 
 	return {
 		rows: data ?? [],
-		total: count ?? 0,
-		// page,
 		search: {
 			column,
 			value
