@@ -12,7 +12,7 @@
 		};
 	}}
 >
-	<h1 class="mb-6 text-5xl font-medium text-neutral-400">TRS Dashboard</h1>
+	<h1 class="mb-6 text-5xl font-medium text-neutral-400 text-center">TRS Dashboard</h1>
 
 	<!-- KPI SECTION -->
 	<section class="kpi-grid">

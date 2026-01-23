@@ -17,7 +17,7 @@
 </script>
 
 <div class="bg-neutral text-neutral-400 min-w-full space-y-6">
-	<h1 class="mb-6 text-5xl font-medium text-neutral-400"> Blank Stock Database</h1>
+	<h1 class="mb-6 text-5xl font-medium text-neutral-400 text-center"> Blank Stock Database</h1>
 	<!-- ================= SEARCH BAR ================= --> 
 	<form method="GET" class="gap-3 items-center bg-surface p-4 rounded-md">
 
