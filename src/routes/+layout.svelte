@@ -2,7 +2,6 @@
 	import './layout.css';
 	import '../app.css';
 	import logo from '$lib/assets/ipa_logo.png';
-	import { slide } from 'svelte/transition';
 
 	let { children } = $props();
 	let isOpen = $state(false);
