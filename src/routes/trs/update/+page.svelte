@@ -58,7 +58,7 @@
 </script>
 
 <div class="min-w-full space-y-6">
-	<h1 class="mb-6 text-5xl font-medium text-neutral-400">Loadcell Update</h1>
+	<h1 class="mb-6 text-5xl font-medium text-neutral-400 text-center">Loadcell Update</h1>
 
 	<!-- SEARCH -->
 	<form method="GET" class="bg-surface shadow-card flex gap-3 rounded-md px-6">
