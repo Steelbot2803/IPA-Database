@@ -25,14 +25,14 @@ export const actions = {
 
 		const allowDuplicate = f.allow_duplicate_blank === 'on';
 
-		if (existing && !allowDuplicate) {
+		if (existing?.length && !allowDuplicate) {
 			return fail(400, {
 				error: 'Blank No already exists. Enable override to proceed.'
 			});
 		}
 
 		/* ---------- INSERT ---------- */
-		const { error } = await supabase.from('blank_stock').insert({
+		const { error:insertErr } = await supabase.from('blank_stock').insert({
 			received_date: f.received_date,
 			job_no: f.job_no,
 			model_no: f.model_no,
@@ -42,8 +42,8 @@ export const actions = {
 			remarks: f.remarks || null,
 		});
 
-		if (error) {
-			return fail(500, { error: error.message });
+		if (insertErr) {
+			return fail(500, { error: insertErr.message });
 		}
 
 		return { success: true };
