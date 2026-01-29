@@ -61,6 +61,8 @@
 		['serial_no', 'Serial No'],
 		['customer', 'Customer'],
 		['remarks', 'Remarks'],
+		['curing', 'Curing'],
+		['post_curing', 'Post Curing'],
 		['wiring', 'Wiring'],
 		['tc0', 'TC0'],
 		['cycling', 'Cycling'],
@@ -295,6 +297,35 @@
 							</svg>
 						</button>
 					</th>
+					<th class="{sortColumn === 'derived_status' ? 'bg-green-950/70' : ''} rounded-md py-2">
+						<span>Status</span>
+						<button
+							class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
+							on:click={() => toggleSort('derived_status')}
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down"
+							>
+								{#if sortColumn !== 'derived_status'}
+									<path d="m7 15 5 5 5-5" />
+									<path d="m7 9 5-5 5 5" />
+								{:else if sortAscending}
+									<path d="m7 9 5-5 5 5" />
+								{:else}
+									<path d="m7 15 5 5 5-5" />
+								{/if}
+							</svg>
+						</button>
+					</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -308,6 +339,7 @@
 						<td>{row.model_no ?? '—'}</td>
 						<td>{row.blank_no}</td>
 						<td>{row.serial_no ?? '—'}</td>
+						<td>{row.derived_status}</td>
 						<td>
 							<button
 								class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
