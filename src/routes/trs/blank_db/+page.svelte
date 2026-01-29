@@ -203,7 +203,7 @@
 				<tr>
 					{#each Object.keys(columnMeta) as column}
 						<th
-							class="rounded-md py-2 text-center transition-colors"
+							class="border-b-2 border-neutral-700 rounded-md py-2 text-center transition-colors"
 							class:bg-teal-950={sortColumn === column && !filters[column]}
 							class:bg-lime-950={filters[column] && sortColumn !== column}
 							class:bg-orange-950={sortColumn === column && filters[column]}
@@ -318,7 +318,7 @@
 							{/if}
 						</th>
 					{/each}
-					<th></th>
+					<th class="border-b-2 border-neutral-700 rounded-md py-2 text-center transition-colors"></th>
 				</tr>
 			</thead>
 
