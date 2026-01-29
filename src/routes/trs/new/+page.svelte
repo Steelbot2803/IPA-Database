@@ -72,7 +72,6 @@
 						pattern="\d{7}"
 						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
-					<button type="submit">Check</button>
 					<div class="col-span-6 mb-2 flex items-center gap-2">
 						<input
 							type="checkbox"
