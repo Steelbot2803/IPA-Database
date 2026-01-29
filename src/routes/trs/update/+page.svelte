@@ -180,7 +180,7 @@
 
 				<div class="mb-4 grid grid-cols-8 gap-4">
 					<div class="col-span-2">
-						<label for="job_date" class="text-xl text-neutral-400">Job Date</label>
+						<label for="job_date" class="text-xl text-neutral-400 px-2">Job Date</label>
 						<input
 							type="date"
 							name="job_date"
@@ -191,7 +191,7 @@
 					</div>
 
 					<div class="col-span-2">
-						<label for="job_no" class="text-xl text-neutral-400">Job No</label>
+						<label for="job_no" class="text-xl text-neutral-400 px-2">Job No</label>
 						<input
 							type="text"
 							name="job_no"
@@ -201,7 +201,7 @@
 					</div>
 
 					<div class="col-span-2">
-						<label for="model_no" class="text-xl text-neutral-400">Model No</label>
+						<label for="model_no" class="text-xl text-neutral-400 px-2">Model No</label>
 						<input
 							type="text"
 							name="model_no"
@@ -211,7 +211,7 @@
 					</div>
 
 					<div class="col-span-2">
-						<label for="blank_no" class="text-xl text-neutral-400">Blank No</label>
+						<label for="blank_no" class="text-xl text-neutral-400 px-2">Blank No</label>
 						<input
 							name="blank_no"
 							type="number"
@@ -228,7 +228,7 @@
 				<h2 class="mb-4 text-2xl text-neutral-400">Additional Details</h2>
 				<div class="mb-4 grid grid-cols-8 gap-4">
 					<div class="col-span-2">
-						<label for="job_card_no" class="text-xl text-neutral-400">Job Card No</label>
+						<label for="job_card_no" class="text-xl text-neutral-400 px-2">Job Card No</label>
 						<input
 							name="job_card_no"
 							type="number"
@@ -239,7 +239,7 @@
 					</div>
 
 					<div class="col-span-2">
-						<label for="serial_no" class="text-xl text-neutral-400">Serial No</label>
+						<label for="serial_no" class="text-xl text-neutral-400 px-2">Serial No</label>
 						<input
 							name="serial_no"
 							type="number"
@@ -252,7 +252,7 @@
 					</div>
 
 					<div class="col-span-2">
-						<label for="customer" class="text-xl text-neutral-400">Customer</label>
+						<label for="customer" class="text-xl text-neutral-400 px-2">Customer</label>
 						<textarea
 							name="customer"
 							rows="1"
@@ -284,7 +284,7 @@
 
 			<!-- REMARKS -->
 			<section>
-				<h2 class="mb-4 text-xl text-neutral-400">Remarks</h2>
+				<h2 class="mb-4 text-xl text-neutral-400 px-2">Remarks</h2>
 				<div class="grid grid-cols-2">
 					<textarea
 						name="remarks"

@@ -40,7 +40,7 @@ export async function load({ url }) {
 	let jobs;
 	let error;
 
-	if (blank_no_num != null) {
+	if (!Number.isNaN(blank_no_num)) {
 		({ data: jobs, error } = await supabase
 			.from('trs_prod')
 			.select('*')
@@ -48,7 +48,7 @@ export async function load({ url }) {
 			.order('id', { ascending: false }));
 	}
 
-	if (serial_no_num != null) {
+	if (!Number.isNaN(serial_no_num) && (jobs == null || jobs.length === 0)) {
 		({ data: jobs, error } = await supabase
 			.from('trs_prod')
 			.select('*')

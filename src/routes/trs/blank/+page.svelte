@@ -12,7 +12,7 @@
 			<h2 class="mb-4 text-2xl text-neutral-400">Core Details</h2>
 			<div class="mb-4 grid grid-cols-8 gap-4">
 				<div class="col-span-2">
-					<label for="received_date" class="text-xl text-neutral-400">Received Date *</label>
+					<label for="received_date" class="text-xl text-neutral-400 px-2">Received Date *</label>
 					<input
 						type="date"
 						name="received_date"
@@ -22,7 +22,7 @@
 				</div>
 
 				<div class="col-span-2">
-					<label for="job_no" class="text-xl text-neutral-400">Job No *</label>
+					<label for="job_no" class="text-xl text-neutral-400 px-2">Job No *</label>
 					<input
 						type="text"
 						name="job_no"
@@ -33,7 +33,7 @@
 				</div>
 
 				<div class="col-span-2">
-					<label for="model_no" class="text-xl text-neutral-400">Model No *</label>
+					<label for="model_no" class="text-xl text-neutral-400 px-2">Model No *</label>
 					<input
 						type="text"
 						name="model_no"
@@ -44,7 +44,7 @@
 				</div>
 
 				<div class="col-span-2">
-					<label for="blank_no" class="text-xl text-neutral-400">Blank No *</label>
+					<label for="blank_no" class="text-xl text-neutral-400 px-2">Blank No *</label>
 					<input
 						name="blank_no"
 						type="number"
@@ -73,7 +73,7 @@
 			<h2 class="mb-4 text-2xl text-neutral-400">Additional Details</h2>
 			<div class="mb-4 grid grid-cols-8 gap-4">
 				<div class="col-span-2">
-					<label for="job_card_no" class="text-xl text-neutral-400">Job Card No</label>
+					<label for="job_card_no" class="text-xl text-neutral-400 px-2">Job Card No</label>
 					<input
 						name="job_card_no"
 						type="number"
@@ -82,7 +82,7 @@
 					/>
 				</div>
                 <div class="grid grid-cols-2 col-span-2">
-                <label for="remarks" class="text-xl text-neutral-400">Remarks</label>
+                <label for="remarks" class="text-xl text-neutral-400 px-2">Remarks</label>
 				<textarea
 					name="remarks"
 					class="input focus:ring-primary focus:border-primary col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
