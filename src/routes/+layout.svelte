@@ -38,7 +38,7 @@
 </button>
 
 <div
-	class="grid min-h-screen bg-neutral-950 text-neutral-200 transition-all ease-in-out motion-reduce:transition-none duration-300"
+	class="grid min-h-screen bg-neutral-950 text-neutral-400 transition-all ease-in-out motion-reduce:transition-none duration-300"
 	class:grid-cols-[250px_1fr]={isOpen}
 	class:grid-cols-[0_1fr]={!isOpen}
 >

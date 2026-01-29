@@ -21,7 +21,7 @@ export const actions = {
 			.from('blank_stock')
 			.select('blank_no')
 			.eq('blank_no', f.blank_no)
-			.order('received_date', { ascending: false });
+			.order('id', { ascending: false });
 
 		const allowDuplicate = f.allow_duplicate_blank === 'on';
 

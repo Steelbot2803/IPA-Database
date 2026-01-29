@@ -1,6 +1,19 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 
+	let searchMode: 'blank' | 'serial' = 'blank';
+	let searchValue = '';
+
+	function handleSearchSubmit(e: SubmitEvent) {
+		e.preventDefault();
+
+		if (!searchValue) return;
+
+		const param = searchMode === 'blank' ? `blank_no=${searchValue}` : `serial_no=${searchValue}`;
+
+		window.location.href = `?${param}`;
+	}
+
 	type Job = {
 		id: string;
 		job_date: Date;
@@ -36,8 +49,6 @@
 		notFound?: boolean;
 	};
 
-	let blankNo = data.blank_no ?? '';
-
 	const dateFields: [keyof Job, string][] = [
 		['wiring', 'Wiring'],
 		['tc0', 'TC0'],
@@ -58,18 +69,49 @@
 </script>
 
 <div class="min-w-full space-y-6">
-	<h1 class="mb-6 text-5xl font-medium text-neutral-400 text-center">Loadcell Update</h1>
+	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Loadcell Update</h1>
 
 	<!-- SEARCH -->
-	<form method="GET" class="bg-surface shadow-card flex gap-3 rounded-md px-6">
+	<form
+		method="GET"
+		class="bg-surface shadow-card flex gap-3 rounded-md px-6"
+		onsubmit={handleSearchSubmit}
+	>
+		<div>
+			<button
+				type="button"
+				class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 border-2"
+				class:bg-neutral-900={searchMode === 'blank'}
+				class:text-neutral-100={searchMode === 'blank'}
+				class:shadow-inner={searchMode === 'blank'}
+				class:border-blue-600={searchMode === 'blank'}
+				onclick={() => (searchMode = 'blank')}
+				aria-pressed={searchMode === 'blank'}
+			>
+				Blank No
+			</button>
+
+			<button
+				type="button"
+				class="font-5xl ml-2 cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 border-2"
+				class:bg-neutral-900={searchMode === 'serial'}
+				class:text-neutral-100={searchMode === 'serial'}
+				class:shadow-inner={searchMode === 'serial'}
+				class:border-blue-600={searchMode === 'serial'}
+				onclick={() => (searchMode = 'serial')}
+				aria-pressed={searchMode === 'serial'}
+			>
+				Serial No
+			</button>
+		</div>
 		<input
-			name="blank_no"
-			bind:value={blankNo}
-			placeholder="Enter Blank No"
-			class="w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 text-xl focus:ring-primary focus:border-primary focus:outline-none focus:ring-2"
+			type="number"
+			class="focus:ring-primary focus:border-primary w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-400 focus:ring-2 focus:outline-none"
+			bind:value={searchValue}
+			placeholder={searchMode === 'blank' ? 'Enter Blank No' : 'Enter Serial No'}
 		/>
 		<button
-			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
 		>
 			Search
 		</button>
@@ -79,7 +121,8 @@
 	{#if data.notFound}
 		<div class="max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2">
 			<p class="text-danger rounded-md bg-red-800 px-4 py-3 shadow-lg">
-				No job found for Blank No {blankNo}
+				No job found for {searchMode === 'blank' ? 'Blank No' : 'Serial No'}
+				{searchValue}
 			</p>
 		</div>
 	{/if}
@@ -88,7 +131,7 @@
 	{#if data.jobs && data.jobs.length >= 1}
 		<div class="bg-surface shadow-card rounded-md p-4">
 			<h2 class="mb-3 text-2xl text-neutral-400">Multiple jobs found — select one</h2>
-			<div class="overflow-x-auto w-full text-center text-xl text-neutral-400">
+			<div class="w-full overflow-x-auto text-center text-xl text-neutral-400">
 				<table class="mb-12 w-full border-separate border-spacing-y-2">
 					<thead class="text-neutral-400">
 						<tr>
@@ -110,7 +153,7 @@
 								<td>{job.serial_no ?? '—'}</td>
 								<td>
 									<a
-										href={`/trs/update?blank_no=${job.blank_no}&id=${job.id}`}
+										href={`/trs/update?id=${job.id}`}
 										class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
 									>
 										Edit
@@ -143,7 +186,7 @@
 							name="job_date"
 							bind:value={job.job_date}
 							disabled
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 
@@ -153,7 +196,7 @@
 							type="text"
 							name="job_no"
 							bind:value={job.job_no}
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 
@@ -163,7 +206,7 @@
 							type="text"
 							name="model_no"
 							bind:value={job.model_no}
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 
@@ -174,7 +217,7 @@
 							type="number"
 							bind:value={job.blank_no}
 							disabled
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 				</div>
@@ -191,7 +234,7 @@
 							type="number"
 							bind:value={job.job_card_no}
 							placeholder={job.job_card_no ? '' : 'Job Card No'}
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 
@@ -204,7 +247,7 @@
 							bind:value={job.serial_no}
 							inputmode="numeric"
 							pattern="\d{6}"
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 
@@ -215,7 +258,7 @@
 							rows="1"
 							bind:value={job.customer}
 							placeholder={job.customer ? '' : 'Customer'}
-							class="input focus:ring-primary focus:border-primary col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						></textarea>
 					</div>
 				</div>
@@ -233,7 +276,7 @@
 							name={field}
 							bind:value={job[field]}
 							placeholder={job[field] ? '' : label}
-							class="input focus:ring-primary focus:border-primary col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					{/each}
 				</div>
@@ -245,7 +288,7 @@
 				<div class="grid grid-cols-2">
 					<textarea
 						name="remarks"
-						class="input focus:ring-primary focus:border-primary col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						>{job.remarks ?? ''}</textarea
 					>
 				</div>
@@ -258,6 +301,11 @@
 				>
 					Update Job
 				</button>
+				<a
+					href="/trs/update"
+					class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+					>Cancel</a
+				>
 			</div>
 		</form>
 	{/if}

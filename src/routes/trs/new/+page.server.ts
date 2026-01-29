@@ -46,8 +46,8 @@ export const actions = {
 			.from('blank_stock')
 			.select('*')
 			.eq('blank_no', blank_no)
-			.order('received_date', { ascending: false })
-			.limit(1);
+			.order('id', { ascending: false })
+			.single();
 
 		if (stockErr || !blank) {
 			return fail(400, { error: 'Blank not available in stock' });
@@ -58,7 +58,7 @@ export const actions = {
 			.from('trs_prod_status_view')
 			.select('blank_no')
 			.eq('blank_no', f.blank_no)
-			.order('job_date', { ascending: false });
+			.order('id', { ascending: false });
 
 		const allowDuplicate = f.allow_duplicate_blank === 'on';
 

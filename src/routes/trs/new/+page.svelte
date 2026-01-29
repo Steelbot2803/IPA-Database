@@ -35,7 +35,7 @@
 					<input
 						type="date"
 						name="job_date"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -46,7 +46,7 @@
 						name="job_no"
 						placeholder="Job No *"
 						value={blank?.job_no ?? ''}
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -57,7 +57,7 @@
 						name="model_no"
 						placeholder="Model No *"
 						value="{blank?.model_no ?? ''}"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -70,7 +70,7 @@
 						value={blank?.blank_no ?? ''}
 						inputmode="numeric"
 						pattern="\d{7}"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 					<button type="submit">Check</button>
 					<div class="col-span-6 mb-2 flex items-center gap-2">
@@ -98,7 +98,7 @@
 						type="number"
 						placeholder="Job Card No"
 						value="{blank?.job_card_no ?? ''}"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -110,7 +110,7 @@
 						placeholder="Serial No (6 digits)"
 						inputmode="numeric"
 						pattern="\d{6}"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -120,7 +120,7 @@
 						name="customer"
 						rows="1"
 						placeholder="Customer"
-						class="input focus:ring-primary focus:border-primary col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					></textarea>
 				</div>
 			</div>
@@ -136,7 +136,7 @@
 						type="date"
 						id={field}
 						name={field}
-						class="input focus:ring-primary focus:border-primary col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				{/each}
 			</div>
@@ -148,7 +148,7 @@
 			<div class="grid grid-cols-2">
 				<textarea
 					name="remarks"
-					class="input focus:ring-primary focus:border-primary col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+					class="input focus:ring-primary focus:border-primary col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 				></textarea>
 			</div>
 		</section>
@@ -172,7 +172,7 @@
 
 		<!-- ACTIONS -->
 		<div class="flex justify-end gap-2">
-			<a href="/" class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 cursor-pointer"
+			<a href="/trs/new" class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 cursor-pointer"
 				>Cancel</a
 			>
 			<button

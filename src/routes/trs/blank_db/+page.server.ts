@@ -2,53 +2,99 @@ import { supabase } from '$lib/supabaseClient';
 
 const PAGE_SIZE = 25;
 
-const SEARCHABLE_COLUMNS = {
-	received_date: { type: 'date' },
-	job_no: { type: 'text' },
-	job_card_no: { type: 'number' },
-	model_no: { type: 'text' },
-	blank_no: { type: 'number' }
+const COLUMN_META = {
+	received_date: { type: 'date', label: 'Received Date' },
+	job_no: { type: 'text', label: 'Job No' },
+	job_card_no: { type: 'number', label: 'Job Card No' },
+	model_no: { type: 'text', label: 'Model No' },
+	blank_no: { type: 'number', label: 'Blank No' },
 } as const;
 
-const COLUMN_ALIASES = {
-	received_date: 'Received Date',
-	job_no: 'Job No',
-	job_card_no: 'Job Card No',
-	model_no: 'Model No',
-	blank_no: 'Blank No'
-} as const;
+type ColumnKey = keyof typeof COLUMN_META;
 
-type SearchColumn = keyof typeof SEARCHABLE_COLUMNS;
+type filterop =
+	| 'contains'
+	| 'not_contains'
+	| 'eq'
+	| 'gte'
+	| 'lte'
+	| 'gt'
+	| 'lt'
+	| 'neq'
+	| 'between';
+
+type Filter = {
+	op: filterop;
+	value: string | number | [number, number] | [string, string];
+};
+
+type Filters = Partial<Record<ColumnKey, Filter>>;
 
 export async function load({ url }) {
 	const page = Number(url.searchParams.get('page') ?? 1);
 	const from = (page - 1) * PAGE_SIZE;
 	const to = from + PAGE_SIZE - 1;
-	const column = url.searchParams.get('column') as SearchColumn | null;
-	const value = url.searchParams.get('value');
+	const rawFilters = url.searchParams.get('filters');
 	const sort = url.searchParams.get('sort');
 	const order = url.searchParams.get('order') !== 'desc';
 
 	let query = supabase.from('blank_stock').select('*', { count: 'exact' }).range(from, to);
-
-	/* ---------- SINGLE-COLUMN SEARCH ---------- */
-	if (column && value && column in SEARCHABLE_COLUMNS) {
-		const columnType = SEARCHABLE_COLUMNS[column].type;
-
-		if (columnType === 'number') {
-			// numeric equality or partial via text cast
-			query = query.eq(column, Number(value));
-		} else if (columnType === 'date') {
-			query = query.eq(column, value);
-		} else {
-			query = query.ilike(column, `%${value}%`);
-		}
-	}
+	let filters: Filters = {};
 
 	if (sort) {
 		query = query.order(sort, { ascending: order }).order('id', { ascending: true });
 	} else {
 		query = query.order('id', { ascending: false });
+	}
+
+	if (rawFilters) {
+		try {
+			filters = JSON.parse(rawFilters) as Filters;
+		} catch {
+			filters = {};
+		}
+	}
+
+	for (const [column, filter] of Object.entries(filters) as [ColumnKey, Filter][]) {
+		const meta = COLUMN_META[column];
+		if (!meta || !filter) continue;
+
+		const { op, value } = filter;
+
+		switch (meta.type) {
+			case 'text':
+				if (op === 'contains') {
+					query = query.ilike(column, `%${value}%`);
+				}
+				if (op === 'not_contains') {
+					query = query.or(`${column}.not.ilike.%${value}%,${column}.is.null`);
+				}
+				if (op === 'eq') {
+					query = query.eq(column, value);
+				}
+				break;
+			case 'number':
+				if (op === 'eq') query = query.eq(column, Number(value));
+				if (op === 'neq') query = query.neq(column, Number(value));
+				if (op === 'gt') query = query.gt(column, Number(value));
+				if (op === 'lt') query = query.lt(column, Number(value));
+				if (op === 'gte') query = query.gte(column, Number(value));
+				if (op === 'lte') query = query.lte(column, Number(value));
+				break;
+
+			case 'date':
+				if (op === 'eq') query = query.eq(column, value);
+				if (op === 'neq') query = query.neq(column, value);
+				if (op === 'gt') query = query.gt(column, value);
+				if (op === 'lt') query = query.lt(column, value);
+				if (op === 'gte') query = query.gte(column, value);
+				if (op === 'lte') query = query.lte(column, value);
+				if (op === 'between') {
+					const [from, to] = value as [string, string];
+					query = query.gte(column, from).lte(column, to);
+				}
+				break;
+		}
 	}
 
 	const { data, count, error } = await query.range(from, to);
@@ -62,11 +108,7 @@ export async function load({ url }) {
 		page,
 		pageSize: PAGE_SIZE,
 		total: count ?? 0,
-		search: {
-			column,
-			value
-		},
-		searchableColumns: Object.keys(SEARCHABLE_COLUMNS),
-		columnAliases: COLUMN_ALIASES
+		filters,
+		columnMeta: COLUMN_META
 	};
 }

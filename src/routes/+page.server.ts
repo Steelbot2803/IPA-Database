@@ -23,7 +23,7 @@ export async function load() {
 	const { data: recentJobs } = await supabase
 		.from('trs_prod_status_view')
 		.select('job_no, model_no, blank_no, serial_no, derived_status, updated_at')
-		.order('updated_at', { ascending: false })
+		.order('id', { ascending: false })
 		.limit(10);
 
 	/* ---------- DUPLICATE BLANK NO ---------- */

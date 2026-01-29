@@ -17,7 +17,7 @@
 						type="date"
 						name="received_date"
 						required
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -28,7 +28,7 @@
 						name="job_no"
 						placeholder="Job No *"
 						required
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -39,7 +39,7 @@
 						name="model_no"
 						placeholder="Model No *"
 						required
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -52,7 +52,7 @@
 						inputmode="numeric"
 						pattern="\d{7}"
 						required
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 					<div class="col-span-6 mb-2 flex items-center gap-2">
 						<input
@@ -78,14 +78,14 @@
 						name="job_card_no"
 						type="number"
 						placeholder="Job Card No"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
                 <div class="grid grid-cols-2 col-span-2">
                 <label for="remarks" class="text-xl text-neutral-400">Remarks</label>
 				<textarea
 					name="remarks"
-					class="input focus:ring-primary focus:border-primary col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+					class="input focus:ring-primary focus:border-primary col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 				></textarea>
 			</div>
             </div>

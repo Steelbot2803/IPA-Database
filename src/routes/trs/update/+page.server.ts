@@ -3,22 +3,12 @@ import { supabase } from '$lib/supabaseClient';
 
 /* ---------- LOAD JOB BY BLANK NO ---------- */
 export async function load({ url }) {
-	const blank_no = url.searchParams.get("blank_no");
-	const id = url.searchParams.get("id");
+	const blank_no = url.searchParams.get('blank_no');
+	const serial_no = url.searchParams.get('serial_no');
+	const id = url.searchParams.get('id');
 
-	if (!blank_no || Number.isNaN(blank_no)) {
-		return {
-			jobs: [],
-			job: undefined
-		};
-	}
-
-    if (id) {
-		const { data: job, error } = await supabase
-			.from("trs_prod")
-			.select("*")
-			.eq("id", id)
-			.single();
+	if (id) {
+		const { data: job, error } = await supabase.from('trs_prod').select('*').eq('id', id).single();
 
 		if (error || !job) {
 			return {
@@ -34,11 +24,37 @@ export async function load({ url }) {
 		};
 	}
 
-	const { data: jobs, error } = await supabase
-		.from("trs_prod")
-		.select("*")
-		.eq("blank_no", blank_no)
-		.order("job_date", { ascending: false });
+	const blank_no_num = blank_no ? Number(blank_no) : NaN;
+	const serial_no_num = serial_no ? Number(serial_no) : NaN;
+
+	if (
+		(blank_no === null || Number.isNaN(blank_no_num)) &&
+		(serial_no === null || Number.isNaN(serial_no_num))
+	) {
+		return {
+			jobs: [],
+			job: undefined
+		};
+	}
+
+	let jobs;
+	let error;
+
+	if (blank_no_num != null) {
+		({ data: jobs, error } = await supabase
+			.from('trs_prod')
+			.select('*')
+			.eq('blank_no', blank_no_num)
+			.order('id', { ascending: false }));
+	}
+
+	if (serial_no_num != null) {
+		({ data: jobs, error } = await supabase
+			.from('trs_prod')
+			.select('*')
+			.eq('serial_no', serial_no_num)
+			.order('id', { ascending: false }));
+	}
 
 	if (error || !jobs || jobs.length === 0) {
 		return {
@@ -49,14 +65,14 @@ export async function load({ url }) {
 	}
 
 	if (jobs.length === 1) {
-	return {
-		jobs: [],
-		job: jobs[0]
-	};
-}
+		return {
+			jobs: [],
+			job: jobs[0]
+		};
+	}
 
 	return {
-        blank_no,
+		blank_no,
 		jobs,
 		job: undefined
 	};
@@ -69,11 +85,11 @@ export const actions = {
 
 		/* ---- HARD REQUIREMENT ---- */
 		if (!f.id) {
-			return fail(400, { error: "Row ID missing. Cannot update." });
+			return fail(400, { error: 'Row ID missing. Cannot update.' });
 		}
 
 		const updatePayload = {
-            job_card_no: f.job_card_no || null,
+			job_card_no: f.job_card_no || null,
 			serial_no: f.serial_no || null,
 			customer: f.customer || null,
 			remarks: f.remarks || null,
@@ -95,10 +111,7 @@ export const actions = {
 			dispatch_date: f.dispatch_date || null
 		};
 
-		const { error } = await supabase
-			.from("trs_prod")
-			.update(updatePayload)
-			.eq("id", f.id);
+		const { error } = await supabase.from('trs_prod').update(updatePayload).eq('id', f.id);
 
 		if (error) {
 			return fail(500, { error: error.message });

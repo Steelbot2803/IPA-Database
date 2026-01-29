@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
 
 	export let data;
 
@@ -51,6 +52,130 @@
 		}
 	}
 
+	type ColumnType = 'text' | 'number' | 'date';
+
+	type ColumnMeta = {
+		type: ColumnType;
+		label: string;
+		values?: readonly string[];
+	};
+
+	type Filter = {
+		op: string;
+		value: any;
+	};
+
+	let filters: Record<string, Filter> = data.filters ?? {};
+	let columnMeta: Record<string, ColumnMeta> = data.columnMeta;
+	let activeFilter: string | null = null;
+	let popoverEl: HTMLDivElement | null = null;
+
+	const OPERATORS: Record<ColumnType, { value: string; label: string }[]> = {
+		text: [
+			{ value: 'contains', label: 'Contains' },
+			{ value: 'not_contains', label: 'Does Not Contain' },
+			{ value: 'eq', label: 'Equals' }
+		],
+		number: [
+			{ value: 'eq', label: '=' },
+			{ value: 'neq', label: '≠' },
+			{ value: 'gt', label: '>' },
+			{ value: 'lt', label: '<' },
+			{ value: 'gte', label: '>=' },
+			{ value: 'lte', label: '<=' }
+		],
+		date: [
+			{ value: 'eq', label: 'On' },
+			{ value: 'between', label: 'Between' }
+		]
+	};
+
+	function applyFilters() {
+		const params = new URLSearchParams(window.location.search);
+		params.set('filters', JSON.stringify(filters));
+		params.set('page', '1');
+
+		goto(`?${params.toString()}`);
+	}
+
+	function clearFilter(column: string) {
+		delete filters[column];
+
+		const params = new URLSearchParams(window.location.search);
+		params.set('filters', JSON.stringify(filters));
+		params.set('page', '1');
+
+		goto(`?${params.toString()}`);
+		closePopover();
+	}
+
+	function resetAll() {
+		filters = {};
+		sortColumn = null;
+		sortAscending = true;
+
+		applyFilters();
+		closePopover();
+
+		goto('?', { replaceState: true, noScroll: true });
+	}
+
+	$: isDefaultState = Object.keys(filters).length === 0 && !sortColumn;
+
+	function defaultOperator(column: string) {
+		const type = columnMeta[column].type;
+		if (type === 'text') return 'contains';
+		if (type === 'number') return 'eq';
+		if (type === 'date') return 'eq';
+		return 'eq';
+	}
+
+	function defaultValue(column: string) {
+		const type = columnMeta[column].type;
+		if (type === 'date') return '';
+		if (type === 'number') return '';
+		return '';
+	}
+
+	function ensureFilter(column: string) {
+		if (!filters[column]) {
+			filters[column] = {
+				op: defaultOperator(column),
+				value: defaultValue(column)
+			};
+		}
+	}
+
+	function closePopover() {
+		activeFilter = null;
+	}
+
+	function onKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			closePopover();
+		}
+	}
+
+	function onClickOutside(event: MouseEvent) {
+		if (popoverEl && !popoverEl.contains(event.target as Node)) {
+			closePopover();
+		}
+	}
+
+	onMount(() => {
+		window.addEventListener('keydown', onKeyDown);
+		return () => {
+			window.removeEventListener('keydown', onKeyDown);
+		};
+	});
+
+	onMount(() => {
+		window.addEventListener('mousedown', onClickOutside, true);
+		return () => {
+			window.removeEventListener('mousedown', onClickOutside, true);
+		};
+	});
+
 	const fields: [keyof Job, string][] = [
 		['id', 'ID'],
 		['received_date', 'Received Date'],
@@ -63,210 +188,154 @@
 
 <div class="bg-neutral min-w-full space-y-6 text-neutral-400">
 	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Blank Stock Database</h1>
-	<!-- ================= SEARCH BAR ================= -->
-	<form method="GET" class="bg-surface items-center gap-3 rounded-md p-4">
-		<select
-			name="column"
-			class="w-2/9 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400"
-		>
-			<option value="">Select column</option>
-			{#each data.searchableColumns as col}
-				<option value={col} selected={data.search.column === col}>
-					{data.columnAliases[col as keyof typeof data.columnAliases] ??
-						col.replaceAll('_', ' ').toUpperCase()}
-				</option>
-			{/each}
-		</select>
-
-		<input
-			name="value"
-			value={data.search.value ?? ''}
-			placeholder="Search value"
-			class="w-4/9 flex-1 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400"
-		/>
+	<div class="flex justify-end">
 		<button
-			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-3 hover:bg-neutral-600"
+			disabled={isDefaultState}
+			class="font-5xl cursor-pointer rounded-md bg-red-800 px-4 py-2 hover:bg-red-600 disabled:pointer-events-none disabled:opacity-0"
+			onclick={() => resetAll()}>Reset Filters</button
 		>
-			Apply Filter
-		</button>
-		<a
-			href="/trs/blank_db"
-			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-3 py-3 hover:bg-neutral-600"
-		>
-			Clear Filter
-		</a>
-	</form>
+	</div>
 
 	<!-- ================= TABLE ================= -->
 	<div class="w-full text-center text-xl text-neutral-400">
-		<table class="mb-12 w-full border-separate border-spacing-y-2">
+		<table class="whitespace-nonwrap mb-12 w-full border-separate border-spacing-y-2 select-none">
 			<thead>
 				<tr>
-					<th class="{sortColumn === 'received_date' ? 'bg-green-950/70' : ''} rounded-md py-2">
-						<span>Received Date</span>
-						<button
-							class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
-							on:click={() => toggleSort('received_date')}
+					{#each Object.keys(columnMeta) as column}
+						<th
+							class="border-b-2 border-neutral-700 rounded-md py-2 text-center transition-colors"
+							class:bg-teal-950={sortColumn === column && !filters[column]}
+							class:bg-lime-950={filters[column] && sortColumn !== column}
+							class:bg-orange-950={sortColumn === column && filters[column]}
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down"
+							<span class="text-center">{columnMeta[column].label}</span>
+							<button
+								aria-label="Sort"
+								class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
+								onclick={() => toggleSort(column)}
 							>
-								{#if sortColumn !== 'received_date'}
-									<path d="m7 15 5 5 5-5" />
-									<path d="m7 9 5-5 5 5" />
-								{:else if sortAscending}
-									<path d="m7 9 5-5 5 5" />
-								{:else}
-									<path d="m7 15 5 5 5-5" />
-								{/if}
-							</svg>
-						</button>
-					</th>
-					<th class="{sortColumn === 'job_no' ? 'bg-green-950/70' : ''} rounded-md py-2">
-						<span>Job No</span>
-						<button
-							class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
-							on:click={() => toggleSort('job_no')}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down"
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down"
+								>
+									{#if sortColumn !== column}
+										<path d="m7 15 5 5 5-5" />
+										<path d="m7 9 5-5 5 5" />
+									{:else if sortAscending}
+										<path d="m7 9 5-5 5 5" />
+									{:else}
+										<path d="m7 15 5 5 5-5" />
+									{/if}
+								</svg>
+							</button>
+							<button
+								class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
+								aria-label="Filter"
+								onclick={() => {
+									ensureFilter(column);
+									activeFilter = column;
+								}}
 							>
-								{#if sortColumn !== 'job_no'}
-									<path d="m7 15 5 5 5-5" />
-									<path d="m7 9 5-5 5 5" />
-								{:else if sortAscending}
-									<path d="m7 9 5-5 5 5" />
-								{:else}
-									<path d="m7 15 5 5 5-5" />
-								{/if}
-							</svg>
-						</button>
-					</th>
-					<th class="{sortColumn === 'job_card_no' ? 'bg-green-950/70' : ''} rounded-md py-2">
-						<span>Job Card No</span>
-						<button
-							class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
-							on:click={() => toggleSort('job_card_no')}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down"
-							>
-								{#if sortColumn !== 'job_card_no'}
-									<path d="m7 15 5 5 5-5" />
-									<path d="m7 9 5-5 5 5" />
-								{:else if sortAscending}
-									<path d="m7 9 5-5 5 5" />
-								{:else}
-									<path d="m7 15 5 5 5-5" />
-								{/if}
-							</svg>
-						</button>
-					</th>
-					<th class="{sortColumn === 'model_no' ? 'bg-green-950/70' : ''} rounded-md py-2">
-						<span>Model No</span>
-						<button
-							class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
-							on:click={() => toggleSort('model_no')}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down"
-							>
-								{#if sortColumn !== 'model_no'}
-									<path d="m7 15 5 5 5-5" />
-									<path d="m7 9 5-5 5 5" />
-								{:else if sortAscending}
-									<path d="m7 9 5-5 5 5" />
-								{:else}
-									<path d="m7 15 5 5 5-5" />
-								{/if}
-							</svg>
-						</button>
-					</th>
-					<th class="{sortColumn === 'blank_no' ? 'bg-green-950/70' : ''} rounded-md py-2">
-						<span>Blank No</span>
-						<button
-							class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
-							on:click={() => toggleSort('blank_no')}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down"
-							>
-								{#if sortColumn !== 'blank_no'}
-									<path d="m7 15 5 5 5-5" />
-									<path d="m7 9 5-5 5 5" />
-								{:else if sortAscending}
-									<path d="m7 9 5-5 5 5" />
-								{:else}
-									<path d="m7 15 5 5 5-5" />
-								{/if}
-							</svg>
-						</button>
-					</th>
-					<th></th>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-funnel-icon lucide-funnel"
+									><path
+										d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"
+									/></svg
+								>
+							</button>
+							{#if activeFilter === column}
+								<div
+									bind:this={popoverEl}
+									class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
+								>
+									<select
+										class="focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-400 focus:ring-2 focus:outline-none"
+										bind:value={filters[column].op}
+										onchange={() => {
+											if (!filters[column]) {
+												filters[column] = { op: 'eq', value: '' };
+											}
+										}}
+									>
+										{#each OPERATORS[columnMeta[column].type] as op}
+											<option value={op.value}>{op.label}</option>
+										{/each}
+									</select>
+
+									{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
+										<input
+											class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											type="date"
+											bind:value={filters[column].value[0]}
+										/>
+										<input
+											class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											type="date"
+											bind:value={filters[column].value[1]}
+										/>
+									{:else if columnMeta[column].type === 'date'}
+										<input
+											class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											type="date"
+											bind:value={filters[column].value}
+										/>
+									{:else}
+										<input
+											class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											type={columnMeta[column].type === 'number' ? 'number' : 'text'}
+											bind:value={filters[column].value}
+											onkeydown={(e) => e.key === 'Enter' && applyFilters()}
+										/>
+									{/if}
+									<div class="actions">
+										<button
+											class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+											onclick={applyFilters}>Apply</button
+										>
+										<button
+											class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+											onclick={() => clearFilter(column)}>Clear</button
+										>
+									</div>
+								</div>
+							{/if}
+						</th>
+					{/each}
+					<th class="border-b-2 border-neutral-700 rounded-md py-2 text-center transition-colors"></th>
 				</tr>
 			</thead>
 
 			<tbody>
 				{#each data.rows as row}
 					<tr class="hover:bg-neutral-600/50">
-						<td>{row.received_date ?? '—'}</td>
-						<td>{row.job_no ?? 'STOCK'}</td>
-						<td>{row.job_card_no ?? '—'}</td>
-						<td>{row.model_no}</td>
-						<td>{row.blank_no}</td>
+						{#each Object.keys(columnMeta) as column}
+							<td>{row[column] ?? '—'}</td>
+						{/each}
 						<td
 							><button
 								class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-								on:click={() => (selectedJob = row)}
+								onclick={() => (selectedJob = row)}
 							>
 								Open
-							</button></td
-						>
+							</button>
+						</td>
 					</tr>
 				{/each}
 			</tbody>
@@ -278,7 +347,7 @@
 			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
 			aria-label="First page"
 			disabled={data.page === 1}
-			on:click={() => gotoPage(1)}
+			onclick={() => gotoPage(1)}
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -298,7 +367,7 @@
 			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
 			aria-label="Previous page"
 			disabled={data.page === 1}
-			on:click={() => gotoPage(data.page - 1)}
+			onclick={() => gotoPage(data.page - 1)}
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -320,7 +389,7 @@
 			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
 			aria-label="Next page"
 			disabled={data.page === totalPages}
-			on:click={() => gotoPage(data.page + 1)}
+			onclick={() => gotoPage(data.page + 1)}
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -340,7 +409,7 @@
 			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
 			aria-label="Last page"
 			disabled={data.page === totalPages}
-			on:click={() => gotoPage(totalPages)}
+			onclick={() => gotoPage(totalPages)}
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -369,7 +438,7 @@
 			<div class="flex items-center justify-between">
 				<h2 class="text-5xl font-medium">Blank Details</h2>
 				<button
-					on:click={() => (selectedJob = null)}
+					onclick={() => (selectedJob = null)}
 					class="rounded-md bg-neutral-800 px-4 py-2 text-2xl text-neutral-400 hover:bg-neutral-600"
 				>
 					Close
