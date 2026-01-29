@@ -1,6 +1,19 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 
+	let searchMode: 'blank' | 'serial' = 'blank';
+	let searchValue = '';
+
+	function handleSearchSubmit(e: SubmitEvent) {
+		e.preventDefault();
+
+		if (!searchValue) return;
+
+		const param = searchMode === 'blank' ? `blank_no=${searchValue}` : `serial_no=${searchValue}`;
+
+		window.location.href = `?${param}`;
+	}
+
 	type Job = {
 		id: string;
 		job_date: Date;
@@ -36,8 +49,6 @@
 		notFound?: boolean;
 	};
 
-	let blankNo = data.blank_no ?? '';
-
 	const dateFields: [keyof Job, string][] = [
 		['wiring', 'Wiring'],
 		['tc0', 'TC0'],
@@ -61,15 +72,46 @@
 	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Loadcell Update</h1>
 
 	<!-- SEARCH -->
-	<form method="GET" class="bg-surface shadow-card flex gap-3 rounded-md px-6">
+	<form
+		method="GET"
+		class="bg-surface shadow-card flex gap-3 rounded-md px-6"
+		onsubmit={handleSearchSubmit}
+	>
+		<div>
+			<button
+				type="button"
+				class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 border-2"
+				class:bg-neutral-900={searchMode === 'blank'}
+				class:text-neutral-100={searchMode === 'blank'}
+				class:shadow-inner={searchMode === 'blank'}
+				class:border-blue-600={searchMode === 'blank'}
+				onclick={() => (searchMode = 'blank')}
+				aria-pressed={searchMode === 'blank'}
+			>
+				Blank No
+			</button>
+
+			<button
+				type="button"
+				class="font-5xl ml-2 cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 border-2"
+				class:bg-neutral-900={searchMode === 'serial'}
+				class:text-neutral-100={searchMode === 'serial'}
+				class:shadow-inner={searchMode === 'serial'}
+				class:border-blue-600={searchMode === 'serial'}
+				onclick={() => (searchMode = 'serial')}
+				aria-pressed={searchMode === 'serial'}
+			>
+				Serial No
+			</button>
+		</div>
 		<input
-			name="blank_no"
-			bind:value={blankNo}
-			placeholder="Enter Blank No"
+			type="number"
 			class="focus:ring-primary focus:border-primary w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-400 focus:ring-2 focus:outline-none"
+			bind:value={searchValue}
+			placeholder={searchMode === 'blank' ? 'Enter Blank No' : 'Enter Serial No'}
 		/>
 		<button
-			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
 		>
 			Search
 		</button>
@@ -79,7 +121,8 @@
 	{#if data.notFound}
 		<div class="max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2">
 			<p class="text-danger rounded-md bg-red-800 px-4 py-3 shadow-lg">
-				No job found for Blank No {blankNo}
+				No job found for {searchMode === 'blank' ? 'Blank No' : 'Serial No'}
+				{searchValue}
 			</p>
 		</div>
 	{/if}
@@ -110,7 +153,7 @@
 								<td>{job.serial_no ?? '—'}</td>
 								<td>
 									<a
-										href={`/trs/update?blank_no=${job.blank_no}&id=${job.id}`}
+										href={`/trs/update?id=${job.id}`}
 										class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
 									>
 										Edit
