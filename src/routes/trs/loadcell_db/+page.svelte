@@ -213,7 +213,7 @@
 </script>
 
 <div class="bg-neutral min-w-full space-y-6 text-neutral-400">
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Loadcell Stock Database</h1>
+	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Loadcell Database</h1>
 	<div class="flex justify-end">
 		<button
 			disabled={isDefaultState}
