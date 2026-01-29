@@ -5,7 +5,23 @@
 
 	let { children } = $props();
 	let isOpen = $state(false);
+	let sidebarElement: HTMLElement | undefined;
+	let toggleButtonElement: HTMLButtonElement | undefined;
+
+	function handleClickOutside(event: MouseEvent) {
+		if(!isOpen) return;
+
+		const target = event.target as Node;
+		if (!target) return;
+
+		if (sidebarElement && sidebarElement.contains(target)) return;
+		if (toggleButtonElement && toggleButtonElement.contains(target)) return;
+
+		isOpen = false;
+	}
 </script>
+
+<svelte:document onclick={handleClickOutside} />
 
 <svelte:head>
 	<title>TRS</title>
@@ -15,15 +31,16 @@
 </svelte:head>
 
 <button
+	bind:this={toggleButtonElement}
 	onclick={() => (isOpen = !isOpen)}
 	aria-label="Toggle Navigation"
-	class="fixed top-2 left-2 z-50 rounded-md"
+	class="fixed top-3 left-2 z-50 rounded-md"
 >
 	<div class="w-6 space-y-1">
 		<div
 			class="h-1 w-6 bg-cyan-500/80 transition-transform duration-300"
-			class:rotate-45={isOpen}
 			class:translate-y-2={isOpen}
+			class:rotate-45={isOpen}
 		></div>
 		<div
 			class="h-1 w-6 bg-cyan-500/80 transition-opacity duration-300"
@@ -31,18 +48,19 @@
 		></div>
 		<div
 			class="h-1 w-6 bg-cyan-500/80 transition-transform duration-300"
-			class:-rotate-45={isOpen}
 			class:-translate-y-2={isOpen}
+			class:-rotate-45={isOpen}
 		></div>
 	</div>
 </button>
 
 <div
-	class="grid min-h-screen bg-neutral-950 text-neutral-400 transition-all ease-in-out motion-reduce:transition-none duration-300"
+	class="grid min-h-screen bg-neutral-950 text-neutral-400 transition-all duration-300 ease-in-out motion-reduce:transition-none"
 	class:grid-cols-[250px_1fr]={isOpen}
 	class:grid-cols-[0_1fr]={!isOpen}
 >
 	<aside
+		bind:this={sidebarElement}
 		class="overflow-hidden bg-neutral-900 transition-all duration-300"
 		class:w-[250px]={isOpen}
 		class:w-0={!isOpen}
