@@ -192,7 +192,7 @@
 		<button
 			disabled={isDefaultState}
 			class="font-5xl cursor-pointer rounded-md bg-red-800 px-4 py-2 hover:bg-red-600 disabled:pointer-events-none disabled:opacity-0"
-			onclick={() => resetAll()}>Reset Filters</button
+			onclick={() => resetAll()}>Reset</button
 		>
 	</div>
 
