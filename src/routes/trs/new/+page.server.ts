@@ -15,23 +15,19 @@ export async function load ({ url }) {
 		.from('blank_stock')
 		.select('*')
 		.eq('blank_no', blank_no)
-		.single();
+		.limit(1);
 
-	if (error) {
+	if (error || !data || data.length === 0) {
 		return { blank: null };
 	}
 
-	return { blank: data };
+	return { blank: data[0] };
 };
 
 export const actions = {
 	create: async ({ request }) => {
 		const f = Object.fromEntries(await request.formData());
 		const blank_no = f.blank_no?.toString();
-
-		if (!blank_no) {
-			return fail(400, { error: 'Blank No is required' });
-		}
 
 		/* ---------- REQUIRED FIELDS ---------- */
 		if (!f.job_date || !f.job_no || !f.model_no || !f.blank_no) {
@@ -66,14 +62,14 @@ export const actions = {
 
 		const allowDuplicate = f.allow_duplicate_blank === 'on';
 
-		if (existing && !allowDuplicate) {
+		if (existing?.length && !allowDuplicate) {
 			return fail(400, {
 				error: 'Blank No already exists. Enable override to proceed.'
 			});
 		}
 
 		/* ---------- INSERT ---------- */
-		const { error:insertError } = await supabase.from('trs_prod').insert({
+		const { error:insertErr } = await supabase.from('trs_prod').insert({
 			job_date: f.job_date,
 			job_no: f.job_no,
 			model_no: f.model_no,
@@ -101,8 +97,8 @@ export const actions = {
 			dispatch_date: f.dispatch_date || null
 		});
 
-		if (insertError) {
-			return fail(500, { error: insertError.message });
+		if (insertErr) {
+			return fail(500, { error: insertErr.message });
 		}
 
 		return { success: true };
