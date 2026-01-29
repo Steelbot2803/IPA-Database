@@ -58,7 +58,7 @@
 </script>
 
 <div class="min-w-full space-y-6">
-	<h1 class="mb-6 text-5xl font-medium text-neutral-400 text-center">Loadcell Update</h1>
+	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Loadcell Update</h1>
 
 	<!-- SEARCH -->
 	<form method="GET" class="bg-surface shadow-card flex gap-3 rounded-md px-6">
@@ -66,7 +66,7 @@
 			name="blank_no"
 			bind:value={blankNo}
 			placeholder="Enter Blank No"
-			class="w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 text-xl focus:ring-primary focus:border-primary focus:outline-none focus:ring-2"
+			class="focus:ring-primary focus:border-primary w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-400 focus:ring-2 focus:outline-none"
 		/>
 		<button
 			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
@@ -88,7 +88,7 @@
 	{#if data.jobs && data.jobs.length >= 1}
 		<div class="bg-surface shadow-card rounded-md p-4">
 			<h2 class="mb-3 text-2xl text-neutral-400">Multiple jobs found — select one</h2>
-			<div class="overflow-x-auto w-full text-center text-xl text-neutral-400">
+			<div class="w-full overflow-x-auto text-center text-xl text-neutral-400">
 				<table class="mb-12 w-full border-separate border-spacing-y-2">
 					<thead class="text-neutral-400">
 						<tr>
@@ -143,7 +143,7 @@
 							name="job_date"
 							bind:value={job.job_date}
 							disabled
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 
@@ -153,7 +153,7 @@
 							type="text"
 							name="job_no"
 							bind:value={job.job_no}
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 
@@ -163,7 +163,7 @@
 							type="text"
 							name="model_no"
 							bind:value={job.model_no}
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 
@@ -174,7 +174,7 @@
 							type="number"
 							bind:value={job.blank_no}
 							disabled
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 				</div>
@@ -191,7 +191,7 @@
 							type="number"
 							bind:value={job.job_card_no}
 							placeholder={job.job_card_no ? '' : 'Job Card No'}
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 
@@ -204,7 +204,7 @@
 							bind:value={job.serial_no}
 							inputmode="numeric"
 							pattern="\d{6}"
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					</div>
 
@@ -215,7 +215,7 @@
 							rows="1"
 							bind:value={job.customer}
 							placeholder={job.customer ? '' : 'Customer'}
-							class="input focus:ring-primary focus:border-primary col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						></textarea>
 					</div>
 				</div>
@@ -233,7 +233,7 @@
 							name={field}
 							bind:value={job[field]}
 							placeholder={job[field] ? '' : label}
-							class="input focus:ring-primary focus:border-primary col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+							class="input focus:ring-primary focus:border-primary col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 					{/each}
 				</div>
@@ -245,7 +245,7 @@
 				<div class="grid grid-cols-2">
 					<textarea
 						name="remarks"
-						class="input focus:ring-primary focus:border-primary col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:ring-2 focus:outline-none"
+						class="input focus:ring-primary focus:border-primary col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						>{job.remarks ?? ''}</textarea
 					>
 				</div>
@@ -258,6 +258,11 @@
 				>
 					Update Job
 				</button>
+				<a
+					href="/trs/update"
+					class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+					>Cancel</a
+				>
 			</div>
 		</form>
 	{/if}
