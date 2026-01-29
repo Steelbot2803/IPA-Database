@@ -360,7 +360,7 @@
 				{#each data.rows as row}
 					<tr class="hover:bg-neutral-600/50">
 						{#each Object.keys(columnMeta) as column}
-							<td>{row[column] ?? '—'}</td>
+							<td class="px-6">{row[column] ?? '—'}</td>
 						{/each}
 						<td>
 							<button

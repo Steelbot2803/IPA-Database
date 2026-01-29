@@ -197,7 +197,7 @@
 	</div>
 
 	<!-- ================= TABLE ================= -->
-	<div class="w-full text-center text-xl text-neutral-400">
+	<div class="w-full text-xl text-neutral-400">
 		<table class="whitespace-nonwrap mb-12 w-full border-separate border-spacing-y-2 select-none">
 			<thead>
 				<tr>
@@ -326,7 +326,7 @@
 				{#each data.rows as row}
 					<tr class="hover:bg-neutral-600/50">
 						{#each Object.keys(columnMeta) as column}
-							<td>{row[column] ?? '—'}</td>
+							<td class="px-6">{row[column] ?? '—'}</td>
 						{/each}
 						<td
 							><button
