@@ -288,7 +288,7 @@
 							{#if activeFilter === column}
 								<div
 									bind:this={popoverEl}
-									class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
+									class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-md border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
 								>
 									<select
 										class="focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-400 focus:ring-2 focus:outline-none"
