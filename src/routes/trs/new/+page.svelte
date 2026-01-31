@@ -163,7 +163,7 @@
 
 				{#if form?.success}
 					<p class="rounded-md bg-green-800 px-4 py-3 shadow-lg text-success">
-						Job created successfully
+						Loadcell entry created successfully
 					</p>
 				{/if}
 			</div>

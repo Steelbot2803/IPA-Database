@@ -123,7 +123,7 @@
 	{#if data.success}
 		<div class="max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2">
 			<p class="text-success rounded-md bg-green-800 px-4 py-3 shadow-lg">
-				Job updated successfully
+				Loadcell entry updated successfully
 			</p>
 		</div>
 	{/if}
