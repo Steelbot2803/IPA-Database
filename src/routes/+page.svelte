@@ -50,7 +50,7 @@
 					<thead>
 						<tr>
 							<th>Model No</th>
-							<th>Stock Quantity</th>
+							<th>Quantity</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -71,7 +71,7 @@
 					<thead>
 						<tr>
 							<th>Model No</th>
-							<th>Stock Quantity</th>
+							<th>Quantity</th>
 						</tr>
 					</thead>
 					<tbody>
