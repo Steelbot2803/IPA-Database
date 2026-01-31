@@ -1,11 +1,13 @@
 import { fail } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
+import { redirect } from '@sveltejs/kit';
 
 /* ---------- LOAD JOB BY BLANK NO ---------- */
 export async function load({ url }) {
 	const blank_no = url.searchParams.get('blank_no');
 	const serial_no = url.searchParams.get('serial_no');
 	const id = url.searchParams.get('id');
+	const success = url.searchParams.get('success');
 
 	if (id) {
 		const { data: job, error } = await supabase.from('trs_prod').select('*').eq('id', id).single();
@@ -20,7 +22,8 @@ export async function load({ url }) {
 
 		return {
 			jobs: [],
-			job
+			job,
+			success: success === 'true'
 		};
 	}
 
@@ -33,7 +36,8 @@ export async function load({ url }) {
 	) {
 		return {
 			jobs: [],
-			job: undefined
+			job: undefined,
+			success: success === 'true'
 		};
 	}
 
@@ -67,14 +71,16 @@ export async function load({ url }) {
 	if (jobs.length === 1) {
 		return {
 			jobs: [],
-			job: jobs[0]
+			job: jobs[0],
+			success: success === 'true'
 		};
 	}
 
 	return {
 		blank_no,
 		jobs,
-		job: undefined
+		job: undefined,
+		success: success === 'true'
 	};
 }
 
@@ -117,6 +123,6 @@ export const actions = {
 			return fail(500, { error: error.message });
 		}
 
-		return { success: true };
+		throw redirect(303, `/trs/update?success=true`);
 	}
 };

@@ -12,7 +12,7 @@ export async function load ({ url }) {
 	}
 
 	const { data, error } = await supabase
-		.from('blank_stock')
+		.from('blank_stock_view')
 		.select('*')
 		.eq('blank_no', blank_no)
 		.limit(1);
@@ -43,7 +43,7 @@ export const actions = {
 		}
 
 		const { data: blank, error: stockErr } = await supabase
-			.from('blank_stock')
+			.from('blank_stock_view')
 			.select('*')
 			.eq('blank_no', blank_no)
 			.order('id', { ascending: false })

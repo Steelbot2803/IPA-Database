@@ -45,7 +45,7 @@
 					Blank Stock
 				</h2>
 				<table
-					class="w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-teal-900/20 p-4"
+					class="mb-4 w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-teal-900/20 p-4"
 				>
 					<thead>
 						<tr>
@@ -57,7 +57,28 @@
 						{#each data.blankStock as bstk}
 							<tr>
 								<td>{bstk.model_no}</td>
-								<td>{bstk.count}</td>
+								<td>{bstk.quantity}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+				<h2 class="mb-4 w-full rounded-md bg-teal-900/20 p-4 text-2xl font-medium text-neutral-400">
+					Loadcell Stock
+				</h2>
+				<table
+					class="w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-teal-900/20 p-4"
+				>
+					<thead>
+						<tr>
+							<th>Model No</th>
+							<th>Stock Quantity</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each data.loadcellStock as lcstk}
+							<tr>
+								<td>{lcstk.model_no}</td>
+								<td>{lcstk.quantity}</td>
 							</tr>
 						{/each}
 					</tbody>

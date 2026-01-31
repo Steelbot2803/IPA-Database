@@ -36,6 +36,10 @@ export async function load() {
 
 	const { data: blankStock } = await supabase.from('blank_stock_by_model_no_view').select('*').order('model_no', { ascending: true });
 
+	/* ---------- LOADCELL STOCK BY MODEL NO ---------- */
+
+	const { data: loadcellStock } = await supabase.from('loadcell_stock_by_model_no_view').select('*').order('model_no', { ascending: true });
+
 	return {
 		dispatched: dispatched ?? 0,
 		ready: ready ?? 0,
@@ -43,6 +47,7 @@ export async function load() {
 		recentJobs: recentJobs ?? [],
 		blankDuplicates: blankDuplicates ?? [],
 		serialDuplicates: serialDuplicates ?? [],
-		blankStock: blankStock ?? []
+		blankStock: blankStock ?? [],
+		loadcellStock: loadcellStock ?? []
 	};
 }

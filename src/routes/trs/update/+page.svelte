@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import {goto} from '$app/navigation';
+	import { page } from '$app/state';
 
 	let searchMode: 'blank' | 'serial' = 'blank';
 	let searchValue = '';
@@ -11,7 +13,7 @@
 
 		const param = searchMode === 'blank' ? `blank_no=${searchValue}` : `serial_no=${searchValue}`;
 
-		window.location.href = `?${param}`;
+		goto(`${page.url.pathname}?${param}`);
 	}
 
 	type Job = {
@@ -47,6 +49,7 @@
 		jobs?: Job[];
 		job?: Job;
 		notFound?: boolean;
+		success?: boolean;
 	};
 
 	const dateFields: [keyof Job, string][] = [
@@ -116,6 +119,14 @@
 			Search
 		</button>
 	</form>
+
+	{#if data.success}
+		<div class="max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2">
+			<p class="text-success rounded-md bg-green-800 px-4 py-3 shadow-lg">
+				Job updated successfully
+			</p>
+		</div>
+	{/if}
 
 	<!-- NOT FOUND -->
 	{#if data.notFound}
