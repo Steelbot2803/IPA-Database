@@ -1,5 +1,4 @@
 import { supabase } from '$lib/supabaseClient';
-import { url } from 'inspector';
 
 const PAGE_SIZE = 25;
 
