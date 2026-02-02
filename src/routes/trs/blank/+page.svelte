@@ -1,8 +1,17 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { toast } from '$lib/stores/toast.js';
 	export let form;
 
 	let isBatchMode = false;
+
+	$: if (form?.error || form?.success) {
+		if (form.error) {
+			toast.show(form.error, 'error', 5000);
+		} else if (form.success) {
+			toast.show('Blank entry created successfully', 'success', 5000);
+		}
+	}
 </script>
 
 <div class="min-w-full space-y-6">
@@ -50,7 +59,7 @@
 						type="date"
 						name="received_date"
 						required
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -61,7 +70,7 @@
 						name="job_no"
 						placeholder="Job No *"
 						required
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -72,7 +81,7 @@
 						name="model_no"
 						placeholder="Model No *"
 						required
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -87,16 +96,16 @@
 							inputmode="numeric"
 							pattern="\d{7}"
 							required
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+							class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 						/>
 						<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
 							<input
 								type="checkbox"
 								id="allow_duplicate_blank"
 								name="allow_duplicate_blank"
-								class="accent-primary"
+								class="accent-blue-600"
 							/>
-							<label for="allow_duplicate_blank" class="text-base text-neutral-400 px-2">
+							<label for="allow_duplicate_blank" class="px-2 text-base text-neutral-400">
 								Allow duplicate Blank No
 							</label>
 						</div>
@@ -115,7 +124,7 @@
 								inputmode="numeric"
 								pattern="\d{7}"
 								required
-								class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+								class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 							/>
 							<input
 								name="blank_no_end"
@@ -124,7 +133,7 @@
 								inputmode="numeric"
 								pattern="\d{7}"
 								required
-								class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+								class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 							/>
 						</div>
 						<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
@@ -132,9 +141,9 @@
 								type="checkbox"
 								id="allow_duplicate_blank_batch"
 								name="allow_duplicate_blank"
-								class="accent-primary"
+								class="accent-blue-600"
 							/>
-							<label for="allow_duplicate_blank_batch" class="text-base text-neutral-400 px-2">
+							<label for="allow_duplicate_blank_batch" class="px-2 text-base text-neutral-400">
 								Allow duplicate Blank No
 							</label>
 						</div>
@@ -153,22 +162,22 @@
 						name="job_card_no"
 						type="number"
 						placeholder="Job Card No"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 				<div class="col-span-2 grid grid-cols-2">
 					<label for="remarks" class="px-2 text-xl text-neutral-400">Remarks</label>
 					<textarea
 						name="remarks"
-						class="input focus:ring-primary focus:border-primary col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					></textarea>
 				</div>
 			</div>
 		</section>
 
 		<!-- FEEDBACK -->
-		{#if form?.error || form?.success}
-			<div class="max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2">
+		<!-- <div class="max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2">
+			{#if form?.error || form?.success}
 				{#if form?.error}
 					<p class="text-danger rounded-md bg-red-800 px-4 py-3 shadow-lg">
 						{form.error}
@@ -184,8 +193,8 @@
 						{/if}
 					</p>
 				{/if}
-			</div>
-		{/if}
+			{/if}
+		</div> -->
 
 		<!-- ACTIONS -->
 		<div class="flex justify-end gap-2">

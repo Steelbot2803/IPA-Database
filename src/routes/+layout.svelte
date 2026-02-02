@@ -2,6 +2,7 @@
 	import './layout.css';
 	import '../app.css';
 	import logo from '$lib/assets/ipa_logo.png';
+	import Toasts from '$lib/components/Toasts.svelte';
 
 	let { children } = $props();
 	let isOpen = $state(false);
@@ -20,6 +21,8 @@
 		isOpen = false;
 	}
 </script>
+
+<Toasts />
 
 <svelte:document onclick={handleClickOutside} />
 

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import {goto} from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { toast } from '$lib/stores/toast';
 
 	let searchMode: 'blank' | 'serial' = 'blank';
 	let searchValue = '';
@@ -44,13 +45,13 @@
 		dispatch_date: Date | null;
 	};
 
-	export let data: {
-		blank_no?: string;
-		jobs?: Job[];
-		job?: Job;
-		notFound?: boolean;
-		success?: boolean;
-	};
+	export let data;
+
+	$: if(data.notFound){
+		toast.show('Loadcell entry not found', 'error', 5000);
+	} else if (data.success){
+		toast.show('Loadcell entry updated successfully', 'success', 5000);
+	}
 
 	const dateFields: [keyof Job, string][] = [
 		['wiring', 'Wiring'],
@@ -83,7 +84,7 @@
 		<div>
 			<button
 				type="button"
-				class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 border-2"
+				class="font-5xl cursor-pointer rounded-md border-2 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
 				class:bg-neutral-900={searchMode === 'blank'}
 				class:text-neutral-100={searchMode === 'blank'}
 				class:shadow-inner={searchMode === 'blank'}
@@ -96,7 +97,7 @@
 
 			<button
 				type="button"
-				class="font-5xl ml-2 cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 border-2"
+				class="font-5xl ml-2 cursor-pointer rounded-md border-2 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
 				class:bg-neutral-900={searchMode === 'serial'}
 				class:text-neutral-100={searchMode === 'serial'}
 				class:shadow-inner={searchMode === 'serial'}
@@ -109,7 +110,7 @@
 		</div>
 		<input
 			type="number"
-			class="focus:ring-primary focus:border-primary w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-400 focus:ring-2 focus:outline-none"
+			class="w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 			bind:value={searchValue}
 			placeholder={searchMode === 'blank' ? 'Enter Blank No' : 'Enter Serial No'}
 		/>
@@ -120,23 +121,22 @@
 		</button>
 	</form>
 
-	{#if data.success}
-		<div class="max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2">
-			<p class="text-success rounded-md bg-green-800 px-4 py-3 shadow-lg">
+	<!-- 	{#if data.success}
+		<div class="max-w-base fixed top-8 right-4 z-50 flex flex-col gap-3 text-xl">
+			<p class="rounded-md bg-green-800 px-4 py-3 text-green-100 shadow-md">
 				Loadcell entry updated successfully
 			</p>
 		</div>
 	{/if}
 
-	<!-- NOT FOUND -->
 	{#if data.notFound}
 		<div class="max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2">
-			<p class="text-danger rounded-md bg-red-800 px-4 py-3 shadow-lg">
+			<p class="rounded-md bg-red-800 px-4 py-3 text-red-100 shadow-lg">
 				No job found for {searchMode === 'blank' ? 'Blank No' : 'Serial No'}
 				{searchValue}
 			</p>
 		</div>
-	{/if}
+	{/if} -->
 
 	<!-- IF DUPLICATE BLANK NO -->
 	{#if data.jobs && data.jobs.length >= 1}
@@ -191,44 +191,44 @@
 
 				<div class="mb-4 grid grid-cols-8 gap-4">
 					<div class="col-span-2">
-						<label for="job_date" class="text-xl text-neutral-400 px-2">Job Date</label>
+						<label for="job_date" class="px-2 text-xl text-neutral-400">Job Date</label>
 						<input
 							type="date"
 							name="job_date"
 							bind:value={job.job_date}
 							disabled
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 
 					<div class="col-span-2">
-						<label for="job_no" class="text-xl text-neutral-400 px-2">Job No</label>
+						<label for="job_no" class="px-2 text-xl text-neutral-400">Job No</label>
 						<input
 							type="text"
 							name="job_no"
 							bind:value={job.job_no}
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 
 					<div class="col-span-2">
-						<label for="model_no" class="text-xl text-neutral-400 px-2">Model No</label>
+						<label for="model_no" class="px-2 text-xl text-neutral-400">Model No</label>
 						<input
 							type="text"
 							name="model_no"
 							bind:value={job.model_no}
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 
 					<div class="col-span-2">
-						<label for="blank_no" class="text-xl text-neutral-400 px-2">Blank No</label>
+						<label for="blank_no" class="px-2 text-xl text-neutral-400">Blank No</label>
 						<input
 							name="blank_no"
 							type="number"
 							bind:value={job.blank_no}
 							disabled
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 				</div>
@@ -239,18 +239,18 @@
 				<h2 class="mb-4 text-2xl text-neutral-400">Additional Details</h2>
 				<div class="mb-4 grid grid-cols-8 gap-4">
 					<div class="col-span-2">
-						<label for="job_card_no" class="text-xl text-neutral-400 px-2">Job Card No</label>
+						<label for="job_card_no" class="px-2 text-xl text-neutral-400">Job Card No</label>
 						<input
 							name="job_card_no"
 							type="number"
 							bind:value={job.job_card_no}
 							placeholder={job.job_card_no ? '' : 'Job Card No'}
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 
 					<div class="col-span-2">
-						<label for="serial_no" class="text-xl text-neutral-400 px-2">Serial No</label>
+						<label for="serial_no" class="px-2 text-xl text-neutral-400">Serial No</label>
 						<input
 							name="serial_no"
 							type="number"
@@ -258,18 +258,18 @@
 							bind:value={job.serial_no}
 							inputmode="numeric"
 							pattern="\d{6}"
-							class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 
 					<div class="col-span-2">
-						<label for="customer" class="text-xl text-neutral-400 px-2">Customer</label>
+						<label for="customer" class="px-2 text-xl text-neutral-400">Customer</label>
 						<textarea
 							name="customer"
 							rows="1"
 							bind:value={job.customer}
 							placeholder={job.customer ? '' : 'Customer'}
-							class="input focus:ring-primary focus:border-primary col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+							class="input col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						></textarea>
 					</div>
 				</div>
@@ -287,7 +287,7 @@
 							name={field}
 							bind:value={job[field]}
 							placeholder={job[field] ? '' : label}
-							class="input focus:ring-primary focus:border-primary col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+							class="input col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					{/each}
 				</div>
@@ -295,11 +295,11 @@
 
 			<!-- REMARKS -->
 			<section>
-				<h2 class="mb-4 text-xl text-neutral-400 px-2">Remarks</h2>
+				<h2 class="mb-4 px-2 text-xl text-neutral-400">Remarks</h2>
 				<div class="grid grid-cols-2">
 					<textarea
 						name="remarks"
-						class="input focus:ring-primary focus:border-primary col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						>{job.remarks ?? ''}</textarea
 					>
 				</div>

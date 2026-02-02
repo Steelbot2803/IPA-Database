@@ -3,6 +3,16 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import {
+		ChevronUp,
+		ChevronDown,
+		ChevronsUpDown,
+		ChevronFirst,
+		ChevronLast,
+		ChevronLeft,
+		ChevronRight,
+		Funnel
+	} from 'lucide-svelte';
 
 	export let data;
 
@@ -203,7 +213,7 @@
 				<tr>
 					{#each Object.keys(columnMeta) as column}
 						<th
-							class="border-b-2 border-neutral-700 rounded-md py-2 text-center transition-colors"
+							class="rounded-md border-b-2 border-neutral-700 py-2 text-center transition-colors"
 							class:bg-teal-950={sortColumn === column && !filters[column]}
 							class:bg-lime-950={filters[column] && sortColumn !== column}
 							class:bg-orange-950={sortColumn === column && filters[column]}
@@ -214,27 +224,13 @@
 								class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
 								onclick={() => toggleSort(column)}
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down"
-								>
-									{#if sortColumn !== column}
-										<path d="m7 15 5 5 5-5" />
-										<path d="m7 9 5-5 5 5" />
-									{:else if sortAscending}
-										<path d="m7 9 5-5 5 5" />
-									{:else}
-										<path d="m7 15 5 5 5-5" />
-									{/if}
-								</svg>
+								{#if sortColumn !== column}
+									<ChevronsUpDown size="16" />
+								{:else if sortAscending}
+									<ChevronUp size="16" />
+								{:else}
+									<ChevronDown size="16" />
+								{/if}
 							</button>
 							<button
 								class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
@@ -244,21 +240,7 @@
 									activeFilter = column;
 								}}
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="lucide lucide-funnel-icon lucide-funnel"
-									><path
-										d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"
-									/></svg
-								>
+								<Funnel size="16" />
 							</button>
 							{#if activeFilter === column}
 								<div
@@ -266,7 +248,7 @@
 									class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-md border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
 								>
 									<select
-										class="focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-400 focus:ring-2 focus:outline-none"
+										class="focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-400 focus:ring-2 focus:outline-none"
 										bind:value={filters[column].op}
 										onchange={() => {
 											if (!filters[column]) {
@@ -281,24 +263,24 @@
 
 									{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
 										<input
-											class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
 											type="date"
 											bind:value={filters[column].value[0]}
 										/>
 										<input
-											class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
 											type="date"
 											bind:value={filters[column].value[1]}
 										/>
 									{:else if columnMeta[column].type === 'date'}
 										<input
-											class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
 											type="date"
 											bind:value={filters[column].value}
 										/>
 									{:else}
 										<input
-											class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
 											type={columnMeta[column].type === 'number' ? 'number' : 'text'}
 											bind:value={filters[column].value}
 											onkeydown={(e) => e.key === 'Enter' && applyFilters()}
@@ -318,7 +300,8 @@
 							{/if}
 						</th>
 					{/each}
-					<th class="border-b-2 border-neutral-700 rounded-md py-2 text-center transition-colors"></th>
+					<th class="rounded-md border-b-2 border-neutral-700 py-2 text-center transition-colors"
+					></th>
 				</tr>
 			</thead>
 
@@ -349,19 +332,7 @@
 			disabled={data.page === 1}
 			onclick={() => gotoPage(1)}
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="lucide lucide-chevron-first-icon lucide-chevron-first"
-				><path d="m17 18-6-6 6-6" /><path d="M7 6v12" /></svg
-			>
+			<ChevronFirst size="24" />
 		</button>
 		<button
 			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
@@ -369,18 +340,7 @@
 			disabled={data.page === 1}
 			onclick={() => gotoPage(data.page - 1)}
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="lucide lucide-chevron-left-icon lucide-chevron-left"><path d="m15 18-6-6 6-6" /></svg
-			>
+			<ChevronLeft size="24" />
 		</button>
 
 		<span class="px-4 text-xl"> {data.page} / {totalPages} </span>
@@ -391,19 +351,7 @@
 			disabled={data.page === totalPages}
 			onclick={() => gotoPage(data.page + 1)}
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="lucide lucide-chevron-right-icon lucide-chevron-right"
-				><path d="m9 18 6-6-6-6" /></svg
-			>
+			<ChevronRight size="24" />
 		</button>
 		<button
 			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
@@ -411,19 +359,7 @@
 			disabled={data.page === totalPages}
 			onclick={() => gotoPage(totalPages)}
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="lucide lucide-chevron-last-icon lucide-chevron-last"
-				><path d="m7 18 6-6-6-6" /><path d="M17 6v12" /></svg
-			>
+			<ChevronLast size="24" />
 		</button>
 	</div>
 </div>

@@ -1,8 +1,20 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { toast } from '$lib/stores/toast.js';
+
 	export let form;
 	export let data;
+
 	const blank = data.blank;
+
+	$: if( form?.error || form?.success) {
+		if (form.error) {
+			toast.show(form.error, 'error', 5000);
+		} else if (form.success) {
+			toast.show('Loadcell entry created successfully', 'success', 5000);
+		}
+	}
+
 	const dateFields = [
 		['wiring', 'Wiring'],
 		['tc0', 'TC0'],
@@ -35,7 +47,7 @@
 					<input
 						type="date"
 						name="job_date"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -46,7 +58,7 @@
 						name="job_no"
 						placeholder="Job No *"
 						value={blank?.job_no ?? ''}
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -57,7 +69,7 @@
 						name="model_no"
 						placeholder="Model No *"
 						value="{blank?.model_no ?? ''}"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -70,7 +82,7 @@
 						value={blank?.blank_no ?? ''}
 						inputmode="numeric"
 						pattern="\d{7}"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 					<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
 						<input
@@ -97,7 +109,7 @@
 						type="number"
 						placeholder="Job Card No"
 						value="{blank?.job_card_no ?? ''}"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -109,7 +121,7 @@
 						placeholder="Serial No (6 digits)"
 						inputmode="numeric"
 						pattern="\d{6}"
-						class="input focus:ring-primary focus:border-primary w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				</div>
 
@@ -119,7 +131,7 @@
 						name="customer"
 						rows="1"
 						placeholder="Customer"
-						class="input focus:ring-primary focus:border-primary col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					></textarea>
 				</div>
 			</div>
@@ -135,7 +147,7 @@
 						type="date"
 						id={field}
 						name={field}
-						class="input focus:ring-primary focus:border-primary col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input focus:ring-blue-600 focus:border-blue-600 col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 					/>
 				{/each}
 			</div>
@@ -147,13 +159,13 @@
 			<div class="grid grid-cols-2">
 				<textarea
 					name="remarks"
-					class="input focus:ring-primary focus:border-primary col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+					class="input focus:ring-blue-600 focus:border-blue-600 col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
 				></textarea>
 			</div>
 		</section>
 
 		<!-- FEEDBACK -->
-		{#if form?.error || form?.success}
+		<!-- {#if form?.error || form?.success}
 			<div class="fixed top-8 right-12 z-50 flex max-w-base flex-col gap-2">
 				{#if form?.error}
 					<p class="rounded-md bg-red-800 px-4 py-3 shadow-lg text-danger">
@@ -167,7 +179,7 @@
 					</p>
 				{/if}
 			</div>
-		{/if}
+		{/if} -->
 
 		<!-- ACTIONS -->
 		<div class="flex justify-end gap-2">
