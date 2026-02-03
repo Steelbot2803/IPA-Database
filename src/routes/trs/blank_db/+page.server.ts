@@ -38,7 +38,10 @@ export async function load({ url }) {
 	const rawFilters = url.searchParams.get('filters');
 	const sort = url.searchParams.get('sort');
 	const order = url.searchParams.get('order') !== 'desc';
-	const sortableColumns = new Set<ColumnKey | 'id'>([...Object.keys(COLUMN_META), 'id']);
+	const sortableColumns = new Set<ColumnKey | 'id'>([
+		...(Object.keys(COLUMN_META) as ColumnKey[]),
+		'id'
+	]);
 
 	let query = supabase.from('blank_stock').select('*', { count: 'exact' }).range(from, to);
 	let filters: Filters = {};
