@@ -17,9 +17,15 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		if (!r.planned_dispatch) throw error(400, `Row ${i + 1}: committed date missing`);
 		if (!r.scheduled_month) throw error(400, `Row ${i + 1}: scheduled month missing`);
 
+		const jobCardNo = r.job_card_no ? String(r.job_card_no).trim() : '';
+		const dispatchedQtyValue =
+			r.dispatched_qty === '' || r.dispatched_qty === null || r.dispatched_qty === undefined
+				? null
+				: Number(r.dispatched_qty);
+
 		return {
 			job_no: r.job_no.trim(),
-			job_card_no: r.job_card_no.trim() || null,
+			job_card_no: jobCardNo || null,
 			model_no: r.model_no.trim(),
 			quantity: Number(r.quantity),
 			planned_dispatch: r.planned_dispatch,
@@ -28,7 +34,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			customer: r.customer || null,
 			remarks: r.remarks || null,
 			dimension: r.dimension || null,
-			dispatched_qty: Number(r.dispatched_qty)
+			dispatched_qty: dispatchedQtyValue
 		};
 	});
 
