@@ -7,11 +7,13 @@
 
 	const blank = data.blank;
 
-	$: if( form?.error || form?.success) {
+	$: if( form?.error || form?.success || form?.warn) {
 		if (form.error) {
 			toast.show(form.error, 'error', 5000);
 		} else if (form.success) {
 			toast.show('Loadcell entry created successfully', 'success', 5000);
+		} else if (form.warn){
+			toast.show(form.warn,'warning',5000)
 		}
 	}
 

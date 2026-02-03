@@ -31,15 +31,15 @@ export const actions = {
 
 		/* ---------- REQUIRED FIELDS ---------- */
 		if (!f.job_date || !f.job_no || !f.model_no || !f.blank_no) {
-			return fail(400, { error: 'Missing required fields' });
+			return fail(400, { warn: 'Missing required fields' });
 		}
 
 		if (!isNDigits(f.blank_no.toString(), 7)) {
-			return fail(400, { error: 'Blank No must be exactly 7 digits' });
+			return fail(400, { warn: 'Blank No must be exactly 7 digits' });
 		}
 
 		if (f.serial_no && !isNDigits(f.serial_no.toString(), 6)) {
-			return fail(400, { error: 'Serial No must be exactly 6 digits' });
+			return fail(400, { warn: 'Serial No must be exactly 6 digits' });
 		}
 
 		const { data: blank, error: stockErr } = await supabase
