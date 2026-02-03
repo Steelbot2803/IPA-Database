@@ -4,15 +4,15 @@
 
 	type JobRow = {
 		job_no: string;
-		job_card_no: string;
+		job_card_no: number | '';
 		model_no: string;
-		quantity: string;
+		quantity: number | '';
 		planned_dispatch: Date;
 		actual_dispatch: Date;
 		customer: string;
 		remarks: string;
 		dimension: string;
-		dispatched_qty: string;
+		dispatched_qty: number | '';
 	};
 
 	function emptyRow(): JobRow {
