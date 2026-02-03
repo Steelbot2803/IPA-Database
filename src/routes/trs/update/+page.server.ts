@@ -8,6 +8,7 @@ export async function load({ url }) {
 	const serial_no = url.searchParams.get('serial_no');
 	const id = url.searchParams.get('id');
 	const success = url.searchParams.get('success');
+	const isDigits = (value: string | null) => (value ? /^\d+$/.test(value) : false);
 
 	if (id) {
 		const { data: job, error } = await supabase.from('trs_prod').select('*').eq('id', id).single();
@@ -27,13 +28,10 @@ export async function load({ url }) {
 		};
 	}
 
-	const blank_no_num = blank_no ? Number(blank_no) : NaN;
-	const serial_no_num = serial_no ? Number(serial_no) : NaN;
+	const hasBlankNo = isDigits(blank_no);
+	const hasSerialNo = isDigits(serial_no);
 
-	if (
-		(blank_no === null || Number.isNaN(blank_no_num)) &&
-		(serial_no === null || Number.isNaN(serial_no_num))
-	) {
+	if (!hasBlankNo && !hasSerialNo) {
 		return {
 			jobs: [],
 			job: undefined,
@@ -44,19 +42,19 @@ export async function load({ url }) {
 	let jobs;
 	let error;
 
-	if (!Number.isNaN(blank_no_num)) {
+	if (hasBlankNo && blank_no) {
 		({ data: jobs, error } = await supabase
 			.from('trs_prod')
 			.select('*')
-			.eq('blank_no', blank_no_num)
+			.eq('blank_no', blank_no)
 			.order('id', { ascending: false }));
 	}
 
-	if (!Number.isNaN(serial_no_num) && (jobs == null || jobs.length === 0)) {
+	if (hasSerialNo && serial_no && (jobs == null || jobs.length === 0)) {
 		({ data: jobs, error } = await supabase
 			.from('trs_prod')
 			.select('*')
-			.eq('serial_no', serial_no_num)
+			.eq('serial_no', serial_no)
 			.order('id', { ascending: false }));
 	}
 

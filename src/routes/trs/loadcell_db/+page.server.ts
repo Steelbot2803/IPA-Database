@@ -33,17 +33,22 @@ type Filter = {
 type Filters = Partial<Record<ColumnKey, Filter>>;
 
 export async function load({ url }) {
-	const page = Number(url.searchParams.get('page') ?? 1);
+	const rawPage = Number(url.searchParams.get('page') ?? 1);
+	const page = Number.isFinite(rawPage) && rawPage > 0 ? Math.floor(rawPage) : 1;
 	const from = (page - 1) * PAGE_SIZE;
 	const to = from + PAGE_SIZE - 1;
 	const rawFilters = url.searchParams.get('filters');
 	const sort = url.searchParams.get('sort');
 	const order = url.searchParams.get('order') !== 'desc';
+	const sortableColumns = new Set<ColumnKey | 'id'>([
+		...(Object.keys(COLUMN_META) as ColumnKey[]),
+		'id'
+	]);
 
 	let query = supabase.from('trs_prod_status_view').select('*', { count: 'exact' }).range(from, to);
 	let filters: Filters = {};
 
-	if (sort) {
+	if (sort && sortableColumns.has(sort as ColumnKey | 'id')) {
 		query = query.order(sort, { ascending: order }).order('id', { ascending: true });
 	} else {
 		query = query.order('id', { ascending: false });
