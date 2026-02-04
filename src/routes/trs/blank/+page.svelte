@@ -4,6 +4,7 @@
 	export let form;
 
 	let isBatchMode = false;
+	let saving = false;
 
 	$: if (form?.error || form?.success) {
 		if (form.error) {
@@ -22,7 +23,7 @@
 		<button
 			type="button"
 			class="font-5xl cursor-pointer rounded-md border-2 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
-			class:bg-neutral-900={isBatchMode === false}
+			class:bg-neutral-800={isBatchMode === false}
 			class:text-neutral-100={isBatchMode === false}
 			class:shadow-inner={isBatchMode === false}
 			class:border-blue-600={isBatchMode === false}
@@ -34,7 +35,7 @@
 		<button
 			type="button"
 			class="font-5xl cursor-pointer rounded-md border-2 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
-			class:bg-neutral-900={isBatchMode === true}
+			class:bg-neutral-800={isBatchMode === true}
 			class:text-neutral-100={isBatchMode === true}
 			class:shadow-inner={isBatchMode === true}
 			class:border-blue-600={isBatchMode === true}
@@ -45,7 +46,17 @@
 		</button>
 	</div>
 
-	<form method="POST" use:enhance class="bg-surface shadow-card space-y-8 rounded-md p-6">
+	<form
+		method="POST"
+		use:enhance={() => {
+			saving = true;
+			return async ({ update }) => {
+				saving = false;
+				await update();
+			};
+		}}
+		class="bg-surface shadow-card space-y-8 rounded-md p-6"
+	>
 		<!-- Hidden field to indicate batch mode -->
 		<input type="hidden" name="is_batch" value={isBatchMode ? 'true' : 'false'} />
 
@@ -59,7 +70,7 @@
 						type="date"
 						name="received_date"
 						required
-						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
@@ -70,7 +81,7 @@
 						name="job_no"
 						placeholder="Job No *"
 						required
-						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
@@ -81,7 +92,7 @@
 						name="model_no"
 						placeholder="Model No *"
 						required
-						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
@@ -96,7 +107,7 @@
 							inputmode="numeric"
 							pattern="\d{7}"
 							required
-							class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 						<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
 							<input
@@ -124,7 +135,7 @@
 								inputmode="numeric"
 								pattern="\d{7}"
 								required
-								class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+								class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							/>
 							<input
 								name="blank_no_end"
@@ -133,7 +144,7 @@
 								inputmode="numeric"
 								pattern="\d{7}"
 								required
-								class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+								class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							/>
 						</div>
 						<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
@@ -162,14 +173,14 @@
 						name="job_card_no"
 						type="number"
 						placeholder="Job Card No"
-						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 				<div class="col-span-2 grid grid-cols-2">
 					<label for="remarks" class="px-2 text-xl text-neutral-400">Remarks</label>
 					<textarea
 						name="remarks"
-						class="input focus:ring-blue-600 focus:border-blue-600 col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					></textarea>
 				</div>
 			</div>
@@ -206,9 +217,10 @@
 			<button
 				type="submit"
 				formaction="?/create"
-				class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+				class="font-5xl diabled:opacity-50 cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:cursor-not-allowed"
+				disabled={saving}
 			>
-				{isBatchMode ? 'Create Batch Entries' : 'Create Entry'}
+				{saving ? 'Saving...' : isBatchMode ? 'Create Batch Entries' : 'Create Entry'}
 			</button>
 		</div>
 	</form>

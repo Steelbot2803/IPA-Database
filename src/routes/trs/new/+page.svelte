@@ -4,16 +4,17 @@
 
 	export let form;
 	export let data;
+	let saving = false;
 
 	const blank = data.blank;
 
-	$: if( form?.error || form?.success || form?.warn) {
+	$: if (form?.error || form?.success || form?.warn) {
 		if (form.error) {
 			toast.show(form.error, 'error', 5000);
 		} else if (form.success) {
 			toast.show('Loadcell entry created successfully', 'success', 5000);
-		} else if (form.warn){
-			toast.show(form.warn,'warning',5000)
+		} else if (form.warn) {
+			toast.show(form.warn, 'warning', 5000);
 		}
 	}
 
@@ -37,46 +38,56 @@
 </script>
 
 <div class="min-w-full space-y-6">
-	<h1 class="mb-6 text-5xl font-medium text-neutral-400 text-center">Loadcell Entry</h1>
+	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Loadcell Entry</h1>
 
-	<form method="POST" use:enhance class="bg-surface shadow-card space-y-8 rounded-md p-6">
+	<form
+		method="POST"
+		use:enhance={() => {
+			saving = true;
+			return async ({ update }) => {
+				saving = false;
+				await update();
+			};
+		}}
+		class="bg-surface shadow-card space-y-8 rounded-md p-6"
+	>
 		<!-- CORE DETAILS -->
 		<section>
 			<h2 class="mb-4 text-2xl text-neutral-400">Core Details</h2>
 			<div class="mb-4 grid grid-cols-8 gap-4">
 				<div class="col-span-2">
-					<label for="job_date" class="text-xl text-neutral-400 px-2">Job Date *</label>
+					<label for="job_date" class="px-2 text-xl text-neutral-400">Job Date *</label>
 					<input
 						type="date"
 						name="job_date"
-						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="job_no" class="text-xl text-neutral-400 px-2">Job No *</label>
+					<label for="job_no" class="px-2 text-xl text-neutral-400">Job No *</label>
 					<input
 						type="text"
 						name="job_no"
 						placeholder="Job No *"
 						value={blank?.job_no ?? ''}
-						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="model_no" class="text-xl text-neutral-400 px-2">Model No *</label>
+					<label for="model_no" class="px-2 text-xl text-neutral-400">Model No *</label>
 					<input
 						type="text"
 						name="model_no"
 						placeholder="Model No *"
-						value="{blank?.model_no ?? ''}"
-						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						value={blank?.model_no ?? ''}
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="blank_no" class="text-xl text-neutral-400 px-2">Blank No *</label>
+					<label for="blank_no" class="px-2 text-xl text-neutral-400">Blank No *</label>
 					<input
 						name="blank_no"
 						type="number"
@@ -84,7 +95,7 @@
 						value={blank?.blank_no ?? ''}
 						inputmode="numeric"
 						pattern="\d{7}"
-						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 					<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
 						<input
@@ -93,7 +104,7 @@
 							name="allow_duplicate_blank"
 							class="accent-neutral-800"
 						/>
-						<label for="allow_duplicate_blank" class="text-base text-neutral-400 px-1">
+						<label for="allow_duplicate_blank" class="px-1 text-base text-neutral-400">
 							Allow duplicate Blank No
 						</label>
 					</div>
@@ -105,35 +116,35 @@
 			<h2 class="mb-4 text-2xl text-neutral-400">Additional Details</h2>
 			<div class="mb-4 grid grid-cols-8 gap-4">
 				<div class="col-span-2">
-					<label for="job_card_no" class="text-xl text-neutral-400 px-2">Job Card No</label>
+					<label for="job_card_no" class="px-2 text-xl text-neutral-400">Job Card No</label>
 					<input
 						name="job_card_no"
 						type="number"
 						placeholder="Job Card No"
-						value="{blank?.job_card_no ?? ''}"
-						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						value={blank?.job_card_no ?? ''}
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="serial_no" class="text-xl text-neutral-400 px-2">Serial No</label>
+					<label for="serial_no" class="px-2 text-xl text-neutral-400">Serial No</label>
 					<input
 						name="serial_no"
 						type="number"
 						placeholder="Serial No (6 digits)"
 						inputmode="numeric"
 						pattern="\d{6}"
-						class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="customer" class="text-xl text-neutral-400 px-2">Customer</label>
+					<label for="customer" class="px-2 text-xl text-neutral-400">Customer</label>
 					<textarea
 						name="customer"
 						rows="1"
 						placeholder="Customer"
-						class="input focus:ring-blue-600 focus:border-blue-600 col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					></textarea>
 				</div>
 			</div>
@@ -149,7 +160,7 @@
 						type="date"
 						id={field}
 						name={field}
-						class="input focus:ring-blue-600 focus:border-blue-600 col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+						class="input col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				{/each}
 			</div>
@@ -157,11 +168,11 @@
 
 		<!-- REMARKS -->
 		<section>
-			<h2 class="mb-4 text-2xl text-neutral-400 px-2">Remarks</h2>
+			<h2 class="mb-4 px-2 text-2xl text-neutral-400">Remarks</h2>
 			<div class="grid grid-cols-2">
 				<textarea
 					name="remarks"
-					class="input focus:ring-blue-600 focus:border-blue-600 col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:ring-2 focus:outline-none"
+					class="input col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 				></textarea>
 			</div>
 		</section>
@@ -185,15 +196,18 @@
 
 		<!-- ACTIONS -->
 		<div class="flex justify-end gap-2">
-			<a href="/trs/new" class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 cursor-pointer"
+			<a
+				href="/trs/new"
+				class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
 				>Cancel</a
 			>
 			<button
 				type="submit"
 				formaction="?/create"
-				class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 cursor-pointer"
+				class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
+				disabled={saving}
 			>
-				Create Job
+				{saving ? 'Saving...' : 'Create Entry'}
 			</button>
 		</div>
 	</form>

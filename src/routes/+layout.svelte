@@ -64,7 +64,7 @@
 >
 	<aside
 		bind:this={sidebarElement}
-		class="overflow-hidden bg-neutral-900 transition-all duration-300"
+		class="overflow-hidden bg-neutral-800 transition-all duration-300"
 		class:w-[250px]={isOpen}
 		class:w-0={!isOpen}
 		class:p-4={isOpen}
@@ -83,29 +83,40 @@
 			<h1 class="mb-6 text-center text-4xl">Transducer</h1>
 
 			<nav class="space-y-6" aria-label="Main Navigation">
-				<a href="/" class="block rounded-md px-3 py-2 text-2xl hover:bg-neutral-600">
-					| Dashboard
+				<a href="/" class="block px-3 py-2 text-2xl hover:bg-neutral-600 border-b-2 text-center">
+					Dashboard
 				</a>
-				<nav class="space-y-1" aria-label="Incoming Blanks Navigation">
-					<a href="/trs/blank" class="block rounded-md px-3 py-2 text-2xl hover:bg-neutral-600">
-						| Blank Entry
+				<nav class="space-y-1 border-b-2 py-2" aria-label="Production Plan Navigation">
+					<h2 class="rounded-md px-3 py-2 text-2xl bg-neutral-950">Production Plan</h2>
+					<a href="/trs/prod_plan" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+						| Entry
 					</a>
-					<a href="/trs/blank_db" class="block rounded-md px-3 py-2 text-2xl hover:bg-neutral-600">
-						| Blank Stock DB
+					<a href="/trs/prod_plan_update" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+						| Update
 					</a>
 				</nav>
-				<nav class="space-y-1" aria-label="Jobs Navigation">
-					<a href="/trs/new" class="block rounded-md px-3 py-2 text-2xl hover:bg-neutral-600">
-						| Loadcell Entry
+				<nav class="space-y-1 border-b-2 py-2" aria-label="Incoming Blanks Navigation">
+					<h2 class="rounded-md px-3 py-2 text-2xl bg-neutral-950">Blank</h2>
+					<a href="/trs/blank" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+						| Entry
 					</a>
-					<a href="/trs/update" class="block rounded-md px-3 py-2 text-2xl hover:bg-neutral-600">
-						| Loadcell Update
+					<a href="/trs/blank_db" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+						| Database
+					</a>
+				</nav>
+				<nav class="space-y-1 border-b-2 py-2" aria-label="Jobs Navigation">
+					<h2 class="rounded-md px-3 py-2 text-2xl bg-neutral-950">Loadcell</h2>
+					<a href="/trs/new" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+						| Entry
+					</a>
+					<a href="/trs/update" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+						| Update
 					</a>
 					<a
 						href="/trs/loadcell_db"
-						class="block rounded-md px-3 py-2 text-2xl hover:bg-neutral-600"
+						class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600"
 					>
-						| Loadcell DB
+						| Database
 					</a>
 				</nav>
 			</nav>

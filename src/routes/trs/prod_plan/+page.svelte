@@ -33,7 +33,7 @@
 	let rows: JobRow[] = [emptyRow()];
 	let submitting = false;
 	const today = new Date();
-	const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+	const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 2).padStart(2, '0')}`;
 	let scheduledMonth = defaultMonth;
 
 	function addRow() {
@@ -77,105 +77,135 @@
 	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Monthly Production Plan</h1>
 
 	<div class="bg-surface shadow-card space-y-6 rounded-md p-6">
-		<div class="grid grid-cols-12 gap-4">
-			<div class="col-span-3">
-				<label for="scheduled_month" class="px-2 text-xl text-neutral-400">
-					Scheduled Month
-				</label>
-				<input
-					id="scheduled_month"
-					class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					type="month"
-					bind:value={scheduledMonth}
-				/>
-			</div>
-		</div>
-
-		{#each rows as row, index}
-			<div class="grid grid-cols-12 items-center gap-3">
-				<input
-					class="input col-span-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					placeholder="Job No"
-					bind:value={row.job_no}
-				/>
-				<input
-					class="input col-span-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					placeholder="Job Card"
-					type="number"
-					bind:value={row.job_card_no}
-				/>
-				<input
-					class="input col-span-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					placeholder="Model No"
-					bind:value={row.model_no}
-				/>
-				<input
-					class="input col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					type="number"
-					placeholder="Qty"
-					bind:value={row.quantity}
-				/>
-				<input
-					class="input col-span-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					type="date"
-					bind:value={row.planned_dispatch}
-				/>
-				<input
-					class="input col-span-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					type="date"
-					bind:value={row.actual_dispatch}
-				/>
-				<input
-					class="input col-span-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					placeholder="Customer"
-					bind:value={row.customer}
-				/>
-				<input
-					class="input col-span-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					placeholder="Remarks"
-					bind:value={row.remarks}
-				/>
-				<input
-					class="input col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					placeholder="Dimension"
-					bind:value={row.dimension}
-				/>
-				<input
-					class="input col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-					type="number"
-					placeholder="Dispatched"
-					bind:value={row.dispatched_qty}
-				/>
-				<div class="col-span-1 flex justify-center">
-					<button
-						type="button"
-						on:click={() => removeRow(index)}
-						disabled={rows.length === 1}
-						class="rounded-md border border-neutral-700 p-2 text-neutral-300 transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
-						aria-label="Remove row"
-					>
-						<Trash2 size={18} />
-					</button>
+		<section>
+			<div class="mb-4 grid grid-cols-8 gap-4">
+				<div class="col-span-2">
+					<label for="scheduled_month" class="px-2 text-xl text-neutral-400">
+						Scheduled Month *
+					</label>
+					<input
+						id="scheduled_month"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						type="month"
+						bind:value={scheduledMonth}
+					/>
 				</div>
 			</div>
-		{/each}
+		</section>
 
-		<div class="flex gap-3">
+		<section>
+			{#each rows as row, index}
+				<div class="mb-4 grid grid-cols-8 gap-4 border-b-2 border-neutral-400 py-3">
+					<div class="col-span-2">
+						<label for="job_no" class="px-2 text-xl text-neutral-400">Job No *</label>
+						<input
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							placeholder="Job No *"
+							bind:value={row.job_no}
+						/>
+					</div>
+					<div class="col-span-2">
+						<label for="model_no" class="px-2 text-xl text-neutral-400">Model No *</label>
+						<input
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							placeholder="Model No *"
+							bind:value={row.model_no}
+						/>
+					</div>
+					<div class="col-span-2">
+						<label for="quantity" class="px-2 text-xl text-neutral-400">Total Quantity *</label>
+						<input
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							type="number"
+							placeholder="Quantity *"
+							bind:value={row.quantity}
+						/>
+					</div>
+					<div class="col-span-2">
+						<label for="planned_dispatch" class="px-2 text-xl text-neutral-400"
+							>Planned Dispatch *</label
+						>
+						<input
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							type="date"
+							bind:value={row.planned_dispatch}
+						/>
+					</div>
+					<div class="col-span-2">
+						<label for="job_card_no" class="px-2 text-xl text-neutral-400">Job Card No</label>
+						<input
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							placeholder="Job Card No"
+							type="number"
+							bind:value={row.job_card_no}
+						/>
+					</div>
+					<div class="col-span-2">
+						<label for="customer" class="px-2 text-xl text-neutral-400">Customer</label>
+						<input
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							placeholder="Customer"
+							bind:value={row.customer}
+						/>
+					</div>
+					<div class="col-span-2">
+						<label for="job_no" class="px-2 text-xl text-neutral-400">Dispatched Quantity</label>
+						<input
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							type="number"
+							placeholder="Dispatched Quantity"
+							bind:value={row.dispatched_qty}
+						/>
+					</div>
+					<div class="col-span-2">
+						<label for="actual_dispatch" class="px-2 text-xl text-neutral-400"
+							>Actual Dispatch</label
+						>
+						<input
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							type="date"
+							bind:value={row.actual_dispatch}
+						/>
+					</div>
+					<div class="col-span-7">
+						<label for="job_no" class="px-2 text-xl text-neutral-400">Remarks</label>
+						<textarea
+							name="Remarks"
+							bind:value={row.remarks}
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							>Remarks</textarea
+						>
+					</div>
+					<div class="relative justify-self-end">
+						<button
+							type="button"
+							onclick={() => removeRow(index)}
+							disabled={rows.length === 1}
+							class="absolute right-2 bottom-2 font-5xl rounded-md bg-neutral-800 px-2 py-2 hover:bg-neutral-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+							aria-label="Remove row"
+						>
+							<Trash2 size={24} />
+						</button>
+					</div>
+				</div>
+			{/each}
+		</section>
+		<div class="flex gap-3 justify-end">
 			<button
 				type="button"
-				on:click={addRow}
-				class="rounded-md border border-neutral-700 p-2 text-neutral-300 transition hover:bg-neutral-800"
+				onclick={addRow}
+				class="font-5xl rounded-md bg-neutral-800 px-2 py-2 hover:bg-neutral-600 cursor-pointer"
 				aria-label="Add row"
 			>
-				<Plus size={18} />
+				<Plus size={24} />
 			</button>
 			<button
 				type="button"
-				on:click={submit}
+				onclick={submit}
 				disabled={submitting}
-				class="rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 text-neutral-200 transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-50"
+				class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
 			>
-				{submitting ? 'Saving…' : 'Submit'}
+				{submitting ? 'Saving...' : 'Submit'}
 			</button>
 		</div>
 	</div>

@@ -417,7 +417,7 @@
 
 			<div class="grid grid-cols-12 gap-8 text-center text-xl">
 				{#each fields as [key, label]}
-					<div class="col-span-4 rounded-md bg-neutral-900/80 p-4">
+					<div class="col-span-4 rounded-md bg-neutral-800/80 p-4">
 						<p class="rounded-md bg-neutral-700/80 p-4 text-xl text-neutral-400">{label}</p>
 						<p class="p-2">{selectedJob[key] ?? '—'}</p>
 					</div>

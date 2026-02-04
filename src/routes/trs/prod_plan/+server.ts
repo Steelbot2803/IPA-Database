@@ -38,7 +38,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		};
 	});
 
-	const { error: dbError } = await supabase.from('trs_prod_plan').insert(cleaned);
+	const { error: dbError } = await supabase
+		.from('trs_prod_plan')
+		.insert(cleaned)
+		.order('id', { ascending: false });
 
 	if (dbError) throw error(500, dbError.message);
 

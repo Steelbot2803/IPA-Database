@@ -6,15 +6,19 @@
 
 	let searchMode: 'blank' | 'serial' = 'blank';
 	let searchValue = '';
+	let saving = false;
+	let searching = false;
 
-	function handleSearchSubmit(e: SubmitEvent) {
+	async function handleSearchSubmit(e: SubmitEvent) {
 		e.preventDefault();
 
 		if (!searchValue) return;
 
 		const param = searchMode === 'blank' ? `blank_no=${searchValue}` : `serial_no=${searchValue}`;
 
-		goto(`${page.url.pathname}?${param}`);
+		searching = true;
+		await goto(`${page.url.pathname}?${param}`);
+		searching = false;
 	}
 
 	type Job = {
@@ -47,9 +51,9 @@
 
 	export let data;
 
-	$: if(data.notFound){
+	$: if (data.notFound) {
 		toast.show('Loadcell entry not found', 'error', 5000);
-	} else if (data.success){
+	} else if (data.success) {
 		toast.show('Loadcell entry updated successfully', 'success', 5000);
 	}
 
@@ -85,7 +89,7 @@
 			<button
 				type="button"
 				class="font-5xl cursor-pointer rounded-md border-2 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
-				class:bg-neutral-900={searchMode === 'blank'}
+				class:bg-neutral-800={searchMode === 'blank'}
 				class:text-neutral-100={searchMode === 'blank'}
 				class:shadow-inner={searchMode === 'blank'}
 				class:border-blue-600={searchMode === 'blank'}
@@ -98,7 +102,7 @@
 			<button
 				type="button"
 				class="font-5xl ml-2 cursor-pointer rounded-md border-2 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
-				class:bg-neutral-900={searchMode === 'serial'}
+				class:bg-neutral-800={searchMode === 'serial'}
 				class:text-neutral-100={searchMode === 'serial'}
 				class:shadow-inner={searchMode === 'serial'}
 				class:border-blue-600={searchMode === 'serial'}
@@ -115,9 +119,10 @@
 			placeholder={searchMode === 'blank' ? 'Enter Blank No' : 'Enter Serial No'}
 		/>
 		<button
-			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
+			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
+			disabled={searching}
 		>
-			Search
+			{searching ? 'Searching...' : 'Search'}
 		</button>
 	</form>
 
@@ -156,7 +161,7 @@
 					</thead>
 					<tbody>
 						{#each data.jobs as job}
-							<tr class="border-b border-neutral-800 hover:bg-neutral-900">
+							<tr class="border-b border-neutral-800 hover:bg-neutral-800">
 								<td class="py-3">{job.job_date}</td>
 								<td>{job.job_no}</td>
 								<td>{job.model_no}</td>
@@ -182,7 +187,17 @@
 	{#if data.job}
 		{@const job = data.job}
 
-		<form method="POST" use:enhance class="bg-surface shadow-card space-y-8 rounded-md p-6">
+		<form
+			method="POST"
+			use:enhance={() => {
+				saving = true;
+				return async ({ update }) => {
+					saving = false;
+					await update();
+				};
+			}}
+			class="bg-surface shadow-card space-y-8 rounded-md p-6"
+		>
 			<input type="hidden" name="id" value={job.id} />
 
 			<!-- CORE INFO -->
@@ -307,16 +322,17 @@
 
 			<!-- ACTION -->
 			<div class="flex justify-end gap-3">
-				<button
-					class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-				>
-					Update Job
-				</button>
 				<a
 					href="/trs/update"
 					class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
 					>Cancel</a
 				>
+				<button
+					class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
+					disabled={saving}
+				>
+					{saving ? 'Saving...' : 'Update Entry'}
+				</button>
 			</div>
 		</form>
 	{/if}
