@@ -58,7 +58,7 @@
 </button>
 
 <div
-	class="grid min-h-screen bg-neutral-950 text-neutral-400 transition-all duration-300 ease-in-out motion-reduce:transition-none"
+	class="grid min-h-screen bg-neutral-950 text-neutral-200 transition-all duration-300 ease-in-out motion-reduce:transition-none"
 	class:grid-cols-[250px_1fr]={isOpen}
 	class:grid-cols-[0_1fr]={!isOpen}
 >
@@ -83,7 +83,7 @@
 			<h1 class="mb-6 text-center text-4xl">Transducer</h1>
 
 			<nav class="space-y-6" aria-label="Main Navigation">
-				<a href="/" class="block px-3 py-2 text-2xl hover:bg-neutral-600 border-b-2 text-center">
+				<a href="/" class="block px-3 py-2 text-2xl text-neutral-200 hover:bg-neutral-600 border-b-2 text-center hover:rounded-md">
 					Dashboard
 				</a>
 				<nav class="space-y-1 border-b-2 py-2" aria-label="Production Plan Navigation">

@@ -73,19 +73,19 @@
 	}
 </script>
 
-<div class="min-w-full space-y-6 text-neutral-400">
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Monthly Production Plan</h1>
+<div class="min-w-full space-y-6 text-neutral-200">
+	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">Monthly Production Plan</h1>
 
 	<div class="bg-surface shadow-card space-y-6 rounded-md p-6">
 		<section>
 			<div class="mb-4 grid grid-cols-8 gap-4">
 				<div class="col-span-2">
-					<label for="scheduled_month" class="px-2 text-xl text-neutral-400">
+					<label for="scheduled_month" class="px-2 text-xl text-neutral-200">
 						Scheduled Month *
 					</label>
 					<input
 						id="scheduled_month"
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						type="month"
 						bind:value={scheduledMonth}
 					/>
@@ -97,82 +97,82 @@
 			{#each rows as row, index}
 				<div class="mb-4 grid grid-cols-8 gap-4 border-b-2 border-neutral-400 py-3">
 					<div class="col-span-2">
-						<label for="job_no" class="px-2 text-xl text-neutral-400">Job No *</label>
+						<label for="job_no" class="px-2 text-xl text-neutral-200">Job No *</label>
 						<input
-							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							placeholder="Job No *"
 							bind:value={row.job_no}
 						/>
 					</div>
 					<div class="col-span-2">
-						<label for="model_no" class="px-2 text-xl text-neutral-400">Model No *</label>
+						<label for="model_no" class="px-2 text-xl text-neutral-200">Model No *</label>
 						<input
-							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							placeholder="Model No *"
 							bind:value={row.model_no}
 						/>
 					</div>
 					<div class="col-span-2">
-						<label for="quantity" class="px-2 text-xl text-neutral-400">Total Quantity *</label>
+						<label for="quantity" class="px-2 text-xl text-neutral-200">Total Quantity *</label>
 						<input
-							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							type="number"
 							placeholder="Quantity *"
 							bind:value={row.quantity}
 						/>
 					</div>
 					<div class="col-span-2">
-						<label for="planned_dispatch" class="px-2 text-xl text-neutral-400"
+						<label for="planned_dispatch" class="px-2 text-xl text-neutral-200"
 							>Planned Dispatch *</label
 						>
 						<input
-							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							type="date"
 							bind:value={row.planned_dispatch}
 						/>
 					</div>
 					<div class="col-span-2">
-						<label for="job_card_no" class="px-2 text-xl text-neutral-400">Job Card No</label>
+						<label for="job_card_no" class="px-2 text-xl text-neutral-200">Job Card No</label>
 						<input
-							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							placeholder="Job Card No"
 							type="number"
 							bind:value={row.job_card_no}
 						/>
 					</div>
 					<div class="col-span-2">
-						<label for="customer" class="px-2 text-xl text-neutral-400">Customer</label>
+						<label for="customer" class="px-2 text-xl text-neutral-200">Customer</label>
 						<input
-							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							placeholder="Customer"
 							bind:value={row.customer}
 						/>
 					</div>
 					<div class="col-span-2">
-						<label for="job_no" class="px-2 text-xl text-neutral-400">Dispatched Quantity</label>
+						<label for="job_no" class="px-2 text-xl text-neutral-200">Dispatched Quantity</label>
 						<input
-							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							type="number"
 							placeholder="Dispatched Quantity"
 							bind:value={row.dispatched_qty}
 						/>
 					</div>
 					<div class="col-span-2">
-						<label for="actual_dispatch" class="px-2 text-xl text-neutral-400"
+						<label for="actual_dispatch" class="px-2 text-xl text-neutral-200"
 							>Actual Dispatch</label
 						>
 						<input
-							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							type="date"
 							bind:value={row.actual_dispatch}
 						/>
 					</div>
 					<div class="col-span-7">
-						<label for="job_no" class="px-2 text-xl text-neutral-400">Remarks</label>
+						<label for="job_no" class="px-2 text-xl text-neutral-200">Remarks</label>
 						<textarea
 							name="Remarks"
 							bind:value={row.remarks}
-							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							>Remarks</textarea
 						>
 					</div>

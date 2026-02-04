@@ -16,7 +16,7 @@
 </script>
 
 <div class="min-w-full space-y-6">
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Blank Incoming Entry</h1>
+	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">Blank Incoming Entry</h1>
 
 	<!-- MODE TOGGLE -->
 	<div class="mb-4 flex justify-center gap-2">
@@ -62,44 +62,44 @@
 
 		<!-- CORE DETAILS -->
 		<section>
-			<h2 class="mb-4 text-2xl text-neutral-400">Core Details</h2>
+			<h2 class="mb-4 text-2xl text-neutral-200">Core Details</h2>
 			<div class="mb-4 grid grid-cols-8 gap-4">
 				<div class="col-span-2">
-					<label for="received_date" class="px-2 text-xl text-neutral-400">Received Date *</label>
+					<label for="received_date" class="px-2 text-xl text-neutral-200">Received Date *</label>
 					<input
 						type="date"
 						name="received_date"
 						required
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="job_no" class="px-2 text-xl text-neutral-400">Job No *</label>
+					<label for="job_no" class="px-2 text-xl text-neutral-200">Job No *</label>
 					<input
 						type="text"
 						name="job_no"
 						placeholder="Job No *"
 						required
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="model_no" class="px-2 text-xl text-neutral-400">Model No *</label>
+					<label for="model_no" class="px-2 text-xl text-neutral-200">Model No *</label>
 					<input
 						type="text"
 						name="model_no"
 						placeholder="Model No *"
 						required
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<!-- SINGLE ENTRY MODE -->
 				{#if !isBatchMode}
 					<div class="col-span-2">
-						<label for="blank_no" class="px-2 text-xl text-neutral-400">Blank No *</label>
+						<label for="blank_no" class="px-2 text-xl text-neutral-200">Blank No *</label>
 						<input
 							name="blank_no"
 							type="number"
@@ -107,7 +107,7 @@
 							inputmode="numeric"
 							pattern="\d{7}"
 							required
-							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 						<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
 							<input
@@ -116,7 +116,7 @@
 								name="allow_duplicate_blank"
 								class="accent-blue-600"
 							/>
-							<label for="allow_duplicate_blank" class="px-2 text-base text-neutral-400">
+							<label for="allow_duplicate_blank" class="px-2 text-base text-neutral-200">
 								Allow duplicate Blank No
 							</label>
 						</div>
@@ -126,7 +126,7 @@
 				<!-- BATCH ENTRY MODE -->
 				{#if isBatchMode}
 					<div class="col-span-2">
-						<div class="px-2 text-xl text-neutral-400">Blank No Range *</div>
+						<div class="px-2 text-xl text-neutral-200">Blank No Range *</div>
 						<div class="grid grid-cols-2 gap-2">
 							<input
 								name="blank_no_start"
@@ -135,7 +135,7 @@
 								inputmode="numeric"
 								pattern="\d{7}"
 								required
-								class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+								class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							/>
 							<input
 								name="blank_no_end"
@@ -144,7 +144,7 @@
 								inputmode="numeric"
 								pattern="\d{7}"
 								required
-								class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+								class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 							/>
 						</div>
 						<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
@@ -154,7 +154,7 @@
 								name="allow_duplicate_blank"
 								class="accent-blue-600"
 							/>
-							<label for="allow_duplicate_blank_batch" class="px-2 text-base text-neutral-400">
+							<label for="allow_duplicate_blank_batch" class="px-2 text-base text-neutral-200">
 								Allow duplicate Blank No
 							</label>
 						</div>
@@ -165,22 +165,22 @@
 
 		<!-- ADDITIONAL DETAILS -->
 		<section>
-			<h2 class="mb-4 text-2xl text-neutral-400">Additional Details</h2>
+			<h2 class="mb-4 text-2xl text-neutral-200">Additional Details</h2>
 			<div class="mb-4 grid grid-cols-8 gap-4">
 				<div class="col-span-2">
-					<label for="job_card_no" class="px-2 text-xl text-neutral-400">Job Card No</label>
+					<label for="job_card_no" class="px-2 text-xl text-neutral-200">Job Card No</label>
 					<input
 						name="job_card_no"
 						type="number"
 						placeholder="Job Card No"
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 				<div class="col-span-2 grid grid-cols-2">
-					<label for="remarks" class="px-2 text-xl text-neutral-400">Remarks</label>
+					<label for="remarks" class="px-2 text-xl text-neutral-200">Remarks</label>
 					<textarea
 						name="remarks"
-						class="input col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					></textarea>
 				</div>
 			</div>

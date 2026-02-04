@@ -38,7 +38,7 @@
 </script>
 
 <div class="min-w-full space-y-6">
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Loadcell Entry</h1>
+	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">Loadcell Entry</h1>
 
 	<form
 		method="POST"
@@ -53,41 +53,41 @@
 	>
 		<!-- CORE DETAILS -->
 		<section>
-			<h2 class="mb-4 text-2xl text-neutral-400">Core Details</h2>
+			<h2 class="mb-4 text-2xl text-neutral-200">Core Details</h2>
 			<div class="mb-4 grid grid-cols-8 gap-4">
 				<div class="col-span-2">
-					<label for="job_date" class="px-2 text-xl text-neutral-400">Job Date *</label>
+					<label for="job_date" class="px-2 text-xl text-neutral-200">Job Date *</label>
 					<input
 						type="date"
 						name="job_date"
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="job_no" class="px-2 text-xl text-neutral-400">Job No *</label>
+					<label for="job_no" class="px-2 text-xl text-neutral-200">Job No *</label>
 					<input
 						type="text"
 						name="job_no"
 						placeholder="Job No *"
 						value={blank?.job_no ?? ''}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="model_no" class="px-2 text-xl text-neutral-400">Model No *</label>
+					<label for="model_no" class="px-2 text-xl text-neutral-200">Model No *</label>
 					<input
 						type="text"
 						name="model_no"
 						placeholder="Model No *"
 						value={blank?.model_no ?? ''}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="blank_no" class="px-2 text-xl text-neutral-400">Blank No *</label>
+					<label for="blank_no" class="px-2 text-xl text-neutral-200">Blank No *</label>
 					<input
 						name="blank_no"
 						type="number"
@@ -95,7 +95,7 @@
 						value={blank?.blank_no ?? ''}
 						inputmode="numeric"
 						pattern="\d{7}"
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 					<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
 						<input
@@ -104,7 +104,7 @@
 							name="allow_duplicate_blank"
 							class="accent-neutral-800"
 						/>
-						<label for="allow_duplicate_blank" class="px-1 text-base text-neutral-400">
+						<label for="allow_duplicate_blank" class="px-1 text-base text-neutral-200">
 							Allow duplicate Blank No
 						</label>
 					</div>
@@ -113,38 +113,38 @@
 		</section>
 		<!-- ADDITIONAL DETAILS -->
 		<section>
-			<h2 class="mb-4 text-2xl text-neutral-400">Additional Details</h2>
+			<h2 class="mb-4 text-2xl text-neutral-200">Additional Details</h2>
 			<div class="mb-4 grid grid-cols-8 gap-4">
 				<div class="col-span-2">
-					<label for="job_card_no" class="px-2 text-xl text-neutral-400">Job Card No</label>
+					<label for="job_card_no" class="px-2 text-xl text-neutral-200">Job Card No</label>
 					<input
 						name="job_card_no"
 						type="number"
 						placeholder="Job Card No"
 						value={blank?.job_card_no ?? ''}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="serial_no" class="px-2 text-xl text-neutral-400">Serial No</label>
+					<label for="serial_no" class="px-2 text-xl text-neutral-200">Serial No</label>
 					<input
 						name="serial_no"
 						type="number"
 						placeholder="Serial No (6 digits)"
 						inputmode="numeric"
 						pattern="\d{6}"
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				</div>
 
 				<div class="col-span-2">
-					<label for="customer" class="px-2 text-xl text-neutral-400">Customer</label>
+					<label for="customer" class="px-2 text-xl text-neutral-200">Customer</label>
 					<textarea
 						name="customer"
 						rows="1"
 						placeholder="Customer"
-						class="input col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					></textarea>
 				</div>
 			</div>
@@ -152,15 +152,15 @@
 
 		<!-- PROCESS DATES -->
 		<section>
-			<h2 class="mb-4 text-2xl text-neutral-400">Process Dates</h2>
+			<h2 class="mb-4 text-2xl text-neutral-200">Process Dates</h2>
 			<div class="grid grid-cols-8 gap-4">
 				{#each dateFields as [field, label]}
-					<label for={field} class="col-span-1 text-xl text-neutral-400">{label}</label>
+					<label for={field} class="col-span-1 text-xl text-neutral-200">{label}</label>
 					<input
 						type="date"
 						id={field}
 						name={field}
-						class="input col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					/>
 				{/each}
 			</div>
@@ -168,11 +168,11 @@
 
 		<!-- REMARKS -->
 		<section>
-			<h2 class="mb-4 px-2 text-2xl text-neutral-400">Remarks</h2>
+			<h2 class="mb-4 px-2 text-2xl text-neutral-200">Remarks</h2>
 			<div class="grid grid-cols-2">
 				<textarea
 					name="remarks"
-					class="input col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+					class="input col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 				></textarea>
 			</div>
 		</section>

@@ -196,8 +196,8 @@
 	];
 </script>
 
-<div class="bg-neutral min-w-full space-y-6 text-neutral-400">
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">Blank Stock Database</h1>
+<div class="bg-neutral min-w-full space-y-6 text-neutral-200">
+	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">Blank Stock Database</h1>
 	<div class="flex justify-end">
 		<button
 			disabled={isDefaultState}
@@ -207,7 +207,7 @@
 	</div>
 
 	<!-- ================= TABLE ================= -->
-	<div class="w-full text-xl text-neutral-400">
+	<div class="w-full text-xl text-neutral-200">
 		<table class="whitespace-nonwrap mb-12 w-full border-separate border-spacing-y-2 select-none">
 			<thead>
 				<tr>
@@ -248,7 +248,7 @@
 									class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-md border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
 								>
 									<select
-										class="focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-400 focus:ring-2 focus:outline-none"
+										class="focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:ring-2 focus:outline-none"
 										bind:value={filters[column].op}
 										onchange={() => {
 											if (!filters[column]) {
@@ -366,7 +366,7 @@
 
 {#if selectedJob}
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-800/95 p-4 text-neutral-400"
+		class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-800/95 p-4 text-neutral-200"
 	>
 		<div
 			class="shadow-card max-h-full w-9/10 max-w-full space-y-4 overflow-y-auto rounded-md bg-black p-12"
@@ -375,7 +375,7 @@
 				<h2 class="text-5xl font-medium">Blank Details</h2>
 				<button
 					onclick={() => (selectedJob = null)}
-					class="rounded-md bg-neutral-800 px-4 py-2 text-2xl text-neutral-400 hover:bg-neutral-600"
+					class="rounded-md bg-neutral-800 px-4 py-2 text-2xl text-neutral-200 hover:bg-neutral-600"
 				>
 					Close
 				</button>
@@ -384,7 +384,7 @@
 			<div class="grid grid-cols-12 gap-8 text-center text-xl">
 				{#each fields as [key, label]}
 					<div class="col-span-4 rounded-md bg-neutral-800/80 p-4">
-						<p class="rounded-md bg-neutral-700/80 p-4 text-xl text-neutral-400">{label}</p>
+						<p class="rounded-md bg-neutral-700/80 p-4 text-xl text-neutral-200">{label}</p>
 						<p class="p-2">{selectedJob[key] ?? '—'}</p>
 					</div>
 				{/each}

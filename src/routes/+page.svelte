@@ -12,12 +12,12 @@
 		};
 	}}
 >
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">TRS Dashboard</h1>
+	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">TRS Dashboard</h1>
 
 	<!-- KPI SECTION -->
 	<section class="kpi-grid">
 		<div
-			class="kpi total-jobs mb-4 grid min-w-full grid-cols-3 gap-4 text-2xl font-medium text-neutral-400"
+			class="kpi total-jobs mb-4 grid min-w-full grid-cols-3 gap-4 text-2xl font-medium text-neutral-200"
 		>
 			<div class="kpi dispatched rounded-md border-2 border-green-600/40 bg-green-900/20 p-4">
 				<h3 class="mb-2">Dispatched</h3>
@@ -39,9 +39,9 @@
 	<!-- DATA TABLES SECTION -->
 	 
 	<section>
-		<div class="mt-4 grid min-w-full grid-cols-3 gap-6 rounded-md p-4 text-xl text-neutral-400">
+		<div class="mt-4 grid min-w-full grid-cols-3 gap-6 rounded-md p-4 text-xl text-neutral-200">
 			<div class="col-span-1 rounded-md border-2 border-teal-600/40 p-4 text-center">
-				<h2 class="mb-4 w-full rounded-md bg-teal-900/20 p-4 text-2xl font-medium text-neutral-400">
+				<h2 class="mb-4 w-full rounded-md bg-teal-900/20 p-4 text-2xl font-medium text-neutral-200">
 					Blank Stock
 				</h2>
 				<table
@@ -62,7 +62,7 @@
 						{/each}
 					</tbody>
 				</table>
-				<h2 class="mb-4 w-full rounded-md bg-teal-900/20 p-4 text-2xl font-medium text-neutral-400">
+				<h2 class="mb-4 w-full rounded-md bg-teal-900/20 p-4 text-2xl font-medium text-neutral-200">
 					Loadcell Stock
 				</h2>
 				<table
@@ -87,7 +87,7 @@
 			<div class="col-span-2 flex flex-col gap-4 rounded-md border-2 border-blue-600/40 p-4 text-center">
 				<!-- Recent Entries Section -->
 				<div>
-					<h2 class="mb-4 w-full rounded-md bg-blue-900/20 p-4 text-2xl font-medium text-neutral-400">
+					<h2 class="mb-4 w-full rounded-md bg-blue-900/20 p-4 text-2xl font-medium text-neutral-200">
 						Recent Entries
 					</h2>
 					<table class="w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-blue-900/20 p-4">
@@ -120,10 +120,10 @@
 				<div class="grid grid-cols-2 gap-4">
 					<!-- Duplicate Blank Numbers -->
 					<div class="flex flex-col gap-4">
-						<h2 class="w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-400">
+						<h2 class="w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-200">
 							⚠ Duplicate Blank Numbers
 						</h2>
-						<div class="w-full rounded-md bg-purple-900/20 p-4 text-center text-xl text-neutral-400">
+						<div class="w-full rounded-md bg-purple-900/20 p-4 text-center text-xl text-neutral-200">
 							{#if data.blankDuplicates.length === 0}
 								<p>No duplicates found.</p>
 							{:else}
@@ -149,10 +149,10 @@
 
 					<!-- Duplicate Serial Numbers -->
 					<div class="flex flex-col gap-4">
-						<h2 class="w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-400">
+						<h2 class="w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-200">
 							⚠ Duplicate Serial Numbers
 						</h2>
-						<div class="w-full rounded-md bg-purple-900/20 p-4 text-center text-xl text-neutral-400">
+						<div class="w-full rounded-md bg-purple-900/20 p-4 text-center text-xl text-neutral-200">
 							{#if data.serialDuplicates.length === 0}
 								<p>No duplicates found.</p>
 							{:else}

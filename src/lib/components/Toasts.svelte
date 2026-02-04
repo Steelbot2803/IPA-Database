@@ -26,7 +26,7 @@
 			<div class="flex items-start justify-between gap-3">
 				<p class="leading-snug">{t.message}</p>
 
-				<button class="text-neutral-400 hover:text-white" onclick={() => toast.dismiss(t.id)}>
+				<button class="text-neutral-200 hover:text-white" onclick={() => toast.dismiss(t.id)}>
 					<X size="16" />
 				</button>
 			</div>

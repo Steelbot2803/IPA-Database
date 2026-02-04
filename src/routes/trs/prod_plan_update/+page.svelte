@@ -89,18 +89,18 @@
 	onMount(loadRows);
 </script>
 
-<div class="min-w-full space-y-6 text-neutral-400">
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-400">
+<div class="min-w-full space-y-6 text-neutral-200">
+	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">
 		Update Monthly Production Plan
 	</h1>
 
 	<div class="bg-surface shadow-card space-y-6 rounded-md p-6">
 		<div class="grid grid-cols-12 items-end gap-4">
 			<div class="col-span-3">
-				<label for="scheduled_month" class="px-2 text-xl text-neutral-400"> Scheduled Month </label>
+				<label for="scheduled_month" class="px-2 text-xl text-neutral-200"> Scheduled Month </label>
 				<input
 					id="scheduled_month"
-					class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+					class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					type="month"
 					bind:value={scheduledMonth}
 				/>
@@ -118,13 +118,13 @@
 		</div>
 
 		{#if rows.length === 0 && !loading}
-			<p class="text-neutral-400">No production plan created for this month.</p>
+			<p class="text-neutral-200">No production plan created for this month.</p>
 		{/if}
 
 		{#each rows as row, index}
 			<div class="mb-4 grid grid-cols-8 gap-4 border-b-2 border-neutral-400 py-3">
 				<div class="col-span-2">
-					<label for={`job_no-${index}`} class="px-2 text-xl text-neutral-400">Job No *</label>
+					<label for={`job_no-${index}`} class="px-2 text-xl text-neutral-200">Job No *</label>
 					<input
 						id={`job_no-${index}`}
 						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
@@ -135,28 +135,28 @@
 					/>
 				</div>
 				<div class="col-span-2">
-					<label for={`model_no-${index}`} class="px-2 text-xl text-neutral-400">Model No *</label>
+					<label for={`model_no-${index}`} class="px-2 text-xl text-neutral-200">Model No *</label>
 					<input
 						id={`model_no-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						placeholder="Model No *"
 						bind:value={row.model_no}
 					/>
 				</div>
 				<div class="col-span-2">
-					<label for={`quantity-${index}`} class="px-2 text-xl text-neutral-400"
+					<label for={`quantity-${index}`} class="px-2 text-xl text-neutral-200"
 						>Total Quantity *</label
 					>
 					<input
 						id={`quantity-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						type="number"
 						placeholder="Quantity *"
 						bind:value={row.quantity}
 					/>
 				</div>
 				<div class="col-span-2">
-					<label for={`planned_dispatch-${index}`} class="px-2 text-xl text-neutral-400"
+					<label for={`planned_dispatch-${index}`} class="px-2 text-xl text-neutral-200"
 						>Planned Dispatch *</label
 					>
 					<input
@@ -169,62 +169,62 @@
 					/>
 				</div>
 				<div class="col-span-2">
-					<label for={`job_card_no-${index}`} class="px-2 text-xl text-neutral-400"
+					<label for={`job_card_no-${index}`} class="px-2 text-xl text-neutral-200"
 						>Job Card No</label
 					>
 					<input
 						id={`job_card_no-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						placeholder="Job Card No"
 						type="number"
 						bind:value={row.job_card_no}
 					/>
 				</div>				
 				<div class="col-span-2">
-					<label for={`customer-${index}`} class="px-2 text-xl text-neutral-400">Customer</label>
+					<label for={`customer-${index}`} class="px-2 text-xl text-neutral-200">Customer</label>
 					<input
 						id={`customer-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						placeholder="Customer"
 						bind:value={row.customer}
 					/>
 				</div>
 				<div class="col-span-2">
-					<label for={`dispatched_qty-${index}`} class="px-2 text-xl text-neutral-400">
+					<label for={`dispatched_qty-${index}`} class="px-2 text-xl text-neutral-200">
 						Dispatched Quantity
 					</label>
 					<input
 						id={`dispatched_qty-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						type="number"
 						placeholder="Dispatched Quantity"
 						bind:value={row.dispatched_qty}
 					/>
 				</div>
                 <div class="col-span-2">
-					<label for={`actual_dispatch-${index}`} class="px-2 text-xl text-neutral-400"
+					<label for={`actual_dispatch-${index}`} class="px-2 text-xl text-neutral-200"
 						>Actual Dispatch</label
 					>
 					<input
 						id={`actual_dispatch-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						type="date"
 						bind:value={row.actual_dispatch}
 					/>
 				</div>
 				<div class="col-span-4">
-					<label for={`remarks-${index}`} class="px-2 text-xl text-neutral-400">Remarks</label>
+					<label for={`remarks-${index}`} class="px-2 text-xl text-neutral-200">Remarks</label>
 					<textarea
 						id={`remarks-${index}`}
 						name={`remarks-${index}`}
 						bind:value={row.remarks}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						rows="2"
 						placeholder="Remarks"
 					></textarea>
 				</div>
                 <div class="col-span-2">
-					<label for={`pending_qty-${index}`} class="px-2 text-xl text-neutral-400">
+					<label for={`pending_qty-${index}`} class="px-2 text-xl text-neutral-200">
 						Pending Quantity
 					</label>
 					<input
