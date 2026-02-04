@@ -33,7 +33,7 @@
 	let rows: JobRow[] = [emptyRow()];
 	let submitting = false;
 	const today = new Date();
-	const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 2).padStart(2, '0')}`;
+	const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
 	let scheduledMonth = defaultMonth;
 
 	function addRow() {
