@@ -202,7 +202,7 @@
 		<button
 			disabled={isDefaultState}
 			class="font-5xl cursor-pointer rounded-md bg-red-800 px-4 py-2 hover:bg-red-600 disabled:pointer-events-none disabled:opacity-0"
-			onclick={() => resetAll()}>Reset</button
+			onclick={() => resetAll()}>Filter Reset</button
 		>
 	</div>
 
@@ -248,7 +248,7 @@
 									class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-md border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
 								>
 									<select
-										class="focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:ring-2 focus:outline-none"
+										class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 										bind:value={filters[column].op}
 										onchange={() => {
 											if (!filters[column]) {
@@ -263,24 +263,24 @@
 
 									{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
 										<input
-											class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 											type="date"
 											bind:value={filters[column].value[0]}
 										/>
 										<input
-											class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 											type="date"
 											bind:value={filters[column].value[1]}
 										/>
 									{:else if columnMeta[column].type === 'date'}
 										<input
-											class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 											type="date"
 											bind:value={filters[column].value}
 										/>
 									{:else}
 										<input
-											class="input focus:ring-blue-600 focus:border-blue-600 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 											type={columnMeta[column].type === 'number' ? 'number' : 'text'}
 											bind:value={filters[column].value}
 											onkeydown={(e) => e.key === 'Enter' && applyFilters()}

@@ -94,6 +94,9 @@
 					<a href="/trs/prod_plan_update" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
 						| Update
 					</a>
+					<a href="/trs/prod_plan_db" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+						| Database
+					</a>
 				</nav>
 				<nav class="space-y-1 border-b-2 py-2" aria-label="Incoming Blanks Navigation">
 					<h2 class="rounded-md px-3 py-2 text-2xl bg-neutral-950">Blank</h2>

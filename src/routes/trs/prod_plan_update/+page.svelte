@@ -24,6 +24,13 @@
 	const today = new Date();
 	const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
 	let scheduledMonth = defaultMonth;
+	let electromech = false;
+
+	function isElectromech(customer: string | null | undefined) {
+		return customer?.trim().toLowerCase() === 'electromech';
+	}
+
+	$: visibleRows = electromech ? rows.filter((row) => isElectromech(row.customer)) : rows.filter((row) => !isElectromech(row.customer));
 
 	async function loadRows() {
 		loading = true;
@@ -82,7 +89,7 @@
 		}
 
 		const { updated } = await res.json();
-		toast.show(`Updated ${updated} jobs successfully`, 'success');
+		toast.show(`Updated ${updated} entries successfully`, 'success');
 		await loadRows();
 	}
 
@@ -95,39 +102,62 @@
 	</h1>
 
 	<div class="bg-surface shadow-card space-y-6 rounded-md p-6">
-		<div class="grid grid-cols-12 items-end gap-4">
-			<div class="col-span-3">
+		<div class="grid grid-cols-8 items-end gap-4">
+			<div class="col-span-2">
 				<label for="scheduled_month" class="px-2 text-xl text-neutral-200"> Scheduled Month </label>
 				<input
 					id="scheduled_month"
-					class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+					class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 					type="month"
 					bind:value={scheduledMonth}
 				/>
 			</div>
-			<div class="col-span-2">
+			<div class="col-span-1">
 				<button
 					type="button"
 					onclick={loadRows}
 					disabled={loading}
 					class="rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 text-neutral-200 transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-50"
 				>
-					{loading ? 'Loading…' : 'Load'}
+					{loading ? 'Loading...' : 'Load'}
 				</button>
+			</div>
+			<div class="col-span-3"></div>
+			<div class="relative col-span-2">
+				<label
+					for="electromech_toggle"
+					class="absolute right-0 bottom-0 flex cursor-pointer items-center rounded-md border border-neutral-700 bg-neutral-800 px-3 py-1.5"
+				>
+					<span class="text-xl text-neutral-200">Main</span>
+					<input
+						id="electromech_toggle"
+						type="checkbox"
+						class="peer sr-only"
+						bind:checked={electromech}
+					/>
+					<div
+						class="peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-blue-600 peer-checked:bg-red-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"
+					></div>
+					<span class="text-xl text-neutral-200">Electromech</span>
+				</label>
 			</div>
 		</div>
 
-		{#if rows.length === 0 && !loading}
-			<p class="text-neutral-200">No production plan created for this month.</p>
+		{#if visibleRows.length === 0 && !loading}
+			<p class="text-red-100 text-2xl text-center font-5xl bg-red-800 py-2 rounded-md border-2 border-red-600">
+				{electromech
+					? 'No Electromech production planned for this month'
+					: 'No Main production planned for this month.'}
+			</p>
 		{/if}
 
-		{#each rows as row, index}
+		{#each visibleRows as row, index}
 			<div class="mb-4 grid grid-cols-8 gap-4 border-b-2 border-neutral-400 py-3">
 				<div class="col-span-2">
 					<label for={`job_no-${index}`} class="px-2 text-xl text-neutral-200">Job No *</label>
 					<input
 						id={`job_no-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						placeholder="Job No *"
 						readonly
 						aria-readonly="true"
@@ -138,7 +168,7 @@
 					<label for={`model_no-${index}`} class="px-2 text-xl text-neutral-200">Model No *</label>
 					<input
 						id={`model_no-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						placeholder="Model No *"
 						bind:value={row.model_no}
 					/>
@@ -149,7 +179,7 @@
 					>
 					<input
 						id={`quantity-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						type="number"
 						placeholder="Quantity *"
 						bind:value={row.quantity}
@@ -161,7 +191,7 @@
 					>
 					<input
 						id={`planned_dispatch-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						type="date"
 						readonly
 						aria-readonly="true"
@@ -174,17 +204,17 @@
 					>
 					<input
 						id={`job_card_no-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						placeholder="Job Card No"
 						type="number"
 						bind:value={row.job_card_no}
 					/>
-				</div>				
+				</div>
 				<div class="col-span-2">
 					<label for={`customer-${index}`} class="px-2 text-xl text-neutral-200">Customer</label>
 					<input
 						id={`customer-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						placeholder="Customer"
 						bind:value={row.customer}
 					/>
@@ -195,19 +225,19 @@
 					</label>
 					<input
 						id={`dispatched_qty-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						type="number"
 						placeholder="Dispatched Quantity"
 						bind:value={row.dispatched_qty}
 					/>
 				</div>
-                <div class="col-span-2">
+				<div class="col-span-2">
 					<label for={`actual_dispatch-${index}`} class="px-2 text-xl text-neutral-200"
 						>Actual Dispatch</label
 					>
 					<input
 						id={`actual_dispatch-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						type="date"
 						bind:value={row.actual_dispatch}
 					/>
@@ -218,18 +248,18 @@
 						id={`remarks-${index}`}
 						name={`remarks-${index}`}
 						bind:value={row.remarks}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						rows="2"
 						placeholder="Remarks"
 					></textarea>
 				</div>
-                <div class="col-span-2">
+				<div class="col-span-2">
 					<label for={`pending_qty-${index}`} class="px-2 text-xl text-neutral-200">
 						Pending Quantity
 					</label>
 					<input
 						id={`pending_qty-${index}`}
-						class="input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						type="number"
 						placeholder="Pending Quantity"
 						readonly
@@ -240,12 +270,12 @@
 			</div>
 		{/each}
 
-		<div class="flex gap-3 justify-end">
+		<div class="flex justify-end gap-3">
 			<button
 				type="button"
 				onclick={saveUpdates}
 				disabled={saving || rows.length === 0}
-				class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+				class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{saving ? 'Saving...' : 'Save Updates'}
 			</button>
