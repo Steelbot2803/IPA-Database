@@ -26,10 +26,43 @@
 	const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
 	let scheduledMonth = defaultMonth;
 	let electromech = false;
+	let searchTerm = '';
 
-	$: visibleRows = electromech
+	const normalize = (value: unknown) =>
+		String(value ?? '')
+			.toLowerCase()
+			.replace(/\s+/g, ' ')
+			.trim();
+
+	const compact = (value: unknown) => normalize(value).replace(/[^a-z0-9]/g, '');
+
+	const constainsSearchTerm = (row: JobRow, term: string) => {
+		if (!term) return true;
+
+		const rowText = [
+			row.job_no,
+			row.model_no,
+			row.customer,
+			row.job_card_no,
+			row.remarks,
+			row.planned_dispatch,
+			row.actual_dispatch,
+			row.quantity,
+			row.dispatched_qty,
+			row.pending_qty
+		]
+			.map((value) => normalize(value))
+			.join(' ');
+
+		return rowText.includes(term) || compact(rowText).includes(compact(term));
+	};
+
+	$: filteredRows = electromech
 		? rows.filter((row) => isElectromech(row.customer))
 		: rows.filter((row) => !isElectromech(row.customer));
+
+	$: normSearchTerm = searchTerm.trim().toLowerCase();
+	$: visibleRows = filteredRows.filter((row) => constainsSearchTerm(row, normSearchTerm));
 
 	async function loadRows() {
 		loading = true;
@@ -121,7 +154,17 @@
 					{loading ? 'Loading...' : 'Load'}
 				</button>
 			</div>
-			<div class="col-span-3"></div>
+			<div class="col-span-3">
+				<label for="search" class="px-2 text-xl text-neutral-200">Search</label>
+				<input
+					id="search"
+					type="text"
+					name=""
+					class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+					placeholder="Search"
+					bind:value={searchTerm}
+				/>
+			</div>
 			<div class="relative col-span-2">
 				<label
 					for="electromech_toggle"
@@ -142,13 +185,19 @@
 			</div>
 		</div>
 
-		{#if visibleRows.length === 0 && !loading}
+		{#if visibleRows.length === 0 && !loading && searchTerm.trim() === ''}
 			<p
 				class="font-5xl rounded-md border-2 border-red-600 bg-red-800 py-2 text-center text-2xl text-red-100"
 			>
 				{electromech
-					? 'No Electromech production planned for this month'
+					? 'No Electromech production planned for this month.'
 					: 'No Main production planned for this month.'}
+			</p>
+		{:else if visibleRows.length === 0 && !loading && searchTerm.trim() !== ''}
+			<p
+				class="font-5xl rounded-md border-2 border-red-600 bg-red-800 py-2 text-center text-2xl text-red-100"
+			>
+				No results found!
 			</p>
 		{/if}
 

@@ -14,7 +14,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		.from('trs_prod_plan')
 		.select('*')
 		.eq('scheduled_month', scheduledMonth)
-		.order('id', { ascending: false });
+		.order('planned_dispatch', { ascending: true });
 
 	if (dbError) throw error(500, dbError.message);
 

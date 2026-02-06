@@ -3,22 +3,186 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { toast } from '$lib/utils/toast.js';
+	import { onMount } from 'svelte';
+	import { History } from 'lucide-svelte';
 
-	let searchMode: 'blank' | 'serial' = 'blank';
-	let searchValue = '';
+	const initialBlankNo = page.url.searchParams.get('blank_no') ?? '';
+	const initialSerialNo = page.url.searchParams.get('serial_no') ?? '';
 	let saving = false;
 	let searching = false;
 
+	let searchMode: 'blank' | 'serial' = initialSerialNo ? 'serial' : 'blank';
+	let searchValue = initialSerialNo || initialBlankNo;
+	let searchTimer: ReturnType<typeof setTimeout> | undefined;
+	let suggestionTimer: ReturnType<typeof setTimeout> | undefined;
+	let suggestionAbortController: AbortController | undefined;
+	let lastSearchQuery = '';
+	let isSearchFocused = false;
+	let showSuggestions = false;
+	let dbSuggestion: string[] = [];
+	let searchHistory: string[] = [];
+	let searchInputEl: HTMLInputElement | null = null;
+	let lastNotFoundQuery = '';
+	let lastSuccessQuery = '';
+
+	const SEARCH_HISTORY_KEY = 'trs-update-search-history';
+	const MAX_HISTORY = 8;
+	const MIN_BLANK_SEARCH_LEN = 7;
+	const MIN_SERIAL_SEARCH_LEN = 6;
+
+	type SuggestionOption = {
+		value: string;
+		source: 'history' | 'database';
+	};
+
+	$: normalizedSearch = searchValue.trim();
+
+	$: suggestionOptions = [
+		...searchHistory.map((value) => ({ value, source: 'history' as const })),
+		...dbSuggestion.map((value) => ({ value, source: 'database' as const }))
+	]
+		.filter(
+			(option, index, options) =>
+				option.value && index === options.findIndex((entry) => entry.value === option.value)
+		)
+		.filter((option) =>
+			normalizedSearch ? option.value.toLowerCase().includes(normalizedSearch.toLowerCase()) : true
+		)
+		.slice(0, 10);
+
+	$: showSuggestions = isSearchFocused && suggestionOptions.length > 0;
+
+	function loadSearchHistory() {
+		if (typeof localStorage === 'undefined') return;
+
+		const stored = localStorage.getItem(SEARCH_HISTORY_KEY);
+
+		if (!stored) return;
+
+		try {
+			const parsed = JSON.parse(stored);
+			if (Array.isArray(parsed)) {
+				searchHistory = parsed.filter((value) => typeof value === 'string').slice(0, MAX_HISTORY);
+			}
+		} catch {
+			searchHistory = [];
+		}
+	}
+
+	function saveSearch(value: string) {
+		const cleaned = value.trim();
+		if (!cleaned || typeof localStorage === 'undefined') return;
+
+		searchHistory = [cleaned, ...searchHistory.filter((entry) => entry !== cleaned)].slice(
+			0,
+			MAX_HISTORY
+		);
+		localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
+	}
+
+	async function loadDbSuggestions(term: string) {
+		if (suggestionAbortController) suggestionAbortController.abort();
+
+		suggestionAbortController = new AbortController();
+
+		const params = new URLSearchParams({
+			mode: searchMode,
+			q: term,
+			limit: '10'
+		});
+
+		try {
+			const res = await fetch(`/trs/update?${params.toString()}`, {
+				headers: { accept: 'application/json' },
+				signal: suggestionAbortController.signal
+			});
+
+			if (!res.ok) {
+				dbSuggestion = [];
+				return;
+			}
+
+			const payload = await res.json();
+			dbSuggestion = Array.isArray(payload?.suggestions)
+				? payload.suggestion.map((value: number | string) => String(value))
+				: [];
+		} catch (error) {
+			if ((error as Error).name !== 'AbortError') {
+				dbSuggestion = [];
+			}
+		}
+	}
+
+	$: {
+		if (suggestionTimer) clearTimeout(suggestionTimer);
+
+		suggestionTimer = setTimeout(() => {
+			loadDbSuggestions(normalizedSearch);
+		}, 180);
+	}
+
+	function applySuggestion(option: SuggestionOption) {
+		searchValue = option.value;
+		isSearchFocused = false;
+		showSuggestions = false;
+		searchInputEl?.blur();
+	}
+
+	function runReactiveSearch(query: string, historyValue = '') {
+		if (query === page.url.searchParams.toString()) {
+			searching = false;
+			return;
+		}
+
+		if (searchTimer) clearTimeout(searchTimer);
+
+		searchTimer = setTimeout(async () => {
+			searching = true;
+			saveSearch(historyValue);
+			await goto(query ? `${page.url.pathname}?${query}` : page.url.pathname, {
+				replaceState: true,
+				keepFocus: true,
+				noScroll: true
+			});
+			searching = false;
+		}, 250);
+	}
+
+	$: {
+		const trimmedValue = normalizedSearch;
+		const minLen = searchMode === 'blank' ? MIN_BLANK_SEARCH_LEN : MIN_SERIAL_SEARCH_LEN;
+		if (trimmedValue && trimmedValue.length < minLen) {
+			searching = false;
+		} else {
+			const query = trimmedValue
+				? `${searchMode === 'blank' ? 'blank_no' : 'serial_no'}=${encodeURIComponent(trimmedValue)}`
+				: '';
+			const currentQuery = page.url.searchParams.toString();
+
+			if (query !== lastSearchQuery && query !== currentQuery) {
+				lastSearchQuery = query;
+				runReactiveSearch(query, trimmedValue);
+			}
+		}
+	}
+
 	async function handleSearchSubmit(e: SubmitEvent) {
 		e.preventDefault();
-
-		if (!searchValue) return;
-
-		const param = searchMode === 'blank' ? `blank_no=${searchValue}` : `serial_no=${searchValue}`;
-
-		searching = true;
-		await goto(`${page.url.pathname}?${param}`);
-		searching = false;
+		const trimmedValue = normalizedSearch;
+		const minLen = searchMode === 'blank' ? MIN_BLANK_SEARCH_LEN : MIN_SERIAL_SEARCH_LEN;
+		if (trimmedValue && trimmedValue.length < minLen) {
+			toast.show(
+				`Enter at least ${minLen} digits for ${searchMode === 'blank' ? 'Blank No' : 'Serial No'} search`,
+				'info',
+				3000
+			);
+			return;
+		}
+		const query = trimmedValue
+			? `${searchMode === 'blank' ? 'blank_no' : 'serial_no'}=${encodeURIComponent(trimmedValue)}`
+			: '';
+		lastSearchQuery = query;
+		runReactiveSearch(query, trimmedValue);
 	}
 
 	type Job = {
@@ -51,10 +215,26 @@
 
 	export let data;
 
-	$: if (data.notFound) {
-		toast.show('Loadcell entry not found', 'error', 5000);
-	} else if (data.success) {
-		toast.show('Loadcell entry updated successfully', 'success', 5000);
+	$: {
+		const currentQuery = page.url.searchParams.toString();
+		const queryValue =
+			page.url.searchParams.get(searchMode === 'blank' ? 'blank_no' : 'serial_no') ?? '';
+		const minLen = searchMode === 'blank' ? MIN_BLANK_SEARCH_LEN : MIN_SERIAL_SEARCH_LEN;
+		const isToastEligible = queryValue.length >= minLen;
+
+		if (data.notFound && currentQuery && isToastEligible && lastNotFoundQuery !== currentQuery) {
+			lastNotFoundQuery = currentQuery;
+			toast.show(
+				`Loadcell entry not found against ${searchMode === 'blank' ? 'Blank No' : 'Serial No'} ${searchMode === 'blank' ? currentQuery.slice(-7) : currentQuery.slice(-6)}`,
+				'error',
+				5000
+			);
+		}
+
+		if (data.success && lastSuccessQuery !== currentQuery) {
+			lastSuccessQuery = currentQuery;
+			toast.show('Loadcell entry updated successfully', 'success', 5000);
+		}
 	}
 
 	const dateFields: [keyof Job, string][] = [
@@ -74,6 +254,10 @@
 		['ready_date', 'Ready Date'],
 		['dispatch_date', 'Dispatch Date']
 	];
+
+	onMount(() => {
+		loadSearchHistory();
+	});
 </script>
 
 <div class="min-w-full space-y-6">
@@ -112,18 +296,52 @@
 				Serial No
 			</button>
 		</div>
-		<input
-			type="number"
-			class="w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-			bind:value={searchValue}
-			placeholder={searchMode === 'blank' ? 'Enter Blank No' : 'Enter Serial No'}
-		/>
-		<button
-			class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
-			disabled={searching}
-		>
-			{searching ? 'Searching...' : 'Search'}
-		</button>
+		<div class="relative w-1/2">
+			<input
+				type="text"
+				inputmode="numeric"
+				pattern="\d*"
+				class="w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+				bind:this={searchInputEl}
+				bind:value={searchValue}
+				onfocus={() => (isSearchFocused = true)}
+				onblur={() => setTimeout(() => (isSearchFocused = false), 120)}
+				placeholder={searchMode === 'blank' ? 'Enter Blank No' : 'Enter Serial No'}
+			/>
+
+			{#if showSuggestions}
+				<div
+					class="absolute z-20 mt-1.5 max-h-72 w-1/3 overflow-y-auto rounded-md border border-neutral-700 bg-neutral-900 text-xl shadow-lg ring-2 ring-neutral-700"
+				>
+					{#each suggestionOptions as option}
+						<button
+							type="button"
+							class="flex w-full justify-between rounded-md px-3 py-2 text-left text-neutral-200 hover:bg-neutral-800"
+							onmousedown={(event) => {
+								event.preventDefault();
+								applySuggestion(option);
+							}}
+						>
+							<span>{option.value}</span>
+							{#if option.source === 'history'}
+								<span class="inline-flex items-center gap-1 text-blue-300">
+									<History size={20} />
+								</span>
+							{:else}
+								<span class="text-xl text-neutral-200">Database</span>
+							{/if}
+						</button>
+					{/each}
+				</div>
+			{/if}
+
+			<button
+				class="font-5xl ml-2 cursor-pointer rounded-md border border-neutral-700 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
+				disabled={searching}
+			>
+				{searching ? 'Searching...' : 'Refresh'}
+			</button>
+		</div>
 	</form>
 
 	<!-- 	{#if data.success}
@@ -146,7 +364,11 @@
 	<!-- IF DUPLICATE BLANK NO -->
 	{#if data.jobs && data.jobs.length >= 1}
 		<div class="bg-surface shadow-card rounded-md p-4">
-			<h2 class="mb-3 text-2xl font-5xl text-neutral-200 text-center bg-neutral-800 py-2 rounded-md">Multiple entries found — select one</h2>
+			<h2
+				class="font-5xl mb-3 rounded-md bg-neutral-800 py-2 text-center text-2xl text-neutral-200"
+			>
+				Multiple entries found — select one
+			</h2>
 			<div class="w-full overflow-x-auto text-center text-xl text-neutral-200">
 				<table class="mb-12 w-full border-separate border-spacing-y-2">
 					<thead class="text-neutral-200">
@@ -212,7 +434,7 @@
 							name="job_date"
 							bind:value={job.job_date}
 							disabled
-							class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 
@@ -222,7 +444,7 @@
 							type="text"
 							name="job_no"
 							bind:value={job.job_no}
-							class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 
@@ -232,7 +454,7 @@
 							type="text"
 							name="model_no"
 							bind:value={job.model_no}
-							class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 
@@ -243,7 +465,7 @@
 							type="number"
 							bind:value={job.blank_no}
 							disabled
-							class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 				</div>
@@ -260,7 +482,7 @@
 							type="number"
 							bind:value={job.job_card_no}
 							placeholder={job.job_card_no ? '' : 'Job Card No'}
-							class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 
@@ -273,7 +495,7 @@
 							bind:value={job.serial_no}
 							inputmode="numeric"
 							pattern="\d{6}"
-							class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					</div>
 
@@ -284,7 +506,7 @@
 							rows="1"
 							bind:value={job.customer}
 							placeholder={job.customer ? '' : 'Customer'}
-							class="mt-2 input col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input col-span-3 mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						></textarea>
 					</div>
 				</div>
@@ -302,7 +524,7 @@
 							name={field}
 							bind:value={job[field]}
 							placeholder={job[field] ? '' : label}
-							class="mt-2 input col-span-1 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input col-span-1 mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						/>
 					{/each}
 				</div>
@@ -315,7 +537,7 @@
 					<textarea
 						placeholder="Remarks"
 						name="remarks"
-						class="mt-2 input col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input col-span-2 mt-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 						>{job.remarks ?? ''}</textarea
 					>
 				</div>

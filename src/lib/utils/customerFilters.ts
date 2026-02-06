@@ -1,5 +1,5 @@
 export function normalize(stringData: string | null | undefined) {
-	return stringData?.trim().toLowerCase() ?? '';
+	return stringData?.toLowerCase().replace(/\s+/g,'').trim() ?? '';
 }
 
 export function isElectromech(electromech: string | null | undefined) {
