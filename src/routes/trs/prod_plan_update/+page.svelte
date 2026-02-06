@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { toast } from '$lib/stores/toast';
+	import { toast } from '$lib/utils/toast';
+	import { isElectromech } from '$lib/utils/customerFilters';
 
 	type JobRow = {
 		id: number;
@@ -26,11 +27,9 @@
 	let scheduledMonth = defaultMonth;
 	let electromech = false;
 
-	function isElectromech(customer: string | null | undefined) {
-		return customer?.trim().toLowerCase() === 'electromech';
-	}
-
-	$: visibleRows = electromech ? rows.filter((row) => isElectromech(row.customer)) : rows.filter((row) => !isElectromech(row.customer));
+	$: visibleRows = electromech
+		? rows.filter((row) => isElectromech(row.customer))
+		: rows.filter((row) => !isElectromech(row.customer));
 
 	async function loadRows() {
 		loading = true;
@@ -144,7 +143,9 @@
 		</div>
 
 		{#if visibleRows.length === 0 && !loading}
-			<p class="text-red-100 text-2xl text-center font-5xl bg-red-800 py-2 rounded-md border-2 border-red-600">
+			<p
+				class="font-5xl rounded-md border-2 border-red-600 bg-red-800 py-2 text-center text-2xl text-red-100"
+			>
 				{electromech
 					? 'No Electromech production planned for this month'
 					: 'No Main production planned for this month.'}

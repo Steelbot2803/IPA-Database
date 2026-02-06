@@ -2,6 +2,19 @@
 	export let data;
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import { toast } from '$lib/utils/toast.js';
+	import { onMount } from 'svelte';
+
+	let show = false;
+
+	onMount(() => {
+		if (data.errors?.length && !show) {
+			data.errors.forEach((err) => {
+				toast.show(err, 'error', 5000);
+			});
+			show = true;
+		}
+	});
 </script>
 
 <form
@@ -37,7 +50,7 @@
 	</section>
 
 	<!-- DATA TABLES SECTION -->
-	 
+
 	<section>
 		<div class="mt-4 grid min-w-full grid-cols-3 gap-6 rounded-md p-4 text-xl text-neutral-200">
 			<div class="col-span-1 rounded-md border-2 border-teal-600/40 p-4 text-center">
@@ -84,13 +97,19 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="col-span-2 flex flex-col gap-4 rounded-md border-2 border-blue-600/40 p-4 text-center">
+			<div
+				class="col-span-2 flex flex-col gap-4 rounded-md border-2 border-blue-600/40 p-4 text-center"
+			>
 				<!-- Recent Entries Section -->
 				<div>
-					<h2 class="mb-4 w-full rounded-md bg-blue-900/20 p-4 text-2xl font-medium text-neutral-200">
+					<h2
+						class="mb-4 w-full rounded-md bg-blue-900/20 p-4 text-2xl font-medium text-neutral-200"
+					>
 						Recent Entries
 					</h2>
-					<table class="w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-blue-900/20 p-4">
+					<table
+						class="w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-blue-900/20 p-4"
+					>
 						<thead>
 							<tr>
 								<th>Job No</th>
@@ -120,10 +139,14 @@
 				<div class="grid grid-cols-2 gap-4">
 					<!-- Duplicate Blank Numbers -->
 					<div class="flex flex-col gap-4">
-						<h2 class="w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-200">
+						<h2
+							class="w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-200"
+						>
 							⚠ Duplicate Blank Numbers
 						</h2>
-						<div class="w-full rounded-md bg-purple-900/20 p-4 text-center text-xl text-neutral-200">
+						<div
+							class="w-full rounded-md bg-purple-900/20 p-4 text-center text-xl text-neutral-200"
+						>
 							{#if data.blankDuplicates.length === 0}
 								<p>No duplicates found.</p>
 							{:else}
@@ -149,10 +172,14 @@
 
 					<!-- Duplicate Serial Numbers -->
 					<div class="flex flex-col gap-4">
-						<h2 class="w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-200">
+						<h2
+							class="w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-200"
+						>
 							⚠ Duplicate Serial Numbers
 						</h2>
-						<div class="w-full rounded-md bg-purple-900/20 p-4 text-center text-xl text-neutral-200">
+						<div
+							class="w-full rounded-md bg-purple-900/20 p-4 text-center text-xl text-neutral-200"
+						>
 							{#if data.serialDuplicates.length === 0}
 								<p>No duplicates found.</p>
 							{:else}

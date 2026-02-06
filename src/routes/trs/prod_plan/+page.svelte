@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { toast } from '$lib/stores/toast';
+	import { toast } from '$lib/utils/toast';
 	import { Plus, Trash2 } from 'lucide-svelte';
+	import { isElectromech } from '$lib/utils/customerFilters';
 
 	type JobRow = {
 		job_no: string;
@@ -36,10 +37,6 @@
 	const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
 	let scheduledMonth = defaultMonth;
 	let electromech = false;
-
-	function isElectromech(customer: string | null | undefined) {
-		return customer?.trim().toLowerCase() === 'electromech';
-	}
 
 	function addRow() {
 		const row = emptyRow();

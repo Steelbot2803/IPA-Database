@@ -3,6 +3,7 @@
 	import '../app.css';
 	import logo from '$lib/assets/ipa_logo.png';
 	import Toasts from '$lib/components/Toasts.svelte';
+	import { page } from '$app/state';
 
 	let { children } = $props();
 	let isOpen = $state(false);
@@ -10,7 +11,7 @@
 	let toggleButtonElement: HTMLButtonElement | undefined;
 
 	function handleClickOutside(event: MouseEvent) {
-		if(!isOpen) return;
+		if (!isOpen) return;
 
 		const target = event.target as Node;
 		if (!target) return;
@@ -19,6 +20,10 @@
 		if (toggleButtonElement && toggleButtonElement.contains(target)) return;
 
 		isOpen = false;
+	}
+
+	function isActivePath(path: string) {
+		return page.url.pathname === path;
 	}
 </script>
 
@@ -83,41 +88,75 @@
 			<h1 class="mb-6 text-center text-4xl">Transducer</h1>
 
 			<nav class="space-y-6" aria-label="Main Navigation">
-				<a href="/" class="block px-3 py-2 text-2xl text-neutral-200 hover:bg-neutral-600 border-b-2 text-center hover:rounded-md">
+				<a
+					href="/"
+					class="block border-b-2 px-3 py-2 text-center text-2xl text-neutral-200 hover:rounded-md hover:bg-neutral-600"
+					class:bg-neutral-600={isActivePath('/')}
+					class:rounded-md={isActivePath('/')}
+				>
 					Dashboard
 				</a>
 				<nav class="space-y-1 border-b-2 py-2" aria-label="Production Plan Navigation">
-					<h2 class="rounded-md px-3 py-2 text-2xl bg-neutral-950">Production Plan</h2>
-					<a href="/trs/prod_plan" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+					<h2 class="rounded-md bg-neutral-950 px-3 py-2 text-2xl">Production Plan</h2>
+					<a
+						href="/trs/prod_plan"
+						class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600"
+						class:bg-neutral-600={isActivePath('/trs/prod_plan')}
+					>
 						| Entry
 					</a>
-					<a href="/trs/prod_plan_update" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+					<a
+						href="/trs/prod_plan_update"
+						class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600"
+						class:bg-neutral-600={isActivePath('/trs/prod_plan_update')}
+					>
 						| Update
 					</a>
-					<a href="/trs/prod_plan_db" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+					<a
+						href="/trs/prod_plan_db"
+						class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600"
+						class:bg-neutral-600={isActivePath('/trs/prod_plan_db')}
+					>
 						| Database
 					</a>
 				</nav>
 				<nav class="space-y-1 border-b-2 py-2" aria-label="Incoming Blanks Navigation">
-					<h2 class="rounded-md px-3 py-2 text-2xl bg-neutral-950">Blank</h2>
-					<a href="/trs/blank" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+					<h2 class="rounded-md bg-neutral-950 px-3 py-2 text-2xl">Blanks</h2>
+					<a
+						href="/trs/blank"
+						class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600"
+						class:bg-neutral-600={isActivePath('/trs/blank')}
+					>
 						| Entry
 					</a>
-					<a href="/trs/blank_db" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+					<a
+						href="/trs/blank_db"
+						class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600"
+						class:bg-neutral-600={isActivePath('/trs/blank_db')}
+					>
 						| Database
 					</a>
 				</nav>
 				<nav class="space-y-1 border-b-2 py-2" aria-label="Jobs Navigation">
-					<h2 class="rounded-md px-3 py-2 text-2xl bg-neutral-950">Loadcell</h2>
-					<a href="/trs/new" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+					<h2 class="rounded-md bg-neutral-950 px-3 py-2 text-2xl">Loadcells</h2>
+					<a
+						href="/trs/new"
+						class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600"
+						class:bg-neutral-600={isActivePath('/trs/new')}
+					>
 						| Entry
 					</a>
-					<a href="/trs/update" class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600">
+					<a
+						href="/trs/update"
+						class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600"
+						class:bg-neutral-600={isActivePath('/trs/update')}
+					>
 						| Update
 					</a>
 					<a
 						href="/trs/loadcell_db"
 						class="block rounded-md px-3 py-2 text-xl hover:bg-neutral-600"
+						class:bg-neutral-600={isActivePath('/trs/loadcell_db')}
 					>
 						| Database
 					</a>

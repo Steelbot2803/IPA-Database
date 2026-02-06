@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { toast } from '$lib/stores/toast.js';
+	import { toast } from '$lib/utils/toast.js';
 	export let form;
 
 	let isBatchMode = false;

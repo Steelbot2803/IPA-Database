@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { toast } from '$lib/stores/toast';
+	import { toast } from '$lib/utils/toast.js';
 
 	let searchMode: 'blank' | 'serial' = 'blank';
 	let searchValue = '';

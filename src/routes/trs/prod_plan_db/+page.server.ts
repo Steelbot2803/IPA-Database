@@ -42,16 +42,20 @@ export async function load({ url }) {
 	const scheduledMonth =
 		url.searchParams.get('scheduled_month') ??
 		`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+	const electromech = url.searchParams.get('electromech') === '1';
 	const sortableColumns = new Set<ColumnKey | 'id'>([
 		...(Object.keys(COLUMN_META) as ColumnKey[]),
 		'id'
 	]);
 
+	let tableView = electromech ? 'trs_prod_plan_emech':'trs_prod_plan_main' 
+
 	let query = supabase
-		.from('trs_prod_plan')
+		.from(tableView)
 		.select('*', { count: 'exact' })
 		.eq('scheduled_month', scheduledMonth)
 		.range(from, to);
+
 	let filters: Filters = {};
 
 	if (sort && sortableColumns.has(sort as ColumnKey | 'id')) {
@@ -123,6 +127,7 @@ export async function load({ url }) {
 		total: count ?? 0,
 		filters,
 		columnMeta: COLUMN_META,
-		scheduledMonth
+		scheduledMonth,
+		electromech
 	};
 }

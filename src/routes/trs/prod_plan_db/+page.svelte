@@ -3,6 +3,7 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import { isElectromech } from '$lib/utils/customerFilters.js';
 	import {
 		ChevronUp,
 		ChevronDown,
@@ -43,6 +44,21 @@
 		}
 	}
 
+	let electromech = data.electromech ?? false;
+
+	function toggleElectromech() {
+		const params = new URLSearchParams(window.location.search);
+		const next = !electromech;
+
+		if (next) {
+			params.set('electromech', '1');
+		} else {
+			params.delete('electromech');
+		}
+		params.set('page', '1');
+		goto(`?${params.toString()}`);
+	}
+
 	let sortColumn: string | null = null;
 	let sortAscending = true;
 
@@ -62,6 +78,8 @@
 
 		goto(`?${params.toString()}`);
 	}
+
+	$: electromech = data.electromech ?? false;
 
 	$: {
 		const params = page.url.searchParams;
@@ -83,11 +101,6 @@
 	let columnMeta: Record<string, ColumnMeta> = data.columnMeta;
 	let activeFilter: string | null = null;
 	let popoverEl: HTMLDivElement | null = null;
-	let electromech = false;
-
-	function isElectromech(customer: string | null | undefined) {
-		return customer?.trim().toLowerCase() === 'electromech';
-	}
 
 	$: visibleRows = electromech
 		? data.rows.filter((row) => isElectromech(row.customer))
@@ -198,7 +211,7 @@
 		<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">Production Plan Database</h1>
 		<button
 			disabled={isDefaultState}
-			class="absolute right-0 bottom-0 font-5xl text-xl text-red-100 cursor-pointer rounded-md bg-red-800 px-4 py-2 hover:bg-red-600 disabled:pointer-events-none disabled:opacity-0"
+			class="font-5xl absolute right-0 bottom-0 cursor-pointer rounded-md bg-red-800 px-4 py-2 text-xl text-red-100 hover:bg-red-600 disabled:pointer-events-none disabled:opacity-0"
 			onclick={() => resetAll()}>Filter Reset</button
 		>
 	</div>
@@ -234,7 +247,8 @@
 					id="electromech_toggle"
 					type="checkbox"
 					class="peer sr-only"
-					bind:checked={electromech}
+					checked={electromech}
+					onchange={toggleElectromech}
 				/>
 				<div
 					class="peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-blue-600 peer-checked:bg-red-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"
@@ -246,148 +260,152 @@
 
 	<div class="w-full text-xl text-neutral-200">
 		{#if visibleRows.length === 0}
-			<p class="text-red-100 text-2xl text-center font-5xl bg-red-800 py-2 rounded-md border-2 border-red-600">
+			<p
+				class="font-5xl rounded-md border-2 border-red-600 bg-red-800 py-2 text-center text-2xl text-red-100"
+			>
 				{electromech
 					? 'No Electromech production planned for this month'
 					: 'No Main production planned for this month.'}
 			</p>
-		{/if}
-		<table class="whitespace-nonwrap mb-12 w-full border-separate border-spacing-y-2 select-none">
-			<thead>
-				<tr>
-					{#each Object.keys(columnMeta) as column}
-						<th
-							class="rounded-md border-b-2 border-neutral-700 py-2 text-center transition-colors"
-							class:bg-teal-950={sortColumn === column && !filters[column]}
-							class:bg-lime-950={filters[column] && sortColumn !== column}
-							class:bg-orange-950={sortColumn === column && filters[column]}
-						>
-							<span class="text-center">{columnMeta[column].label}</span>
-							<button
-								aria-label="Sort"
-								class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
-								onclick={() => toggleSort(column)}
-							>
-								{#if sortColumn !== column}
-									<ChevronsUpDown size="16" />
-								{:else if sortAscending}
-									<ChevronUp size="16" />
-								{:else}
-									<ChevronDown size="16" />
-								{/if}
-							</button>
-							<button
-								class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
-								aria-label="Filter"
-								onclick={() => {
-									ensureFilter(column);
-									activeFilter = column;
-								}}
-							>
-								<Funnel size="16" />
-							</button>
-							{#if activeFilter === column}
-								<div
-									bind:this={popoverEl}
-									class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-md border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
-								>
-									<select
-										class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-										bind:value={filters[column].op}
-									>
-										{#each OPERATORS[columnMeta[column].type] as op}
-											<option value={op.value}>{op.label}</option>
-										{/each}
-									</select>
-
-									{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
-										<input
-											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-											type="date"
-											bind:value={filters[column].value[0]}
-										/>
-										<input
-											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-											type="date"
-											bind:value={filters[column].value[1]}
-										/>
-									{:else if columnMeta[column].type === 'date'}
-										<input
-											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-											type="date"
-											bind:value={filters[column].value}
-										/>
-									{:else}
-										<input
-											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-											type={columnMeta[column].type === 'number' ? 'number' : 'text'}
-											bind:value={filters[column].value}
-											onkeydown={(e) => e.key === 'Enter' && applyFilters()}
-										/>
-									{/if}
-									<div class="actions">
-										<button
-											class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-											onclick={applyFilters}>Apply</button
-										>
-										<button
-											class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-											onclick={() => clearFilter(column)}>Clear</button
-										>
-									</div>
-								</div>
-							{/if}
-						</th>
-					{/each}
-					<th class="rounded-md border-b-2 border-neutral-700 py-2 text-center transition-colors"
-					></th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each visibleRows as row}
-					<tr class="hover:bg-neutral-600/50">
+		{:else}
+			<table class="whitespace-nonwrap mb-12 w-full border-separate border-spacing-y-2 select-none">
+				<thead>
+					<tr>
 						{#each Object.keys(columnMeta) as column}
-							<td class="px-6">{row[column] ?? '—'}</td>
-						{/each}
-						<td>
-							<button
-								class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-								onclick={() => (selectedPlan = row)}
+							<th
+								class="rounded-md border-b-2 border-neutral-700 py-2 text-center transition-colors"
+								class:bg-teal-950={sortColumn === column && !filters[column]}
+								class:bg-lime-950={filters[column] && sortColumn !== column}
+								class:bg-orange-950={sortColumn === column && filters[column]}
 							>
-								Open
-							</button>
-						</td>
+								<span class="text-center">{columnMeta[column].label}</span>
+								<button
+									aria-label="Sort"
+									class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
+									onclick={() => toggleSort(column)}
+								>
+									{#if sortColumn !== column}
+										<ChevronsUpDown size="16" />
+									{:else if sortAscending}
+										<ChevronUp size="16" />
+									{:else}
+										<ChevronDown size="16" />
+									{/if}
+								</button>
+								<button
+									class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
+									aria-label="Filter"
+									onclick={() => {
+										ensureFilter(column);
+										activeFilter = column;
+									}}
+								>
+									<Funnel size="16" />
+								</button>
+								{#if activeFilter === column}
+									<div
+										bind:this={popoverEl}
+										class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-md border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
+									>
+										<select
+											class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+											bind:value={filters[column].op}
+										>
+											{#each OPERATORS[columnMeta[column].type] as op}
+												<option value={op.value}>{op.label}</option>
+											{/each}
+										</select>
+
+										{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
+											<input
+												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+												type="date"
+												bind:value={filters[column].value[0]}
+											/>
+											<input
+												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+												type="date"
+												bind:value={filters[column].value[1]}
+											/>
+										{:else if columnMeta[column].type === 'date'}
+											<input
+												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+												type="date"
+												bind:value={filters[column].value}
+											/>
+										{:else}
+											<input
+												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+												type={columnMeta[column].type === 'number' ? 'number' : 'text'}
+												bind:value={filters[column].value}
+												onkeydown={(e) => e.key === 'Enter' && applyFilters()}
+											/>
+										{/if}
+										<div class="actions">
+											<button
+												class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+												onclick={applyFilters}>Apply</button
+											>
+											<button
+												class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+												onclick={() => clearFilter(column)}>Clear</button
+											>
+										</div>
+									</div>
+								{/if}
+							</th>
+						{/each}
+						<th class="rounded-md border-b-2 border-neutral-700 py-2 text-center transition-colors"
+						></th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</div>
-	<div class="flex-nonwrap flex justify-center space-x-4 text-center">
-		<button
-			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
-			aria-label="First page"
-			disabled={data.page === 1}
-			onclick={() => gotoPage(1)}><ChevronFirst size="24" /></button
-		>
-		<button
-			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
-			aria-label="Previous page"
-			disabled={data.page === 1}
-			onclick={() => gotoPage(data.page - 1)}><ChevronLeft size="24" /></button
-		>
-		<span class="px-4 text-xl"> {data.page} / {totalPages} </span>
-		<button
-			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
-			aria-label="Next page"
-			disabled={data.page === totalPages}
-			onclick={() => gotoPage(data.page + 1)}><ChevronRight size="24" /></button
-		>
-		<button
-			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
-			aria-label="Last page"
-			disabled={data.page === totalPages}
-			onclick={() => gotoPage(totalPages)}><ChevronLast size="24" /></button
-		>
+				</thead>
+				<tbody>
+					{#each data.rows as row}
+						<tr class="hover:bg-neutral-600/50">
+							{#each Object.keys(columnMeta) as column}
+								<td class="px-6">{row[column] ?? '—'}</td>
+							{/each}
+							<td>
+								<button
+									class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
+									onclick={() => (selectedPlan = row)}
+								>
+									Open
+								</button>
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+
+			<div class="flex-nonwrap flex justify-center space-x-4 text-center">
+				<button
+					class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+					aria-label="First page"
+					disabled={data.page === 1}
+					onclick={() => gotoPage(1)}><ChevronFirst size="24" /></button
+				>
+				<button
+					class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+					aria-label="Previous page"
+					disabled={data.page === 1}
+					onclick={() => gotoPage(data.page - 1)}><ChevronLeft size="24" /></button
+				>
+				<span class="px-4 text-xl"> {data.page} / {totalPages} </span>
+				<button
+					class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+					aria-label="Next page"
+					disabled={data.page === totalPages}
+					onclick={() => gotoPage(data.page + 1)}><ChevronRight size="24" /></button
+				>
+				<button
+					class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+					aria-label="Last page"
+					disabled={data.page === totalPages}
+					onclick={() => gotoPage(totalPages)}><ChevronLast size="24" /></button
+				>
+			</div>
+		{/if}
 	</div>
 </div>
 
