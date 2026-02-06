@@ -171,6 +171,7 @@
 			<h2 class="mb-4 px-2 text-2xl text-neutral-200">Remarks</h2>
 			<div class="grid grid-cols-2">
 				<textarea
+					placeholder="Remarks"
 					name="remarks"
 					class="mt-2 input col-span-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
 				></textarea>
