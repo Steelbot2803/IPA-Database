@@ -134,7 +134,7 @@
 						<div class="col-span-2">
 							<label for="job_no" class="px-2 text-xl text-neutral-200">Job No *</label>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 								placeholder="Job No *"
 								bind:value={row.job_no}
 							/>
@@ -142,7 +142,7 @@
 						<div class="col-span-2">
 							<label for="model_no" class="px-2 text-xl text-neutral-200">Model No *</label>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 								placeholder="Model No *"
 								bind:value={row.model_no}
 							/>
@@ -150,7 +150,7 @@
 						<div class="col-span-2">
 							<label for="quantity" class="px-2 text-xl text-neutral-200">Total Quantity *</label>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 								type="number"
 								placeholder="Quantity *"
 								bind:value={row.quantity}
@@ -161,7 +161,7 @@
 								>Planned Dispatch *</label
 							>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 								type="date"
 								bind:value={row.planned_dispatch}
 							/>
@@ -169,7 +169,7 @@
 						<div class="col-span-2">
 							<label for="job_card_no" class="px-2 text-xl text-neutral-200">Job Card No</label>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 								placeholder="Job Card No"
 								type="number"
 								bind:value={row.job_card_no}
@@ -178,7 +178,7 @@
 						<div class="col-span-2">
 							<label for="customer" class="px-2 text-xl text-neutral-200">Customer</label>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 								placeholder="Customer"
 								readonly={electromech}
 								aria-readonly={electromech}
@@ -188,7 +188,7 @@
 						<div class="col-span-2">
 							<label for="job_no" class="px-2 text-xl text-neutral-200">Dispatched Quantity</label>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 								type="number"
 								placeholder="Dispatched Quantity"
 								bind:value={row.dispatched_qty}
@@ -199,7 +199,7 @@
 								>Actual Dispatch</label
 							>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 								type="date"
 								bind:value={row.actual_dispatch}
 							/>
@@ -210,9 +210,8 @@
 								name="Remarks"
 								placeholder="Remarks"
 								bind:value={row.remarks}
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-								></textarea
-							>
+								class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+							></textarea>
 						</div>
 						<div class="relative justify-self-end">
 							<button

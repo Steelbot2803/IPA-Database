@@ -273,7 +273,7 @@
 									class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-md border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
 								>
 									<select
-										class="focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:ring-2 focus:outline-none"
+										class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 										bind:value={filters[column].op}
 										onchange={() => {
 											if (!filters[column]) {
@@ -288,7 +288,7 @@
 
 									{#if columnMeta[column].type === 'enum'}
 										<select
-											class="focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 											bind:value={filters[column].value}
 										>
 											{#each columnMeta[column].values as v}
@@ -297,24 +297,24 @@
 										</select>
 									{:else if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
 										<input
-											class="mt-2 input focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 											type="date"
 											bind:value={filters[column].value[0]}
 										/>
 										<input
-											class="mt-2 input focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 											type="date"
 											bind:value={filters[column].value[1]}
 										/>
 									{:else if columnMeta[column].type === 'date'}
 										<input
-											class="mt-2 input focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 											type="date"
 											bind:value={filters[column].value}
 										/>
 									{:else}
 										<input
-											class="mt-2 input focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 											type={columnMeta[column].type === 'number' ? 'number' : 'text'}
 											bind:value={filters[column].value}
 											onkeydown={(e) => e.key === 'Enter' && applyFilters()}

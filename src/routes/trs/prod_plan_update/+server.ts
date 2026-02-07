@@ -51,12 +51,14 @@ export const PATCH: RequestHandler = async ({ request, cookies }) => {
 		};
 	});
 
-    const {error:dbError} = await supabase.from('trs_prod_plan').upsert(cleaned,{onConflict:'id'});
+	const { error: dbError } = await supabase
+		.from('trs_prod_plan')
+		.upsert(cleaned, { onConflict: 'id' });
 
-    if (dbError) throw error (500,dbError.message);
+	if (dbError) throw error(500, dbError.message);
 
-    return json({
-        success: true,
-        updated: cleaned.length
-    })
-}
+	return json({
+		success: true,
+		updated: cleaned.length
+	});
+};

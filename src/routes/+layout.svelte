@@ -46,16 +46,16 @@
 >
 	<div class="w-6 space-y-1">
 		<div
-			class="h-1 w-6 bg-cyan-500 transition-transform duration-300 rounded"	
+			class="h-1 w-6 rounded bg-cyan-500 transition-transform duration-300"
 			class:translate-y-2={isOpen}
 			class:rotate-45={isOpen}
 		></div>
 		<div
-			class="h-1 w-6 bg-cyan-500 transition-opacity duration-300 rounded"
+			class="h-1 w-6 rounded bg-cyan-500 transition-opacity duration-300"
 			class:opacity-0={isOpen}
 		></div>
 		<div
-			class="h-1 w-6 bg-cyan-500 transition-transform duration-300 rounded"
+			class="h-1 w-6 rounded bg-cyan-500 transition-transform duration-300"
 			class:-translate-y-2={isOpen}
 			class:-rotate-45={isOpen}
 		></div>
