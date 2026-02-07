@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { styles as uiStyles } from '$lib/utils/styles';
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -260,20 +261,15 @@
 	});
 </script>
 
-<div class="min-w-full space-y-6">
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">Loadcell Update</h1>
+<div class={uiStyles.c0069}>
+	<h1 class={uiStyles.c0021}>Loadcell Update</h1>
 
 	<!-- SEARCH -->
-	<form
-		name="search"
-		method="GET"
-		class="bg-surface shadow-card flex gap-3 rounded-md px-6"
-		onsubmit={handleSearchSubmit}
-	>
+	<form name="search" method="GET" class={uiStyles.c0070} onsubmit={handleSearchSubmit}>
 		<div>
 			<button
 				type="button"
-				class="font-5xl cursor-pointer rounded-md border-2 px-6 py-2 text-xl hover:bg-neutral-600"
+				class={uiStyles.c0071}
 				class:bg-neutral-800={searchMode === 'blank'}
 				class:border-neutral-700={searchMode === 'serial'}
 				class:text-neutral-100={searchMode === 'blank'}
@@ -287,7 +283,7 @@
 
 			<button
 				type="button"
-				class="font-5xl ml-2 cursor-pointer rounded-md border-2 px-6 py-2 text-xl hover:bg-neutral-600"
+				class={uiStyles.c0072}
 				class:bg-neutral-800={searchMode === 'serial'}
 				class:border-neutral-700={searchMode === 'blank'}
 				class:text-neutral-100={searchMode === 'serial'}
@@ -299,12 +295,12 @@
 				Serial No
 			</button>
 		</div>
-		<div class="relative w-1/2">
+		<div class={uiStyles.c0073}>
 			<input
 				type="text"
 				inputmode="numeric"
 				pattern="\d*"
-				class="w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+				class={uiStyles.c0074}
 				bind:this={searchInputEl}
 				bind:value={searchValue}
 				onfocus={() => (isSearchFocused = true)}
@@ -313,13 +309,11 @@
 			/>
 
 			{#if showSuggestions}
-				<div
-					class="absolute z-20 mt-1.5 max-h-72 w-1/3 overflow-y-auto rounded-md border border-neutral-700 bg-neutral-900 text-xl shadow-lg ring-2 ring-neutral-700"
-				>
+				<div class={uiStyles.c0075}>
 					{#each suggestionOptions as option}
 						<button
 							type="button"
-							class="flex w-full justify-between rounded-md px-3 py-2 text-left text-neutral-200 hover:bg-neutral-800"
+							class={uiStyles.c0076}
 							onmousedown={(event) => {
 								event.preventDefault();
 								applySuggestion(option);
@@ -327,37 +321,34 @@
 						>
 							<span>{option.value}</span>
 							{#if option.source === 'history'}
-								<span class="inline-flex items-center gap-1 text-blue-300">
+								<span class={uiStyles.c0077}>
 									<History size={20} />
 								</span>
 							{:else}
-								<span class="text-xl text-neutral-200">Database</span>
+								<span class={uiStyles.c0051}>Database</span>
 							{/if}
 						</button>
 					{/each}
 				</div>
 			{/if}
 
-			<button
-				class="font-5xl ml-2 cursor-pointer rounded-md border border-neutral-700 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
-				disabled={searching}
-			>
+			<button class={uiStyles.c0078} disabled={searching}>
 				{searching ? 'Searching...' : 'Refresh'}
 			</button>
 		</div>
 	</form>
 
 	<!-- 	{#if data.success}
-		<div class="max-w-base fixed top-8 right-4 z-50 flex flex-col gap-3 text-xl">
-			<p class="rounded-md bg-green-800 px-4 py-3 text-green-100 shadow-md">
+		<div class={uiStyles.c0001}>
+			<p class={uiStyles.c0079}>
 				Loadcell entry updated successfully
 			</p>
 		</div>
 	{/if}
 
 	{#if data.notFound}
-		<div class="max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2">
-			<p class="rounded-md bg-red-800 px-4 py-3 text-red-100 shadow-lg">
+		<div class={uiStyles.c0080}>
+			<p class={uiStyles.c0081}>
 				No job found for {searchMode === 'blank' ? 'Blank No' : 'Serial No'}
 				{searchValue}
 			</p>
@@ -366,15 +357,11 @@
 
 	<!-- IF DUPLICATE BLANK NO -->
 	{#if data.jobs && data.jobs.length >= 1}
-		<div class="bg-surface shadow-card rounded-md p-4">
-			<h2
-				class="font-5xl mb-3 rounded-md bg-neutral-800 py-2 text-center text-2xl text-neutral-200"
-			>
-				Multiple entries found — select one
-			</h2>
-			<div class="w-full overflow-x-auto text-center text-xl text-neutral-200">
-				<table class="mb-12 w-full border-separate border-spacing-y-2">
-					<thead class="text-neutral-200">
+		<div class={uiStyles.c0082}>
+			<h2 class={uiStyles.c0083}>Multiple entries found — select one</h2>
+			<div class={uiStyles.c0084}>
+				<table class={uiStyles.c0085}>
+					<thead class={uiStyles.c0086}>
 						<tr>
 							<th>Job Date</th>
 							<th>Job No</th>
@@ -386,19 +373,14 @@
 					</thead>
 					<tbody>
 						{#each data.jobs as job}
-							<tr class="border-b border-neutral-800 hover:bg-neutral-800">
-								<td class="py-3">{job.job_date}</td>
+							<tr class={uiStyles.c0087}>
+								<td class={uiStyles.c0088}>{job.job_date}</td>
 								<td>{job.job_no}</td>
 								<td>{job.model_no}</td>
 								<td>{job.blank_no}</td>
 								<td>{job.serial_no ?? '—'}</td>
 								<td>
-									<a
-										href={`/trs/update?id=${job.id}`}
-										class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-									>
-										Edit
-									</a>
+									<a href={`/trs/update?id=${job.id}`} class={uiStyles.c0089}> Edit </a>
 								</td>
 							</tr>
 						{/each}
@@ -422,54 +404,44 @@
 					await update();
 				};
 			}}
-			class="bg-surface shadow-card space-y-8 rounded-md p-6"
+			class={uiStyles.c0090}
 		>
 			<input type="hidden" name="id" value={job.id} />
 
 			<!-- CORE INFO -->
 			<section>
-				<h2 class="mb-4 text-2xl text-neutral-200">Core Details</h2>
+				<h2 class={uiStyles.c0091}>Core Details</h2>
 
-				<div class="mb-4 grid grid-cols-8 gap-4">
-					<div class="col-span-2">
-						<label for="job_date" class="px-2 text-xl text-neutral-200">Job Date</label>
+				<div class={uiStyles.c0092}>
+					<div class={uiStyles.c0045}>
+						<label for="job_date" class={uiStyles.c0046}>Job Date</label>
 						<input
 							type="date"
 							name="job_date"
 							bind:value={job.job_date}
 							disabled
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+							class={uiStyles.c0047}
 						/>
 					</div>
 
-					<div class="col-span-2">
-						<label for="job_no" class="px-2 text-xl text-neutral-200">Job No</label>
-						<input
-							type="text"
-							name="job_no"
-							bind:value={job.job_no}
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-						/>
+					<div class={uiStyles.c0045}>
+						<label for="job_no" class={uiStyles.c0046}>Job No</label>
+						<input type="text" name="job_no" bind:value={job.job_no} class={uiStyles.c0047} />
 					</div>
 
-					<div class="col-span-2">
-						<label for="model_no" class="px-2 text-xl text-neutral-200">Model No</label>
-						<input
-							type="text"
-							name="model_no"
-							bind:value={job.model_no}
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-						/>
+					<div class={uiStyles.c0045}>
+						<label for="model_no" class={uiStyles.c0046}>Model No</label>
+						<input type="text" name="model_no" bind:value={job.model_no} class={uiStyles.c0047} />
 					</div>
 
-					<div class="col-span-2">
-						<label for="blank_no" class="px-2 text-xl text-neutral-200">Blank No</label>
+					<div class={uiStyles.c0045}>
+						<label for="blank_no" class={uiStyles.c0046}>Blank No</label>
 						<input
 							name="blank_no"
 							type="number"
 							bind:value={job.blank_no}
 							disabled
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+							class={uiStyles.c0047}
 						/>
 					</div>
 				</div>
@@ -477,21 +449,21 @@
 
 			<!-- ADDITIONAL DETAILS -->
 			<section>
-				<h2 class="mb-4 text-2xl text-neutral-200">Additional Details</h2>
-				<div class="mb-4 grid grid-cols-8 gap-4">
-					<div class="col-span-2">
-						<label for="job_card_no" class="px-2 text-xl text-neutral-200">Job Card No</label>
+				<h2 class={uiStyles.c0091}>Additional Details</h2>
+				<div class={uiStyles.c0092}>
+					<div class={uiStyles.c0045}>
+						<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
 						<input
 							name="job_card_no"
 							type="number"
 							bind:value={job.job_card_no}
 							placeholder={job.job_card_no ? '' : 'Job Card No'}
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+							class={uiStyles.c0047}
 						/>
 					</div>
 
-					<div class="col-span-2">
-						<label for="serial_no" class="px-2 text-xl text-neutral-200">Serial No</label>
+					<div class={uiStyles.c0045}>
+						<label for="serial_no" class={uiStyles.c0046}>Serial No</label>
 						<input
 							name="serial_no"
 							type="number"
@@ -499,18 +471,18 @@
 							bind:value={job.serial_no}
 							inputmode="numeric"
 							pattern="\d{6}"
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+							class={uiStyles.c0047}
 						/>
 					</div>
 
-					<div class="col-span-2">
-						<label for="customer" class="px-2 text-xl text-neutral-200">Customer</label>
+					<div class={uiStyles.c0045}>
+						<label for="customer" class={uiStyles.c0046}>Customer</label>
 						<textarea
 							name="customer"
 							rows="1"
 							bind:value={job.customer}
 							placeholder={job.customer ? '' : 'Customer'}
-							class="input col-span-3 mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+							class={uiStyles.c0093}
 						></textarea>
 					</div>
 				</div>
@@ -518,17 +490,17 @@
 
 			<!-- PROCESS DATES -->
 			<section>
-				<h2 class="mb-4 text-2xl text-neutral-200">Process Dates</h2>
-				<div class="grid grid-cols-8 gap-4">
+				<h2 class={uiStyles.c0091}>Process Dates</h2>
+				<div class={uiStyles.c0094}>
 					{#each dateFields as [field, label]}
-						<label for={field} class="col-span-1 text-xl text-neutral-200">{label}</label>
+						<label for={field} class={uiStyles.c0095}>{label}</label>
 						<input
 							type="date"
 							id={field}
 							name={field}
 							bind:value={job[field]}
 							placeholder={job[field] ? '' : label}
-							class="input col-span-1 mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+							class={uiStyles.c0096}
 						/>
 					{/each}
 				</div>
@@ -536,28 +508,18 @@
 
 			<!-- REMARKS -->
 			<section>
-				<h2 class="mb-4 px-2 text-xl text-neutral-200">Remarks</h2>
-				<div class="grid grid-cols-2">
-					<textarea
-						placeholder="Remarks"
-						name="remarks"
-						class="input col-span-2 mt-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+				<h2 class={uiStyles.c0097}>Remarks</h2>
+				<div class={uiStyles.c0098}>
+					<textarea placeholder="Remarks" name="remarks" class={uiStyles.c0099}
 						>{job.remarks ?? ''}</textarea
 					>
 				</div>
 			</section>
 
 			<!-- ACTION -->
-			<div class="flex justify-end gap-3">
-				<a
-					href="/trs/update"
-					class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-					>Cancel</a
-				>
-				<button
-					class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
-					disabled={saving}
-				>
+			<div class={uiStyles.c0060}>
+				<a href="/trs/update" class={uiStyles.c0100}>Cancel</a>
+				<button class={uiStyles.c0062} disabled={saving}>
 					{saving ? 'Saving...' : 'Update Entry'}
 				</button>
 			</div>

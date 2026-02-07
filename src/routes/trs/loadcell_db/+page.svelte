@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { styles as uiStyles } from '$lib/utils/styles';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
@@ -222,33 +223,27 @@
 	];
 </script>
 
-<div class="bg-neutral min-w-full space-y-6 text-neutral-200">
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">Loadcell Database</h1>
-	<div class="flex justify-end">
-		<button
-			disabled={isDefaultState}
-			class="font-5xl cursor-pointer rounded-md bg-red-800 px-4 py-2 hover:bg-red-600 disabled:pointer-events-none disabled:opacity-0"
-			onclick={() => resetAll()}>Filter Reset</button
+<div class={uiStyles.c0113}>
+	<h1 class={uiStyles.c0021}>Loadcell Database</h1>
+	<div class={uiStyles.c0114}>
+		<button disabled={isDefaultState} class={uiStyles.c0115} onclick={() => resetAll()}
+			>Filter Reset</button
 		>
 	</div>
 	<!-- ================= TABLE ================= -->
-	<div class="w-full text-xl text-neutral-200">
-		<table class="whitespace-nonwrap mb-12 w-full border-separate border-spacing-y-2 select-none">
+	<div class={uiStyles.c0116}>
+		<table class={uiStyles.c0117}>
 			<thead>
 				<tr>
 					{#each Object.keys(columnMeta) as column}
 						<th
-							class="rounded-md border-b-2 border-neutral-700 py-2 text-center transition-colors"
+							class={uiStyles.c0118}
 							class:bg-teal-950={sortColumn === column && !filters[column]}
 							class:bg-lime-950={filters[column] && sortColumn !== column}
 							class:bg-orange-950={sortColumn === column && filters[column]}
 						>
-							<span class="text-center">{columnMeta[column].label}</span>
-							<button
-								aria-label="Sort"
-								class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
-								onclick={() => toggleSort(column)}
-							>
+							<span class={uiStyles.c0119}>{columnMeta[column].label}</span>
+							<button aria-label="Sort" class={uiStyles.c0120} onclick={() => toggleSort(column)}>
 								{#if sortColumn !== column}
 									<ChevronsUpDown size="16" />
 								{:else if sortAscending}
@@ -258,7 +253,7 @@
 								{/if}
 							</button>
 							<button
-								class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
+								class={uiStyles.c0120}
 								aria-label="Filter"
 								onclick={() => {
 									ensureFilter(column);
@@ -268,12 +263,9 @@
 								<Funnel size="16" />
 							</button>
 							{#if activeFilter === column}
-								<div
-									bind:this={popoverEl}
-									class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-md border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
-								>
+								<div bind:this={popoverEl} class={uiStyles.c0121}>
 									<select
-										class="focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:ring-2 focus:outline-none"
+										class={uiStyles.c0150}
 										bind:value={filters[column].op}
 										onchange={() => {
 											if (!filters[column]) {
@@ -287,71 +279,53 @@
 									</select>
 
 									{#if columnMeta[column].type === 'enum'}
-										<select
-											class="focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
-											bind:value={filters[column].value}
-										>
+										<select class={uiStyles.c0151} bind:value={filters[column].value}>
 											{#each columnMeta[column].values as v}
 												<option value={v}>{v}</option>
 											{/each}
 										</select>
 									{:else if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
 										<input
-											class="mt-2 input focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class={uiStyles.c0152}
 											type="date"
 											bind:value={filters[column].value[0]}
 										/>
 										<input
-											class="mt-2 input focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class={uiStyles.c0152}
 											type="date"
 											bind:value={filters[column].value[1]}
 										/>
 									{:else if columnMeta[column].type === 'date'}
-										<input
-											class="mt-2 input focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
-											type="date"
-											bind:value={filters[column].value}
-										/>
+										<input class={uiStyles.c0152} type="date" bind:value={filters[column].value} />
 									{:else}
 										<input
-											class="mt-2 input focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none"
+											class={uiStyles.c0152}
 											type={columnMeta[column].type === 'number' ? 'number' : 'text'}
 											bind:value={filters[column].value}
 											onkeydown={(e) => e.key === 'Enter' && applyFilters()}
 										/>
 									{/if}
-									<div class="actions">
-										<button
-											class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-											onclick={applyFilters}>Apply</button
-										>
-										<button
-											class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-											onclick={() => clearFilter(column)}>Clear</button
+									<div class={uiStyles.c0124}>
+										<button class={uiStyles.c0100} onclick={applyFilters}>Apply</button>
+										<button class={uiStyles.c0100} onclick={() => clearFilter(column)}>Clear</button
 										>
 									</div>
 								</div>
 							{/if}
 						</th>
 					{/each}
-					<th class="rounded-md border-b-2 border-neutral-700 py-2 text-center transition-colors"
-					></th>
+					<th class={uiStyles.c0118}></th>
 				</tr>
 			</thead>
 
 			<tbody>
 				{#each data.rows as row}
-					<tr class="hover:bg-neutral-600/50">
+					<tr class={uiStyles.c0125}>
 						{#each Object.keys(columnMeta) as column}
-							<td class="px-6">{row[column] ?? '—'}</td>
+							<td class={uiStyles.c0126}>{row[column] ?? '—'}</td>
 						{/each}
 						<td>
-							<button
-								class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-								onclick={() => (selectedJob = row)}
-							>
-								Open
-							</button>
+							<button class={uiStyles.c0089} onclick={() => (selectedJob = row)}> Open </button>
 						</td>
 					</tr>
 				{/each}
@@ -359,9 +333,9 @@
 		</table>
 	</div>
 	<!-- ================= PAGINATION ================= -->
-	<div class="flex-nonwrap flex justify-center space-x-4 text-center">
+	<div class={uiStyles.c0127}>
 		<button
-			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+			class={uiStyles.c0128}
 			aria-label="First page"
 			disabled={data.page === 1}
 			onclick={() => gotoPage(1)}
@@ -369,7 +343,7 @@
 			<ChevronFirst size="24" />
 		</button>
 		<button
-			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+			class={uiStyles.c0128}
 			aria-label="Previous page"
 			disabled={data.page === 1}
 			onclick={() => gotoPage(data.page - 1)}
@@ -377,10 +351,10 @@
 			<ChevronLeft size="24" />
 		</button>
 
-		<span class="px-4 text-xl"> {data.page} / {totalPages} </span>
+		<span class={uiStyles.c0129}> {data.page} / {totalPages} </span>
 
 		<button
-			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+			class={uiStyles.c0128}
 			aria-label="Next page"
 			disabled={data.page === totalPages}
 			onclick={() => gotoPage(data.page + 1)}
@@ -388,7 +362,7 @@
 			<ChevronRight size="24" />
 		</button>
 		<button
-			class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+			class={uiStyles.c0128}
 			aria-label="Last page"
 			disabled={data.page === totalPages}
 			onclick={() => gotoPage(totalPages)}
@@ -399,27 +373,18 @@
 </div>
 
 {#if selectedJob}
-	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-800/95 p-4 text-neutral-200"
-	>
-		<div
-			class="shadow-card max-h-full w-9/10 max-w-full space-y-4 overflow-y-auto rounded-md bg-black p-12"
-		>
-			<div class="flex items-center justify-between">
-				<h2 class="text-5xl font-medium">Loadcell Details</h2>
-				<button
-					onclick={() => (selectedJob = null)}
-					class="rounded-md bg-neutral-800 px-4 py-2 text-2xl text-neutral-200 hover:bg-neutral-600"
-				>
-					Close
-				</button>
+	<div class={uiStyles.c0130}>
+		<div class={uiStyles.c0131}>
+			<div class={uiStyles.c0132}>
+				<h2 class={uiStyles.c0133}>Loadcell Details</h2>
+				<button onclick={() => (selectedJob = null)} class={uiStyles.c0134}> Close </button>
 			</div>
 
-			<div class="grid grid-cols-12 gap-8 text-center text-xl">
+			<div class={uiStyles.c0135}>
 				{#each fields as [key, label]}
-					<div class="col-span-4 rounded-md bg-neutral-800/80 p-4">
-						<p class="rounded-md bg-neutral-700/80 p-4 text-xl text-neutral-200">{label}</p>
-						<p class="p-2">{selectedJob[key] ?? '—'}</p>
+					<div class={uiStyles.c0136}>
+						<p class={uiStyles.c0137}>{label}</p>
+						<p class={uiStyles.c0138}>{selectedJob[key] ?? '—'}</p>
 					</div>
 				{/each}
 			</div>

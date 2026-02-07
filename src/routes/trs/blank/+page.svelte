@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { styles as uiStyles } from '$lib/utils/styles';
 	import { enhance } from '$app/forms';
 	import { toast } from '$lib/utils/toast.js';
 	export let form;
@@ -15,14 +16,14 @@
 	}
 </script>
 
-<div class="min-w-full space-y-6">
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">Blank Incoming Entry</h1>
+<div class={uiStyles.c0069}>
+	<h1 class={uiStyles.c0021}>Blank Incoming Entry</h1>
 
 	<!-- MODE TOGGLE -->
-	<div class="mb-4 flex justify-center gap-2">
+	<div class={uiStyles.c0101}>
 		<button
 			type="button"
-			class="font-5xl cursor-pointer rounded-md border-2 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
+			class={uiStyles.c0102}
 			class:bg-neutral-800={isBatchMode === false}
 			class:text-neutral-100={isBatchMode === false}
 			class:shadow-inner={isBatchMode === false}
@@ -34,7 +35,7 @@
 		</button>
 		<button
 			type="button"
-			class="font-5xl cursor-pointer rounded-md border-2 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
+			class={uiStyles.c0102}
 			class:bg-neutral-800={isBatchMode === true}
 			class:text-neutral-100={isBatchMode === true}
 			class:shadow-inner={isBatchMode === true}
@@ -55,51 +56,40 @@
 				await update();
 			};
 		}}
-		class="bg-surface shadow-card space-y-8 rounded-md p-6"
+		class={uiStyles.c0090}
 	>
 		<!-- Hidden field to indicate batch mode -->
 		<input type="hidden" name="is_batch" value={isBatchMode ? 'true' : 'false'} />
 
 		<!-- CORE DETAILS -->
 		<section>
-			<h2 class="mb-4 text-2xl text-neutral-200">Core Details</h2>
-			<div class="mb-4 grid grid-cols-8 gap-4">
-				<div class="col-span-2">
-					<label for="received_date" class="px-2 text-xl text-neutral-200">Received Date *</label>
-					<input
-						type="date"
-						name="received_date"
-						required
-						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-					/>
+			<h2 class={uiStyles.c0091}>Core Details</h2>
+			<div class={uiStyles.c0092}>
+				<div class={uiStyles.c0045}>
+					<label for="received_date" class={uiStyles.c0046}>Received Date *</label>
+					<input type="date" name="received_date" required class={uiStyles.c0055} />
 				</div>
 
-				<div class="col-span-2">
-					<label for="job_no" class="px-2 text-xl text-neutral-200">Job No *</label>
-					<input
-						type="text"
-						name="job_no"
-						placeholder="Job No *"
-						required
-						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-					/>
+				<div class={uiStyles.c0045}>
+					<label for="job_no" class={uiStyles.c0046}>Job No *</label>
+					<input type="text" name="job_no" placeholder="Job No *" required class={uiStyles.c0055} />
 				</div>
 
-				<div class="col-span-2">
-					<label for="model_no" class="px-2 text-xl text-neutral-200">Model No *</label>
+				<div class={uiStyles.c0045}>
+					<label for="model_no" class={uiStyles.c0046}>Model No *</label>
 					<input
 						type="text"
 						name="model_no"
 						placeholder="Model No *"
 						required
-						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+						class={uiStyles.c0055}
 					/>
 				</div>
 
 				<!-- SINGLE ENTRY MODE -->
 				{#if !isBatchMode}
-					<div class="col-span-2">
-						<label for="blank_no" class="px-2 text-xl text-neutral-200">Blank No *</label>
+					<div class={uiStyles.c0045}>
+						<label for="blank_no" class={uiStyles.c0046}>Blank No *</label>
 						<input
 							name="blank_no"
 							type="number"
@@ -107,16 +97,16 @@
 							inputmode="numeric"
 							pattern="\d{7}"
 							required
-							class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+							class={uiStyles.c0055}
 						/>
-						<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
+						<div class={uiStyles.c0103}>
 							<input
 								type="checkbox"
 								id="allow_duplicate_blank"
 								name="allow_duplicate_blank"
-								class="mt-2 accent-cyan-500"
+								class={uiStyles.c0104}
 							/>
-							<label for="allow_duplicate_blank" class="px-2 text-base text-neutral-200">
+							<label for="allow_duplicate_blank" class={uiStyles.c0105}>
 								Allow duplicate Blank No
 							</label>
 						</div>
@@ -125,9 +115,9 @@
 
 				<!-- BATCH ENTRY MODE -->
 				{#if isBatchMode}
-					<div class="col-span-2">
-						<div class="px-2 text-xl text-neutral-200">Blank No Range *</div>
-						<div class="grid grid-cols-2 gap-2">
+					<div class={uiStyles.c0045}>
+						<div class={uiStyles.c0046}>Blank No Range *</div>
+						<div class={uiStyles.c0106}>
 							<input
 								name="blank_no_start"
 								type="number"
@@ -135,7 +125,7 @@
 								inputmode="numeric"
 								pattern="\d{7}"
 								required
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class={uiStyles.c0055}
 							/>
 							<input
 								name="blank_no_end"
@@ -144,17 +134,17 @@
 								inputmode="numeric"
 								pattern="\d{7}"
 								required
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class={uiStyles.c0055}
 							/>
 						</div>
-						<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
+						<div class={uiStyles.c0103}>
 							<input
 								type="checkbox"
 								id="allow_duplicate_blank_batch"
 								name="allow_duplicate_blank"
-								class="mt-2 accent-cyan-500"
+								class={uiStyles.c0104}
 							/>
-							<label for="allow_duplicate_blank_batch" class="px-2 text-base text-neutral-200">
+							<label for="allow_duplicate_blank_batch" class={uiStyles.c0105}>
 								Allow duplicate Blank No
 							</label>
 						</div>
@@ -165,39 +155,35 @@
 
 		<!-- ADDITIONAL DETAILS -->
 		<section>
-			<h2 class="mb-4 text-2xl text-neutral-200">Additional Details</h2>
-			<div class="mb-4 grid grid-cols-8 gap-4">
-				<div class="col-span-2">
-					<label for="job_card_no" class="px-2 text-xl text-neutral-200">Job Card No</label>
+			<h2 class={uiStyles.c0091}>Additional Details</h2>
+			<div class={uiStyles.c0092}>
+				<div class={uiStyles.c0045}>
+					<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
 					<input
 						name="job_card_no"
 						type="number"
 						placeholder="Job Card No"
-						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+						class={uiStyles.c0055}
 					/>
 				</div>
-				<div class="col-span-2 grid grid-cols-2">
-					<label for="remarks" class="px-2 text-xl text-neutral-200">Remarks</label>
-					<textarea
-						placeholder="Remarks"
-						name="remarks"
-						class="mt-2 input col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-					></textarea>
+				<div class={uiStyles.c0107}>
+					<label for="remarks" class={uiStyles.c0046}>Remarks</label>
+					<textarea placeholder="Remarks" name="remarks" class={uiStyles.c0108}></textarea>
 				</div>
 			</div>
 		</section>
 
 		<!-- FEEDBACK -->
-		<!-- <div class="max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2">
+		<!-- <div class={uiStyles.c0080}>
 			{#if form?.error || form?.success}
 				{#if form?.error}
-					<p class="text-danger rounded-md bg-red-800 px-4 py-3 shadow-lg">
+					<p class={uiStyles.c0109}>
 						{form.error}
 					</p>
 				{/if}
 
 				{#if form?.success}
-					<p class="text-success rounded-md bg-green-800 px-4 py-3 shadow-lg">
+					<p class={uiStyles.c0110}>
 						{#if form.count && form.count > 1}
 							{form.count} blank entries created successfully
 						{:else}
@@ -209,18 +195,9 @@
 		</div> -->
 
 		<!-- ACTIONS -->
-		<div class="flex justify-end gap-2">
-			<a
-				href="/"
-				class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-				>Cancel</a
-			>
-			<button
-				type="submit"
-				formaction="?/create"
-				class="font-5xl diabled:opacity-50 cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:cursor-not-allowed"
-				disabled={saving}
-			>
+		<div class={uiStyles.c0111}>
+			<a href="/" class={uiStyles.c0100}>Cancel</a>
+			<button type="submit" formaction="?/create" class={uiStyles.c0112} disabled={saving}>
 				{saving ? 'Saving...' : isBatchMode ? 'Create Batch Entries' : 'Create Entry'}
 			</button>
 		</div>

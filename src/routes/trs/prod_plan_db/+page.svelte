@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { styles as uiStyles } from '$lib/utils/styles';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
@@ -93,7 +94,7 @@
 		}
 	}
 
-	type ColumnType = 'text' | 'number' | 'date';
+	type ColumnType = 'text' | 'number' | 'date' | 'enum';
 	type ColumnMeta = { type: ColumnType; label: string };
 	type Filter = { op: string; value: any };
 
@@ -123,6 +124,10 @@
 		date: [
 			{ value: 'eq', label: 'On' },
 			{ value: 'between', label: 'Between' }
+		],
+		enum: [
+			{ value: 'eq', label: 'Equals' },
+			{ value: 'neq', label: 'Not Equals' }
 		]
 	};
 
@@ -206,84 +211,61 @@
 	];
 </script>
 
-<div class="bg-neutral min-w-full space-y-6 text-neutral-200">
-	<div class="relative">
-		<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">Production Plan Database</h1>
-		<button
-			disabled={isDefaultState}
-			class="font-5xl absolute right-0 bottom-0 cursor-pointer rounded-md bg-red-800 px-4 py-2 text-xl text-red-100 hover:bg-red-600 disabled:pointer-events-none disabled:opacity-0"
-			onclick={() => resetAll()}>Filter Reset</button
+<div class={uiStyles.c0113}>
+	<div class={uiStyles.c0148}>
+		<h1 class={uiStyles.c0021}>Production Plan Database</h1>
+		<button disabled={isDefaultState} class={uiStyles.c0149} onclick={() => resetAll()}
+			>Filter Reset</button
 		>
 	</div>
 
-	<div class="grid grid-cols-8 items-end gap-4">
-		<div class="col-span-2">
-			<label for="scheduled_month" class="px-2 text-xl text-neutral-200">Scheduled Month</label>
-			<input
-				id="scheduled_month"
-				class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-				type="month"
-				bind:value={scheduledMonth}
-			/>
+	<div class={uiStyles.c0063}>
+		<div class={uiStyles.c0045}>
+			<label for="scheduled_month" class={uiStyles.c0046}>Scheduled Month</label>
+			<input id="scheduled_month" class={uiStyles.c0047} type="month" bind:value={scheduledMonth} />
 		</div>
-		<div class="col-span-1">
-			<button
-				type="button"
-				onclick={loadMonth}
-				disabled={loading}
-				class="rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 text-neutral-200 transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-50"
-			>
+		<div class={uiStyles.c0064}>
+			<button type="button" onclick={loadMonth} disabled={loading} class={uiStyles.c0065}>
 				{loading ? 'Loading...' : 'Load'}
 			</button>
 		</div>
-		<div class="col-span-3"></div>
-		<div class="relative col-span-2">
-			<label
-				for="electromech_toggle"
-				class="absolute right-0 bottom-0 flex cursor-pointer items-center rounded-md border border-neutral-700 bg-neutral-800 px-3 py-1.5"
-			>
-				<span class="text-xl text-neutral-200">Main</span>
+		<div class={uiStyles.c0066}></div>
+		<div class={uiStyles.c0049}>
+			<label for="electromech_toggle" class={uiStyles.c0050}>
+				<span class={uiStyles.c0051}>Main</span>
 				<input
 					id="electromech_toggle"
 					type="checkbox"
-					class="peer sr-only"
+					class={uiStyles.c0052}
 					checked={electromech}
 					onchange={toggleElectromech}
 				/>
-				<div
-					class="peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-cyan-500 peer-checked:bg-red-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"
-				></div>
-				<span class="text-xl text-neutral-200">Electromech</span>
+				<div class={uiStyles.c0053}></div>
+				<span class={uiStyles.c0051}>Electromech</span>
 			</label>
 		</div>
 	</div>
 
-	<div class="w-full text-xl text-neutral-200">
+	<div class={uiStyles.c0116}>
 		{#if visibleRows.length === 0}
-			<p
-				class="font-5xl rounded-md border-2 border-red-600 bg-red-800 py-2 text-center text-2xl text-red-100"
-			>
+			<p class={uiStyles.c0067}>
 				{electromech
 					? 'No Electromech production planned for this month'
 					: 'No Main production planned for this month.'}
 			</p>
 		{:else}
-			<table class="whitespace-nonwrap mb-12 w-full border-separate border-spacing-y-2 select-none">
+			<table class={uiStyles.c0117}>
 				<thead>
 					<tr>
 						{#each Object.keys(columnMeta) as column}
 							<th
-								class="rounded-md border-b-2 border-neutral-700 py-2 text-center transition-colors"
+								class={uiStyles.c0118}
 								class:bg-teal-950={sortColumn === column && !filters[column]}
 								class:bg-lime-950={filters[column] && sortColumn !== column}
 								class:bg-orange-950={sortColumn === column && filters[column]}
 							>
-								<span class="text-center">{columnMeta[column].label}</span>
-								<button
-									aria-label="Sort"
-									class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
-									onclick={() => toggleSort(column)}
-								>
+								<span class={uiStyles.c0119}>{columnMeta[column].label}</span>
+								<button aria-label="Sort" class={uiStyles.c0120} onclick={() => toggleSort(column)}>
 									{#if sortColumn !== column}
 										<ChevronsUpDown size="16" />
 									{:else if sortAscending}
@@ -293,7 +275,7 @@
 									{/if}
 								</button>
 								<button
-									class="ml-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-1 hover:bg-neutral-600"
+									class={uiStyles.c0120}
 									aria-label="Filter"
 									onclick={() => {
 										ensureFilter(column);
@@ -303,14 +285,8 @@
 									<Funnel size="16" />
 								</button>
 								{#if activeFilter === column}
-									<div
-										bind:this={popoverEl}
-										class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-md border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
-									>
-										<select
-											class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-											bind:value={filters[column].op}
-										>
+									<div bind:this={popoverEl} class={uiStyles.c0121}>
+										<select class={uiStyles.c0122} bind:value={filters[column].op}>
 											{#each OPERATORS[columnMeta[column].type] as op}
 												<option value={op.value}>{op.label}</option>
 											{/each}
@@ -318,88 +294,78 @@
 
 										{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
 											<input
-												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+												class={uiStyles.c0123}
 												type="date"
 												bind:value={filters[column].value[0]}
 											/>
 											<input
-												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+												class={uiStyles.c0123}
 												type="date"
 												bind:value={filters[column].value[1]}
 											/>
 										{:else if columnMeta[column].type === 'date'}
 											<input
-												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+												class={uiStyles.c0123}
 												type="date"
 												bind:value={filters[column].value}
 											/>
 										{:else}
 											<input
-												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+												class={uiStyles.c0123}
 												type={columnMeta[column].type === 'number' ? 'number' : 'text'}
 												bind:value={filters[column].value}
 												onkeydown={(e) => e.key === 'Enter' && applyFilters()}
 											/>
 										{/if}
-										<div class="actions">
-											<button
-												class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-												onclick={applyFilters}>Apply</button
-											>
-											<button
-												class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-												onclick={() => clearFilter(column)}>Clear</button
+										<div class={uiStyles.c0124}>
+											<button class={uiStyles.c0100} onclick={applyFilters}>Apply</button>
+											<button class={uiStyles.c0100} onclick={() => clearFilter(column)}
+												>Clear</button
 											>
 										</div>
 									</div>
 								{/if}
 							</th>
 						{/each}
-						<th class="rounded-md border-b-2 border-neutral-700 py-2 text-center transition-colors"
-						></th>
+						<th class={uiStyles.c0118}></th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each data.rows as row}
-						<tr class="hover:bg-neutral-600/50">
+						<tr class={uiStyles.c0125}>
 							{#each Object.keys(columnMeta) as column}
-								<td class="px-6">{row[column] ?? '—'}</td>
+								<td class={uiStyles.c0126}>{row[column] ?? '—'}</td>
 							{/each}
 							<td>
-								<button
-									class="font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600"
-									onclick={() => (selectedPlan = row)}
-								>
-									Open
-								</button>
+								<button class={uiStyles.c0089} onclick={() => (selectedPlan = row)}> Open </button>
 							</td>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
 
-			<div class="flex-nonwrap flex justify-center space-x-4 text-center">
+			<div class={uiStyles.c0127}>
 				<button
-					class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+					class={uiStyles.c0128}
 					aria-label="First page"
 					disabled={data.page === 1}
 					onclick={() => gotoPage(1)}><ChevronFirst size="24" /></button
 				>
 				<button
-					class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+					class={uiStyles.c0128}
 					aria-label="Previous page"
 					disabled={data.page === 1}
 					onclick={() => gotoPage(data.page - 1)}><ChevronLeft size="24" /></button
 				>
-				<span class="px-4 text-xl"> {data.page} / {totalPages} </span>
+				<span class={uiStyles.c0129}> {data.page} / {totalPages} </span>
 				<button
-					class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+					class={uiStyles.c0128}
 					aria-label="Next page"
 					disabled={data.page === totalPages}
 					onclick={() => gotoPage(data.page + 1)}><ChevronRight size="24" /></button
 				>
 				<button
-					class="flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0"
+					class={uiStyles.c0128}
 					aria-label="Last page"
 					disabled={data.page === totalPages}
 					onclick={() => gotoPage(totalPages)}><ChevronLast size="24" /></button
@@ -410,25 +376,17 @@
 </div>
 
 {#if selectedPlan}
-	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-800/95 p-4 text-neutral-200"
-	>
-		<div
-			class="shadow-card max-h-full w-9/10 max-w-full space-y-4 overflow-y-auto rounded-md bg-black p-12"
-		>
-			<div class="flex items-center justify-between">
-				<h2 class="text-5xl font-medium">Production Plan Details</h2>
-				<button
-					onclick={() => (selectedPlan = null)}
-					class="rounded-md bg-neutral-800 px-4 py-2 text-2xl text-neutral-200 hover:bg-neutral-600"
-					>Close</button
-				>
+	<div class={uiStyles.c0130}>
+		<div class={uiStyles.c0131}>
+			<div class={uiStyles.c0132}>
+				<h2 class={uiStyles.c0133}>Production Plan Details</h2>
+				<button onclick={() => (selectedPlan = null)} class={uiStyles.c0134}>Close</button>
 			</div>
-			<div class="grid grid-cols-12 gap-8 text-center text-xl">
+			<div class={uiStyles.c0135}>
 				{#each fields as [key, label]}
-					<div class="col-span-4 rounded-md bg-neutral-800/80 p-4">
-						<p class="rounded-md bg-neutral-700/80 p-4 text-xl text-neutral-200">{label}</p>
-						<p class="p-2">{selectedPlan[key] ?? '—'}</p>
+					<div class={uiStyles.c0136}>
+						<p class={uiStyles.c0137}>{label}</p>
+						<p class={uiStyles.c0138}>{selectedPlan[key] ?? '—'}</p>
 					</div>
 				{/each}
 			</div>

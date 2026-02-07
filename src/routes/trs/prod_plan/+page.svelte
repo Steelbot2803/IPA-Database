@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { styles as uiStyles } from '$lib/utils/styles';
 	import { toast } from '$lib/utils/toast';
 	import { Plus, Trash2 } from 'lucide-svelte';
 	import { isElectromech } from '$lib/utils/customerFilters';
@@ -87,41 +88,34 @@
 	}
 </script>
 
-<div class="min-w-full space-y-6 text-neutral-200">
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">Monthly Production Plan</h1>
+<div class={uiStyles.c0042}>
+	<h1 class={uiStyles.c0021}>Monthly Production Plan</h1>
 
-	<div class="bg-surface shadow-card space-y-6 rounded-md p-6">
+	<div class={uiStyles.c0043}>
 		<section>
-			<div class="mb-4 grid grid-cols-8 items-end gap-4">
-				<div class="col-span-2">
-					<label for="scheduled_month" class="px-2 text-xl text-neutral-200">
-						Scheduled Month *
-					</label>
+			<div class={uiStyles.c0044}>
+				<div class={uiStyles.c0045}>
+					<label for="scheduled_month" class={uiStyles.c0046}> Scheduled Month * </label>
 					<input
 						id="scheduled_month"
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+						class={uiStyles.c0047}
 						type="month"
 						bind:value={scheduledMonth}
 					/>
 				</div>
-				<div class="col-span-4"></div>
-				<div class="relative col-span-2">
-					<label
-						for="electromech_toggle"
-						class="absolute right-0 bottom-0 flex cursor-pointer items-center rounded-md border border-neutral-700 bg-neutral-800 px-3 py-1.5"
-					>
-						<span class="text-xl text-neutral-200">Main</span>
+				<div class={uiStyles.c0048}></div>
+				<div class={uiStyles.c0049}>
+					<label for="electromech_toggle" class={uiStyles.c0050}>
+						<span class={uiStyles.c0051}>Main</span>
 						<input
 							id="electromech_toggle"
 							type="checkbox"
-							class="peer sr-only"
+							class={uiStyles.c0052}
 							checked={electromech}
 							onchange={toggleElectromech}
 						/>
-						<div
-							class="peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-cyan-500 peer-checked:bg-red-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"
-						></div>
-						<span class="text-xl text-neutral-200">Electromech</span>
+						<div class={uiStyles.c0053}></div>
+						<span class={uiStyles.c0051}>Electromech</span>
 					</label>
 				</div>
 			</div>
@@ -130,96 +124,75 @@
 		<section>
 			{#each rows as row, index}
 				{#if !electromech || isElectromech(row.customer)}
-					<div class="mb-4 grid grid-cols-8 gap-4 border-b-2 border-neutral-400 py-3">
-						<div class="col-span-2">
-							<label for="job_no" class="px-2 text-xl text-neutral-200">Job No *</label>
-							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-								placeholder="Job No *"
-								bind:value={row.job_no}
-							/>
+					<div class={uiStyles.c0054}>
+						<div class={uiStyles.c0045}>
+							<label for="job_no" class={uiStyles.c0046}>Job No *</label>
+							<input class={uiStyles.c0055} placeholder="Job No *" bind:value={row.job_no} />
 						</div>
-						<div class="col-span-2">
-							<label for="model_no" class="px-2 text-xl text-neutral-200">Model No *</label>
-							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-								placeholder="Model No *"
-								bind:value={row.model_no}
-							/>
+						<div class={uiStyles.c0045}>
+							<label for="model_no" class={uiStyles.c0046}>Model No *</label>
+							<input class={uiStyles.c0055} placeholder="Model No *" bind:value={row.model_no} />
 						</div>
-						<div class="col-span-2">
-							<label for="quantity" class="px-2 text-xl text-neutral-200">Total Quantity *</label>
+						<div class={uiStyles.c0045}>
+							<label for="quantity" class={uiStyles.c0046}>Total Quantity *</label>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class={uiStyles.c0055}
 								type="number"
 								placeholder="Quantity *"
 								bind:value={row.quantity}
 							/>
 						</div>
-						<div class="col-span-2">
-							<label for="planned_dispatch" class="px-2 text-xl text-neutral-200"
-								>Planned Dispatch *</label
-							>
-							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-								type="date"
-								bind:value={row.planned_dispatch}
-							/>
+						<div class={uiStyles.c0045}>
+							<label for="planned_dispatch" class={uiStyles.c0046}>Planned Dispatch *</label>
+							<input class={uiStyles.c0055} type="date" bind:value={row.planned_dispatch} />
 						</div>
-						<div class="col-span-2">
-							<label for="job_card_no" class="px-2 text-xl text-neutral-200">Job Card No</label>
+						<div class={uiStyles.c0045}>
+							<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class={uiStyles.c0055}
 								placeholder="Job Card No"
 								type="number"
 								bind:value={row.job_card_no}
 							/>
 						</div>
-						<div class="col-span-2">
-							<label for="customer" class="px-2 text-xl text-neutral-200">Customer</label>
+						<div class={uiStyles.c0045}>
+							<label for="customer" class={uiStyles.c0046}>Customer</label>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class={uiStyles.c0055}
 								placeholder="Customer"
 								readonly={electromech}
 								aria-readonly={electromech}
 								bind:value={row.customer}
 							/>
 						</div>
-						<div class="col-span-2">
-							<label for="job_no" class="px-2 text-xl text-neutral-200">Dispatched Quantity</label>
+						<div class={uiStyles.c0045}>
+							<label for="job_no" class={uiStyles.c0046}>Dispatched Quantity</label>
 							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								class={uiStyles.c0055}
 								type="number"
 								placeholder="Dispatched Quantity"
 								bind:value={row.dispatched_qty}
 							/>
 						</div>
-						<div class="col-span-2">
-							<label for="actual_dispatch" class="px-2 text-xl text-neutral-200"
-								>Actual Dispatch</label
-							>
-							<input
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-								type="date"
-								bind:value={row.actual_dispatch}
-							/>
+						<div class={uiStyles.c0045}>
+							<label for="actual_dispatch" class={uiStyles.c0046}>Actual Dispatch</label>
+							<input class={uiStyles.c0055} type="date" bind:value={row.actual_dispatch} />
 						</div>
-						<div class="col-span-7">
-							<label for="job_no" class="px-2 text-xl text-neutral-200">Remarks</label>
+						<div class={uiStyles.c0056}>
+							<label for="job_no" class={uiStyles.c0046}>Remarks</label>
 							<textarea
 								name="Remarks"
 								placeholder="Remarks"
 								bind:value={row.remarks}
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-								></textarea
-							>
+								class={uiStyles.c0057}
+							></textarea>
 						</div>
-						<div class="relative justify-self-end">
+						<div class={uiStyles.c0058}>
 							<button
 								type="button"
 								onclick={() => removeRow(index)}
 								disabled={rows.length === 1}
-								class="font-5xl absolute right-2 bottom-2 cursor-pointer rounded-md bg-neutral-800 px-2 py-2 hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
+								class={uiStyles.c0059}
 								aria-label="Remove row"
 							>
 								<Trash2 size={24} />
@@ -229,21 +202,11 @@
 				{/if}
 			{/each}
 		</section>
-		<div class="flex justify-end gap-3">
-			<button
-				type="button"
-				onclick={addRow}
-				class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-2 py-2 hover:bg-neutral-600"
-				aria-label="Add row"
-			>
+		<div class={uiStyles.c0060}>
+			<button type="button" onclick={addRow} class={uiStyles.c0061} aria-label="Add row">
 				<Plus size={24} />
 			</button>
-			<button
-				type="button"
-				onclick={submit}
-				disabled={submitting}
-				class="font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
-			>
+			<button type="button" onclick={submit} disabled={submitting} class={uiStyles.c0062}>
 				{submitting ? 'Saving...' : 'Submit'}
 			</button>
 		</div>

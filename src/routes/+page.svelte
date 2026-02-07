@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { styles as uiStyles } from '$lib/utils/styles';
 	export let data;
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
@@ -25,25 +26,23 @@
 		};
 	}}
 >
-	<h1 class="mb-6 text-center text-5xl font-medium text-neutral-200">TRS Dashboard</h1>
+	<h1 class={uiStyles.c0021}>TRS Dashboard</h1>
 
 	<!-- KPI SECTION -->
-	<section class="kpi-grid">
-		<div
-			class="kpi total-jobs mb-4 grid min-w-full grid-cols-3 gap-4 text-2xl font-medium text-neutral-200"
-		>
-			<div class="kpi dispatched rounded-md border-2 border-green-600/40 bg-green-900/20 p-4">
-				<h3 class="mb-2">Dispatched</h3>
+	<section class={uiStyles.c0022}>
+		<div class={uiStyles.c0023}>
+			<div class={uiStyles.c0024}>
+				<h3 class={uiStyles.c0025}>Dispatched</h3>
 				<p>{data.dispatched}</p>
 			</div>
 
-			<div class="kpi ready rounded-md border-2 border-yellow-600/40 bg-yellow-900/20 p-4">
-				<h3 class="mb-2">Ready</h3>
+			<div class={uiStyles.c0026}>
+				<h3 class={uiStyles.c0025}>Ready</h3>
 				<p>{data.ready}</p>
 			</div>
 
-			<div class="kpi inprocess rounded-md border-2 border-red-600/40 bg-red-900/20 p-4">
-				<h3 class="mb-2">In-Process</h3>
+			<div class={uiStyles.c0027}>
+				<h3 class={uiStyles.c0025}>In-Process</h3>
 				<p>{data.inProcess}</p>
 			</div>
 		</div>
@@ -52,14 +51,10 @@
 	<!-- DATA TABLES SECTION -->
 
 	<section>
-		<div class="mt-4 grid min-w-full grid-cols-3 gap-6 rounded-md p-4 text-xl text-neutral-200">
-			<div class="col-span-1 rounded-md border-2 border-teal-600/40 p-4 text-center">
-				<h2 class="mb-4 w-full rounded-md bg-teal-900/20 p-4 text-2xl font-medium text-neutral-200">
-					Blank Stock
-				</h2>
-				<table
-					class="mb-4 w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-teal-900/20 p-4"
-				>
+		<div class={uiStyles.c0028}>
+			<div class={uiStyles.c0029}>
+				<h2 class={uiStyles.c0030}>Blank Stock</h2>
+				<table class={uiStyles.c0031}>
 					<thead>
 						<tr>
 							<th>Model No</th>
@@ -75,12 +70,8 @@
 						{/each}
 					</tbody>
 				</table>
-				<h2 class="mb-4 w-full rounded-md bg-teal-900/20 p-4 text-2xl font-medium text-neutral-200">
-					Loadcell Stock
-				</h2>
-				<table
-					class="w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-teal-900/20 p-4"
-				>
+				<h2 class={uiStyles.c0030}>Loadcell Stock</h2>
+				<table class={uiStyles.c0032}>
 					<thead>
 						<tr>
 							<th>Model No</th>
@@ -97,19 +88,11 @@
 					</tbody>
 				</table>
 			</div>
-			<div
-				class="col-span-2 flex flex-col gap-4 rounded-md border-2 border-cyan-500/40 p-4 text-center"
-			>
+			<div class={uiStyles.c0033}>
 				<!-- Recent Entries Section -->
 				<div>
-					<h2
-						class="mb-4 w-full rounded-md bg-cyan-500/20 p-4 text-2xl font-medium text-neutral-200"
-					>
-						Recent Entries
-					</h2>
-					<table
-						class="w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-cyan-500/20 p-4"
-					>
+					<h2 class={uiStyles.c0034}>Recent Entries</h2>
+					<table class={uiStyles.c0035}>
 						<thead>
 							<tr>
 								<th>Job No</th>
@@ -136,21 +119,15 @@
 				</div>
 
 				<!-- Duplicate Sections -->
-				<div class="grid grid-cols-2 gap-4">
+				<div class={uiStyles.c0036}>
 					<!-- Duplicate Blank Numbers -->
-					<div class="flex flex-col gap-4">
-						<h2
-							class="w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-200"
-						>
-							⚠ Duplicate Blank Numbers
-						</h2>
-						<div
-							class="w-full rounded-md bg-purple-900/20 p-4 text-center text-xl text-neutral-200"
-						>
+					<div class={uiStyles.c0037}>
+						<h2 class={uiStyles.c0038}>⚠ Duplicate Blank Numbers</h2>
+						<div class={uiStyles.c0039}>
 							{#if data.blankDuplicates.length === 0}
 								<p>No duplicates found.</p>
 							{:else}
-								<table class="w-full border-separate border-spacing-y-2">
+								<table class={uiStyles.c0040}>
 									<thead>
 										<tr>
 											<th>Blank No</th>
@@ -171,19 +148,13 @@
 					</div>
 
 					<!-- Duplicate Serial Numbers -->
-					<div class="flex flex-col gap-4">
-						<h2
-							class="w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-200"
-						>
-							⚠ Duplicate Serial Numbers
-						</h2>
-						<div
-							class="w-full rounded-md bg-purple-900/20 p-4 text-center text-xl text-neutral-200"
-						>
+					<div class={uiStyles.c0037}>
+						<h2 class={uiStyles.c0038}>⚠ Duplicate Serial Numbers</h2>
+						<div class={uiStyles.c0039}>
 							{#if data.serialDuplicates.length === 0}
 								<p>No duplicates found.</p>
 							{:else}
-								<table class="w-full border-separate border-spacing-y-2 overflow-x-auto">
+								<table class={uiStyles.c0041}>
 									<thead>
 										<tr>
 											<th>Serial No</th>

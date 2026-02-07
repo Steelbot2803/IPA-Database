@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { styles as uiStyles } from '$lib/utils/styles';
 	import { toast } from '$lib/utils/toast';
 	import { fade } from 'svelte/transition';
 	import { X } from 'lucide-svelte';
@@ -11,7 +12,7 @@
 	};
 </script>
 
-<div class="max-w-base fixed top-8 right-4 z-50 flex flex-col gap-3 text-xl">
+<div class={uiStyles.c0001}>
 	{#each $toast as t (t.id)}
 		<div
 			role="status"
@@ -23,16 +24,16 @@
 			in:fade={{ duration: 200 }}
 			out:fade={{ duration: 200 }}
 		>
-			<div class="flex items-start justify-between gap-3">
-				<p class="leading-snug">{t.message}</p>
+			<div class={uiStyles.c0002}>
+				<p class={uiStyles.c0003}>{t.message}</p>
 
-				<button class="text-neutral-200 hover:text-white" onclick={() => toast.dismiss(t.id)}>
+				<button class={uiStyles.c0004} onclick={() => toast.dismiss(t.id)}>
 					<X size="16" />
 				</button>
 			</div>
 
 			<div
-				class="absolute bottom-0 left-0 h-1 bg-neutral-400"
+				class={uiStyles.c0005}
 				style={`animation: shrink ${t.remaining}ms linear forwards`}
 			></div>
 		</div>
