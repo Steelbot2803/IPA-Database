@@ -1,7 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
-
-const isNDigits = (val: string, n: number) => new RegExp(`^\\d{${n}}$`).test(val);
+import { isNDigits } from '$lib/utils/validators';
 
 export const actions = {
 	create: async ({ request }) => {
@@ -52,11 +51,7 @@ export const actions = {
 			}
 
 			const entries = [];
-			for (
-				let blank_no = startNum;
-				blank_no <= endNum;
-				blank_no++
-			) {
+			for (let blank_no = startNum; blank_no <= endNum; blank_no++) {
 				entries.push({
 					received_date: f.received_date,
 					job_no: f.job_no,
@@ -101,7 +96,7 @@ export const actions = {
 			model_no: f.model_no,
 			blank_no: f.blank_no,
 			job_card_no: f.job_card_no || null,
-			remarks: f.remarks || null,
+			remarks: f.remarks || null
 		});
 
 		if (insertErr) {

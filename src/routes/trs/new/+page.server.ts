@@ -1,10 +1,8 @@
 import { fail } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
+import { isNDigits } from '$lib/utils/validators';
 
-const isNDigits = (val: string, n: number) => new RegExp(`^\\d{${n}}$`).test(val);
-
-export async function load ({ url }) {
-
+export async function load({ url }) {
 	const blank_no = url.searchParams.get('blank_no');
 
 	if (!blank_no) {
@@ -22,7 +20,7 @@ export async function load ({ url }) {
 	}
 
 	return { blank: data[0] };
-};
+}
 
 export const actions = {
 	create: async ({ request }) => {
@@ -69,12 +67,12 @@ export const actions = {
 		}
 
 		/* ---------- INSERT ---------- */
-		const { error:insertErr } = await supabase.from('trs_prod').insert({
+		const { error: insertErr } = await supabase.from('trs_prod').insert({
 			job_date: f.job_date,
 			job_no: f.job_no,
 			model_no: f.model_no,
 			blank_no: f.blank_no,
-			
+
 			job_card_no: f.job_card_no || null,
 			serial_no: f.serial_no || null,
 			customer: f.customer || null,
