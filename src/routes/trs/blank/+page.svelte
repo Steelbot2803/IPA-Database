@@ -173,27 +173,6 @@
 			</div>
 		</section>
 
-		<!-- FEEDBACK -->
-		<!-- <div class={uiStyles.c0080}>
-			{#if form?.error || form?.success}
-				{#if form?.error}
-					<p class={uiStyles.c0109}>
-						{form.error}
-					</p>
-				{/if}
-
-				{#if form?.success}
-					<p class={uiStyles.c0110}>
-						{#if form.count && form.count > 1}
-							{form.count} blank entries created successfully
-						{:else}
-							Blank entry created successfully
-						{/if}
-					</p>
-				{/if}
-			{/if}
-		</div> -->
-
 		<!-- ACTIONS -->
 		<div class={uiStyles.c0111}>
 			<a href="/" class={uiStyles.c0100}>Cancel</a>
