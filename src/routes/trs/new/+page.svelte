@@ -2,12 +2,27 @@
 	import { styles as uiStyles } from '$lib/utils/styles';
 	import { enhance } from '$app/forms';
 	import { toast } from '$lib/utils/toast.js';
+	import { LOADCELL_PROCESS_DATE_FIELDS } from '$lib/utils/loadcellDates.js';
 
 	export let form;
 	export let data;
 	let saving = false;
+	let loadingBlank = false;
+	let blankLookupTimer: ReturnType<typeof setTimeout> | undefined;
+	let blankNoInput = data.blank?.blank_no ? String(data.blank.blank_no) : '';
+	let selectedBlankID = data.blank?.id ? String(data.blank.id) : '';
+	let duplicateOptions: BlankMatch[] = [];
+	let jobNoInput = data.blank?.job_no ?? '';
+	let modelNoInput = data.blank?.model_no ?? '';
+	let jobCardNoInput = data.blank?.job_card_no ?? '';
 
-	const blank = data.blank;
+	type BlankMatch = {
+		id: number;
+		blank_no: number;
+		job_no: string;
+		model_no: string;
+		job_card_no: number | null;
+	};
 
 	$: if (form?.error || form?.success || form?.warn) {
 		if (form.error) {
@@ -15,27 +30,75 @@
 		} else if (form.success) {
 			toast.show('Loadcell entry created successfully', 'success', 5000);
 		} else if (form.warn) {
-			toast.show(form.warn, 'warning', 5000);
+			toast.show(form.warn, 'info', 3000);
 		}
 	}
 
-	const dateFields = [
-		['wiring', 'Wiring'],
-		['tc0', 'TC0'],
-		['cycling', 'Cycling'],
-		['cabling', 'Cabling'],
-		['trimming', 'Trimming'],
-		['black_putty', 'Black Putty'],
-		['bellow_welding', 'Bellow Welding'],
-		['pocket_welding', 'Pocket Welding'],
-		['sealing_side_1', 'Sealing Side 1'],
-		['sealing_side_2', 'Sealing Side 2'],
-		['linearity', 'Linearity'],
-		['tc0_qc', 'TC0 QC'],
-		['tinning', 'Tinning'],
-		['ready_date', 'Ready Date'],
-		['dispatch_date', 'Dispatch Date']
-	];
+	const dateFields = LOADCELL_PROCESS_DATE_FIELDS;
+
+	function formatOptionLabel(entry: BlankMatch) {
+		return `${entry.job_no ?? '—'} . ${entry.job_card_no ?? '—'} . ${entry.model_no ?? '—'} `;
+	}
+
+	function applySelectedBlank(matchId: string) {
+		selectedBlankID = matchId;
+		const found = duplicateOptions.find((entry) => String(entry.id) === matchId);
+
+		if (!found) return;
+
+		jobNoInput = data.blank?.job_no ?? '';
+		modelNoInput = data.blank?.model_no ?? '';
+		jobCardNoInput = data.blank?.job_card_no ?? '';
+	}
+
+	async function fetchBlankMatches(blankNo: string) {
+		if (!/^\d{7}$/.test(blankNo)) {
+			duplicateOptions = [];
+			selectedBlankID = '';
+			return;
+		}
+
+		loadingBlank = true;
+
+		try {
+			const res = await fetch(`/trs/new/blank_lookup?blank_no=${encodeURIComponent(blankNo)}`, {
+				headers: { accept: 'application/json' }
+			});
+
+			if (!res.ok) {
+				duplicateOptions = [];
+				selectedBlankID = '';
+				return;
+			}
+
+			const payload = await res.json();
+			duplicateOptions = Array.isArray(payload?.matches) ? payload.matches : [];
+
+			if (duplicateOptions.length > 0) {
+				selectedBlankID = String(duplicateOptions[0].id);
+				applySelectedBlank(selectedBlankID);
+			} else {
+				selectedBlankID = '';
+				jobNoInput = '';
+				modelNoInput = '';
+				jobCardNoInput = '';
+			}
+		} catch {
+			duplicateOptions = [];
+			selectedBlankID = '';
+		} finally {
+			loadingBlank = false;
+		}
+	}
+
+	$: {
+		if (blankLookupTimer) clearTimeout(blankLookupTimer);
+
+		const trimmedBlankNo = blankNoInput.trim();
+		blankLookupTimer = setTimeout(() => {
+			void fetchBlankMatches(trimmedBlankNo);
+		}, 220);
+	}
 </script>
 
 <div class={uiStyles.c0069}>
@@ -67,7 +130,7 @@
 						type="text"
 						name="job_no"
 						placeholder="Job No *"
-						value={blank?.job_no ?? ''}
+						bind:value={jobNoInput}
 						class={uiStyles.c0055}
 					/>
 				</div>
@@ -78,7 +141,7 @@
 						type="text"
 						name="model_no"
 						placeholder="Model No *"
-						value={blank?.model_no ?? ''}
+						bind:value={modelNoInput}
 						class={uiStyles.c0055}
 					/>
 				</div>
@@ -86,14 +149,32 @@
 				<div class={uiStyles.c0045}>
 					<label for="blank_no" class={uiStyles.c0046}>Blank No *</label>
 					<input
-						name="blank_no"
 						type="number"
 						placeholder="Blank No (7 digits) *"
-						value={blank?.blank_no ?? ''}
+						bind:value={blankNoInput}
 						inputmode="numeric"
 						pattern="\d{7}"
 						class={uiStyles.c0055}
 					/>
+					{#if loadingBlank}
+						<p class={uiStyles.c0051}>Loading related blank entries...</p>
+					{/if}
+
+					{#if duplicateOptions.length > 1}
+						<div class={uiStyles.c0045}>
+							<label for="blank_match" class={uiStyles.c0046}>Select matching blank entry</label>
+							<select
+								id="blank_match"
+								bind:value={selectedBlankID}
+								onchange={(event) => applySelectedBlank((event.target as HTMLSelectElement).value)}
+								class={uiStyles.c0055}
+							>
+								{#each duplicateOptions as option}
+									<option value={option.id}>{formatOptionLabel(option)}</option>
+								{/each}
+							</select>
+						</div>
+					{/if}
 					<div class={uiStyles.c0103}>
 						<input
 							type="checkbox"
@@ -118,7 +199,7 @@
 						name="job_card_no"
 						type="number"
 						placeholder="Job Card No"
-						value={blank?.job_card_no ?? ''}
+						bind:value={jobCardNoInput}
 						class={uiStyles.c0055}
 					/>
 				</div>
@@ -161,23 +242,6 @@
 				<textarea placeholder="Remarks" name="remarks" class={uiStyles.c0144}></textarea>
 			</div>
 		</section>
-
-		<!-- FEEDBACK -->
-		<!-- {#if form?.error || form?.success}
-			<div class={uiStyles.c0145}>
-				{#if form?.error}
-					<p class={uiStyles.c0146}>
-						{form.error}
-					</p>
-				{/if}
-
-				{#if form?.success}
-					<p class={uiStyles.c0147}>
-						Loadcell entry created successfully
-					</p>
-				{/if}
-			</div>
-		{/if} -->
 
 		<!-- ACTIONS -->
 		<div class={uiStyles.c0111}>

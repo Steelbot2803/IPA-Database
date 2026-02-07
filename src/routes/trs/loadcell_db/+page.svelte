@@ -5,6 +5,17 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import {
+		OPERATORS,
+		buildApplyFiltersQuery,
+		buildPageQuery,
+		buildSortQuery,
+		defaultOperator,
+		defaultValue,
+		getSortState,
+		type ColumnMeta,
+		type Filter
+	} from '$lib/utils/dbTableClient.js';
+	import {
 		ChevronUp,
 		ChevronDown,
 		ChevronsUpDown,
@@ -25,9 +36,7 @@
 	function gotoPage(page: number) {
 		if (!browser) return;
 		if (page < 1 || page > totalPages) return;
-		const params = new URLSearchParams(window.location.search);
-		params.set('page', page.toString());
-		goto(`?${params.toString()}`);
+		goto(buildPageQuery(window.location.search, page));
 	}
 
 	let sortColumn: string | null = null;
@@ -36,90 +45,34 @@
 	function toggleSort(column: string) {
 		if (!browser) return;
 
-		const isSameColumn = sortColumn === column;
-		const nextAscending = isSameColumn ? !sortAscending : true;
+		const { query, nextAscending } = buildSortQuery(
+			window.location.search,
+			column,
+			sortColumn,
+			sortAscending
+		);
 
 		sortColumn = column;
 		sortAscending = nextAscending;
 
-		const params = new URLSearchParams(window.location.search);
-		params.set('sort', column);
-		params.set('order', nextAscending ? 'asc' : 'desc');
-		params.set('page', '1');
-
-		goto(`?${params.toString()}`);
+		goto(query);
 	}
 
-	$: {
-		const params = page.url.searchParams;
-
-		if (params.has('sort')) {
-			sortColumn = params.get('sort');
-			sortAscending = params.get('order') !== 'desc';
-		} else {
-			sortColumn = null;
-			sortAscending = true;
-		}
-	}
-
-	type ColumnType = 'text' | 'number' | 'date' | 'enum';
-
-	type ColumnMeta = {
-		type: ColumnType;
-		label: string;
-		values?: readonly string[];
-	};
-
-	type Filter = {
-		op: string;
-		value: any;
-	};
+	$: ({ sortColumn, sortAscending } = getSortState(page.url.searchParams));
 
 	let filters: Record<string, Filter> = data.filters ?? {};
 	let columnMeta: Record<string, ColumnMeta> = data.columnMeta;
 	let activeFilter: string | null = null;
 	let popoverEl: HTMLDivElement | null = null;
 
-	const OPERATORS: Record<ColumnType, { value: string; label: string }[]> = {
-		text: [
-			{ value: 'contains', label: 'Contains' },
-			{ value: 'not_contains', label: 'Does Not Contain' },
-			{ value: 'eq', label: 'Equals' }
-		],
-		number: [
-			{ value: 'eq', label: '=' },
-			{ value: 'neq', label: '≠' },
-			{ value: 'gt', label: '>' },
-			{ value: 'lt', label: '<' },
-			{ value: 'gte', label: '>=' },
-			{ value: 'lte', label: '<=' }
-		],
-		date: [
-			{ value: 'eq', label: 'On' },
-			{ value: 'between', label: 'Between' }
-		],
-		enum: [
-			{ value: 'eq', label: 'Equals' },
-			{ value: 'neq', label: 'Not Equals' }
-		]
-	};
-
 	function applyFilters() {
-		const params = new URLSearchParams(window.location.search);
-		params.set('filters', JSON.stringify(filters));
-		params.set('page', '1');
-
-		goto(`?${params.toString()}`);
+		goto(buildApplyFiltersQuery(window.location.search, filters));
 	}
 
 	function clearFilter(column: string) {
 		delete filters[column];
 
-		const params = new URLSearchParams(window.location.search);
-		params.set('filters', JSON.stringify(filters));
-		params.set('page', '1');
-
-		goto(`?${params.toString()}`);
+		goto(buildApplyFiltersQuery(window.location.search, filters));
 		closePopover();
 	}
 
@@ -136,28 +89,11 @@
 
 	$: isDefaultState = Object.keys(filters).length === 0 && !sortColumn;
 
-	function defaultOperator(column: string) {
-		const type = columnMeta[column].type;
-		if (type === 'text') return 'contains';
-		if (type === 'number') return 'eq';
-		if (type === 'date') return 'eq';
-		if (type === 'enum') return 'eq';
-		return 'eq';
-	}
-
-	function defaultValue(column: string) {
-		const type = columnMeta[column].type;
-		if (type === 'date') return '';
-		if (type === 'number') return '';
-		if (type === 'enum') return columnMeta[column].values?.[0] ?? '';
-		return '';
-	}
-
 	function ensureFilter(column: string) {
 		if (!filters[column]) {
 			filters[column] = {
-				op: defaultOperator(column),
-				value: defaultValue(column)
+				op: defaultOperator(columnMeta[column].type),
+				value: defaultValue(columnMeta[column])
 			};
 		}
 	}

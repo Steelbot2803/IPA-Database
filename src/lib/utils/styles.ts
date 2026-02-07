@@ -92,7 +92,7 @@ export const styles = {
 		'absolute z-20 mt-1.5 max-h-72 w-1/3 overflow-y-auto rounded-md border border-neutral-700 bg-neutral-900 text-xl shadow-lg ring-2 ring-neutral-700',
 	c0076:
 		'flex w-full justify-between rounded-md px-3 py-2 text-left text-neutral-200 hover:bg-neutral-800',
-	c0077: 'inline-flex items-center gap-1 text-blue-300',
+	c0077: 'inline-flex items-center gap-1 text-cyan-500',
 	c0078:
 		'font-5xl ml-2 cursor-pointer rounded-md border border-neutral-700 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50',
 	c0079: 'rounded-md bg-green-800 px-4 py-3 text-green-100 shadow-md',
@@ -169,7 +169,7 @@ export const styles = {
 	c0137: 'rounded-md bg-neutral-700/80 p-4 text-xl text-neutral-200',
 	c0138: 'p-2',
 	c0139: 'mt-2 accent-neutral-800',
-	c0140: 'px-1 text-base text-neutral-200',
+	c0140: 'px-1 text-base text-neutral-200 mt-2',
 	c0141:
 		'mt-2 input col-span-3 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none',
 	c0142:

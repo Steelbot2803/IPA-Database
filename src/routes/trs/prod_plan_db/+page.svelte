@@ -6,6 +6,17 @@
 	import { onMount } from 'svelte';
 	import { isElectromech } from '$lib/utils/customerFilters.js';
 	import {
+		OPERATORS,
+		buildApplyFiltersQuery,
+		buildPageQuery,
+		buildSortQuery,
+		defaultOperator,
+		defaultValue,
+		getSortState,
+		type ColumnMeta,
+		type Filter
+	} from '$lib/utils/dbTableClient.js';
+	import {
 		ChevronUp,
 		ChevronDown,
 		ChevronsUpDown,
@@ -28,9 +39,7 @@
 	function gotoPage(page: number) {
 		if (!browser) return;
 		if (page < 1 || page > totalPages) return;
-		const params = new URLSearchParams(window.location.search);
-		params.set('page', page.toString());
-		goto(`?${params.toString()}`);
+		goto(buildPageQuery(window.location.search, page));
 	}
 
 	async function loadMonth() {
@@ -66,37 +75,22 @@
 	function toggleSort(column: string) {
 		if (!browser) return;
 
-		const isSameColumn = sortColumn === column;
-		const nextAscending = isSameColumn ? !sortAscending : true;
+		const { query, nextAscending } = buildSortQuery(
+			window.location.search,
+			column,
+			sortColumn,
+			sortAscending
+		);
 
 		sortColumn = column;
 		sortAscending = nextAscending;
 
-		const params = new URLSearchParams(window.location.search);
-		params.set('sort', column);
-		params.set('order', nextAscending ? 'asc' : 'desc');
-		params.set('page', '1');
-
-		goto(`?${params.toString()}`);
+		goto(query);
 	}
 
 	$: electromech = data.electromech ?? false;
 
-	$: {
-		const params = page.url.searchParams;
-
-		if (params.has('sort')) {
-			sortColumn = params.get('sort');
-			sortAscending = params.get('order') !== 'desc';
-		} else {
-			sortColumn = null;
-			sortAscending = true;
-		}
-	}
-
-	type ColumnType = 'text' | 'number' | 'date' | 'enum';
-	type ColumnMeta = { type: ColumnType; label: string };
-	type Filter = { op: string; value: any };
+	$: ({ sortColumn, sortAscending } = getSortState(page.url.searchParams));
 
 	let filters: Record<string, Filter> = data.filters ?? {};
 	let columnMeta: Record<string, ColumnMeta> = data.columnMeta;
@@ -107,43 +101,14 @@
 		? data.rows.filter((row) => isElectromech(row.customer))
 		: data.rows.filter((row) => !isElectromech(row.customer));
 
-	const OPERATORS: Record<ColumnType, { value: string; label: string }[]> = {
-		text: [
-			{ value: 'contains', label: 'Contains' },
-			{ value: 'not_contains', label: 'Does Not Contain' },
-			{ value: 'eq', label: 'Equals' }
-		],
-		number: [
-			{ value: 'eq', label: '=' },
-			{ value: 'neq', label: '≠' },
-			{ value: 'gt', label: '>' },
-			{ value: 'lt', label: '<' },
-			{ value: 'gte', label: '>=' },
-			{ value: 'lte', label: '<=' }
-		],
-		date: [
-			{ value: 'eq', label: 'On' },
-			{ value: 'between', label: 'Between' }
-		],
-		enum: [
-			{ value: 'eq', label: 'Equals' },
-			{ value: 'neq', label: 'Not Equals' }
-		]
-	};
-
 	function applyFilters() {
-		const params = new URLSearchParams(window.location.search);
-		params.set('filters', JSON.stringify(filters));
-		params.set('page', '1');
-		goto(`?${params.toString()}`);
+		goto(buildApplyFiltersQuery(window.location.search, filters));
 	}
 
 	function clearFilter(column: string) {
 		delete filters[column];
-		const params = new URLSearchParams(window.location.search);
-		params.set('filters', JSON.stringify(filters));
-		params.set('page', '1');
-		goto(`?${params.toString()}`);
+
+		goto(buildApplyFiltersQuery(window.location.search, filters));
 		closePopover();
 	}
 
@@ -159,17 +124,9 @@
 
 	$: isDefaultState = Object.keys(filters).length === 0 && !sortColumn;
 
-	function defaultOperator(column: string) {
-		const type = columnMeta[column].type;
-		if (type === 'text') return 'contains';
-		if (type === 'number') return 'eq';
-		if (type === 'date') return 'eq';
-		return 'eq';
-	}
-
 	function ensureFilter(column: string) {
 		if (!filters[column]) {
-			filters[column] = { op: defaultOperator(column), value: '' };
+			filters[column] = { op: defaultOperator(columnMeta[column].type), value: '' };
 		}
 	}
 

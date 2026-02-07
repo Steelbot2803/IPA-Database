@@ -5,13 +5,14 @@ const COLUMN_META = {
 	job_no: { type: 'text', label: 'Job No' },
 	job_card_no: { type: 'number', label: 'Job Card No' },
 	model_no: { type: 'text', label: 'Model No' },
-	blank_no: { type: 'number', label: 'Blank No' }
+	blank_no: { type: 'number', label: 'Blank No' },
+	status: { type: 'enum', label: 'Status' }
 } as const;
 
 export async function load({ url }) {
 	return loadTablePage({
 		url,
-		table: 'blank_stock',
+		table: 'blank_status_view',
 		columnMeta: COLUMN_META
 	});
 }

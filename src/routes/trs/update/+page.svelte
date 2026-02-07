@@ -4,8 +4,9 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { toast } from '$lib/utils/toast.js';
+	import { LOADCELL_PROCESS_DATE_FIELDS } from '$lib/utils/loadcellDates.js';
 	import { onMount } from 'svelte';
-	import { History } from 'lucide-svelte';
+	import { History, Database } from 'lucide-svelte';
 
 	const initialBlankNo = page.url.searchParams.get('blank_no') ?? '';
 	const initialSerialNo = page.url.searchParams.get('serial_no') ?? '';
@@ -21,12 +22,14 @@
 	let isSearchFocused = false;
 	let showSuggestions = false;
 	let dbSuggestion: string[] = [];
-	let searchHistory: string[] = [];
+	let blankSearchHistory: string[] = [];
+	let serialSearchHistory: string[] = [];
 	let searchInputEl: HTMLInputElement | null = null;
 	let lastNotFoundQuery = '';
 	let lastSuccessQuery = '';
 
-	const SEARCH_HISTORY_KEY = 'trs-update-search-history';
+	const BLANK_SEARCH_HISTORY_KEY = 'trs-update-blank-search-history';
+	const SERIAL_SEARCH_HISTORY_KEY = 'trs-update-serial-search-history';
 	const MAX_HISTORY = 8;
 	const MIN_BLANK_SEARCH_LEN = 7;
 	const MIN_SERIAL_SEARCH_LEN = 6;
@@ -38,8 +41,10 @@
 
 	$: normalizedSearch = searchValue.trim();
 
+	$: activeSearchHistory = searchMode === 'blank' ? blankSearchHistory : serialSearchHistory;
+
 	$: suggestionOptions = [
-		...searchHistory.map((value) => ({ value, source: 'history' as const })),
+		...activeSearchHistory.map((value) => ({ value, source: 'history' as const })),
 		...dbSuggestion.map((value) => ({ value, source: 'database' as const }))
 	]
 		.filter(
@@ -53,41 +58,55 @@
 
 	$: showSuggestions = isSearchFocused && suggestionOptions.length > 0;
 
-	function loadSearchHistory() {
-		if (typeof localStorage === 'undefined') return;
-
-		const stored = localStorage.getItem(SEARCH_HISTORY_KEY);
-
-		if (!stored) return;
+	function parseHistoryValue(stored: string | null): string[] {
+		if (!stored) return [];
 
 		try {
 			const parsed = JSON.parse(stored);
 			if (Array.isArray(parsed)) {
-				searchHistory = parsed.filter((value) => typeof value === 'string').slice(0, MAX_HISTORY);
+				return parsed.filter((value) => typeof value === 'string').slice(0, MAX_HISTORY);
 			}
 		} catch {
-			searchHistory = [];
+			return [];
 		}
+
+		return [];
+	}
+
+	function loadSearchHistory() {
+		if (typeof localStorage === 'undefined') return;
+
+		blankSearchHistory = parseHistoryValue(localStorage.getItem(BLANK_SEARCH_HISTORY_KEY));
+		serialSearchHistory = parseHistoryValue(localStorage.getItem(SERIAL_SEARCH_HISTORY_KEY));
 	}
 
 	function saveSearch(value: string) {
 		const cleaned = value.trim();
 		if (!cleaned || typeof localStorage === 'undefined') return;
 
-		searchHistory = [cleaned, ...searchHistory.filter((entry) => entry !== cleaned)].slice(
-			0,
-			MAX_HISTORY
-		);
-		localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
+		if (searchMode === 'blank') {
+			blankSearchHistory = [
+				cleaned,
+				...blankSearchHistory.filter((entry) => entry !== cleaned)
+			].slice(0, MAX_HISTORY);
+			localStorage.setItem(BLANK_SEARCH_HISTORY_KEY, JSON.stringify(blankSearchHistory));
+			return;
+		}
+
+		serialSearchHistory = [
+			cleaned,
+			...serialSearchHistory.filter((entry) => entry !== cleaned)
+		].slice(0, MAX_HISTORY);
+		localStorage.setItem(SERIAL_SEARCH_HISTORY_KEY, JSON.stringify(serialSearchHistory));
 	}
 
-	async function loadDbSuggestions(term: string) {
+	async function loadDbSuggestions(term: string, mode: 'blank' | 'serial') {
 		if (suggestionAbortController) suggestionAbortController.abort();
 
 		suggestionAbortController = new AbortController();
 
 		const params = new URLSearchParams({
-			mode: searchMode,
+			mode,
 			q: term,
 			limit: '10'
 		});
@@ -105,7 +124,7 @@
 
 			const payload = await res.json();
 			dbSuggestion = Array.isArray(payload?.suggestions)
-				? payload.suggestion.map((value: number | string) => String(value))
+				? payload.suggestions.map((value: number | string) => String(value))
 				: [];
 		} catch (error) {
 			if ((error as Error).name !== 'AbortError') {
@@ -117,9 +136,18 @@
 	$: {
 		if (suggestionTimer) clearTimeout(suggestionTimer);
 
+		const mode = searchMode;
 		suggestionTimer = setTimeout(() => {
-			loadDbSuggestions(normalizedSearch);
+			void loadDbSuggestions(normalizedSearch, mode);
 		}, 180);
+	}
+
+	function setSearchMode (mode: 'blank' | 'serial') {
+		if (searchMode === mode) return;
+
+		searchMode = mode;
+		dbSuggestion = [];
+		lastSearchQuery = '';
 	}
 
 	function applySuggestion(option: SuggestionOption) {
@@ -226,7 +254,7 @@
 		if (data.notFound && currentQuery && isToastEligible && lastNotFoundQuery !== currentQuery) {
 			lastNotFoundQuery = currentQuery;
 			toast.show(
-				`No Loadcell entry against ${searchMode === 'blank' ? 'Blank No' : 'Serial No'} ${searchMode === 'blank' ? currentQuery.slice(-7) : currentQuery.slice(-6)}`,
+				`No Loadcell entry against ${searchMode === 'blank' ? 'Blank No' : 'Serial No'} ${queryValue}`,
 				'error',
 				5000
 			);
@@ -238,23 +266,10 @@
 		}
 	}
 
-	const dateFields: [keyof Job, string][] = [
-		['wiring', 'Wiring'],
-		['tc0', 'TC0'],
-		['cycling', 'Cycling'],
-		['cabling', 'Cabling'],
-		['trimming', 'Trimming'],
-		['black_putty', 'Black Putty'],
-		['bellow_welding', 'Bellow Welding'],
-		['pocket_welding', 'Pocket Welding'],
-		['sealing_side_1', 'Sealing - Side 1'],
-		['sealing_side_2', 'Sealing - Side 2'],
-		['linearity', 'Linearity'],
-		['tc0_qc', 'TC0 QC'],
-		['tinning', 'Tinning'],
-		['ready_date', 'Ready Date'],
-		['dispatch_date', 'Dispatch Date']
-	];
+	const dateFields = LOADCELL_PROCESS_DATE_FIELDS.map(([field, label]) => [
+		field as keyof Job,
+		label
+	]);
 
 	onMount(() => {
 		loadSearchHistory();
@@ -275,7 +290,7 @@
 				class:text-neutral-100={searchMode === 'blank'}
 				class:shadow-inner={searchMode === 'blank'}
 				class:border-cyan-500={searchMode === 'blank'}
-				onclick={() => (searchMode = 'blank')}
+				onclick={() => setSearchMode('blank')}
 				aria-pressed={searchMode === 'blank'}
 			>
 				Blank No
@@ -289,7 +304,7 @@
 				class:text-neutral-100={searchMode === 'serial'}
 				class:shadow-inner={searchMode === 'serial'}
 				class:border-cyan-500={searchMode === 'serial'}
-				onclick={() => (searchMode = 'serial')}
+				onclick={() => setSearchMode('serial')}
 				aria-pressed={searchMode === 'serial'}
 			>
 				Serial No
@@ -325,7 +340,9 @@
 									<History size={20} />
 								</span>
 							{:else}
-								<span class={uiStyles.c0051}>Database</span>
+								<span class={uiStyles.c0077}>
+									<Database size={20} />
+								</span>
 							{/if}
 						</button>
 					{/each}
@@ -337,23 +354,6 @@
 			</button>
 		</div>
 	</form>
-
-	<!-- 	{#if data.success}
-		<div class={uiStyles.c0001}>
-			<p class={uiStyles.c0079}>
-				Loadcell entry updated successfully
-			</p>
-		</div>
-	{/if}
-
-	{#if data.notFound}
-		<div class={uiStyles.c0080}>
-			<p class={uiStyles.c0081}>
-				No job found for {searchMode === 'blank' ? 'Blank No' : 'Serial No'}
-				{searchValue}
-			</p>
-		</div>
-	{/if} -->
 
 	<!-- IF DUPLICATE BLANK NO -->
 	{#if data.jobs && data.jobs.length >= 1}

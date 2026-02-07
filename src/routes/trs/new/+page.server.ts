@@ -40,14 +40,15 @@ export const actions = {
 			return fail(400, { warn: 'Serial No must be exactly 6 digits' });
 		}
 
-		const { data: blank, error: stockErr } = await supabase
-			.from('blank_status_view')
-			.select('*')
+		const { data: blankStock, error: stockErr } = await supabase
+			.from('blank_stock')
+			.select('id')
 			.eq('blank_no', blank_no)
 			.order('id', { ascending: false })
-			.single();
+			.limit(1)
+			.maybeSingle();
 
-		if (stockErr || !blank) {
+		if (stockErr || !blankStock) {
 			return fail(400, { error: 'Blank not available in stock' });
 		}
 

@@ -93,7 +93,9 @@ export const actions = {
 		}
 
 		const updatePayload = {
+			job_no: f.job_no,
 			job_card_no: f.job_card_no || null,
+			model_no: f.model_no,
 			serial_no: f.serial_no || null,
 			customer: f.customer || null,
 			remarks: f.remarks || null,

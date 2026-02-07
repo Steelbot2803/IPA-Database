@@ -116,6 +116,13 @@
 						| Entry
 					</a>
 					<a
+						href="/trs/blank_update"
+						class={uiStyles.c0019}
+						class:bg-neutral-600={isActivePath('/trs/blank_update')}
+					>
+						| Update
+					</a>
+					<a
 						href="/trs/blank_db"
 						class={uiStyles.c0019}
 						class:bg-neutral-600={isActivePath('/trs/blank_db')}
