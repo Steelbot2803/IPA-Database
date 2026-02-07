@@ -62,7 +62,7 @@
 		}
 	}
 
-	type ColumnType = 'text' | 'number' | 'date';
+	type ColumnType = 'text' | 'number' | 'date' | 'enum';
 
 	type ColumnMeta = {
 		type: ColumnType;
@@ -97,6 +97,10 @@
 		date: [
 			{ value: 'eq', label: 'On' },
 			{ value: 'between', label: 'Between' }
+		],
+		enum: [
+			{ value: 'eq', label: 'Equals' },
+			{ value: 'neq', label: 'Not Equals' }
 		]
 	};
 
