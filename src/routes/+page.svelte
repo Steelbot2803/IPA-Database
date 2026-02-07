@@ -98,17 +98,17 @@
 				</table>
 			</div>
 			<div
-				class="col-span-2 flex flex-col gap-4 rounded-md border-2 border-blue-600/40 p-4 text-center"
+				class="col-span-2 flex flex-col gap-4 rounded-md border-2 border-cyan-500/40 p-4 text-center"
 			>
 				<!-- Recent Entries Section -->
 				<div>
 					<h2
-						class="mb-4 w-full rounded-md bg-blue-900/20 p-4 text-2xl font-medium text-neutral-200"
+						class="mb-4 w-full rounded-md bg-cyan-500/20 p-4 text-2xl font-medium text-neutral-200"
 					>
 						Recent Entries
 					</h2>
 					<table
-						class="w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-blue-900/20 p-4"
+						class="w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-cyan-500/20 p-4"
 					>
 						<thead>
 							<tr>

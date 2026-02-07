@@ -221,7 +221,7 @@
 			<label for="scheduled_month" class="px-2 text-xl text-neutral-200">Scheduled Month</label>
 			<input
 				id="scheduled_month"
-				class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+				class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 				type="month"
 				bind:value={scheduledMonth}
 			/>
@@ -251,7 +251,7 @@
 					onchange={toggleElectromech}
 				/>
 				<div
-					class="peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-blue-600 peer-checked:bg-red-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"
+					class="peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-cyan-500 peer-checked:bg-red-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"
 				></div>
 				<span class="text-xl text-neutral-200">Electromech</span>
 			</label>
@@ -308,7 +308,7 @@
 										class="absolute z-50 mt-2 flex w-56 flex-col gap-2 rounded-md border border-neutral-700 bg-neutral-800 p-3 shadow-lg"
 									>
 										<select
-											class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+											class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 											bind:value={filters[column].op}
 										>
 											{#each OPERATORS[columnMeta[column].type] as op}
@@ -318,24 +318,24 @@
 
 										{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
 											<input
-												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 												type="date"
 												bind:value={filters[column].value[0]}
 											/>
 											<input
-												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 												type="date"
 												bind:value={filters[column].value[1]}
 											/>
 										{:else if columnMeta[column].type === 'date'}
 											<input
-												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 												type="date"
 												bind:value={filters[column].value}
 											/>
 										{:else}
 											<input
-												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+												class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 												type={columnMeta[column].type === 'number' ? 'number' : 'text'}
 												bind:value={filters[column].value}
 												onkeydown={(e) => e.key === 'Enter' && applyFilters()}

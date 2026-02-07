@@ -225,7 +225,7 @@
 		if (data.notFound && currentQuery && isToastEligible && lastNotFoundQuery !== currentQuery) {
 			lastNotFoundQuery = currentQuery;
 			toast.show(
-				`Loadcell entry not found against ${searchMode === 'blank' ? 'Blank No' : 'Serial No'} ${searchMode === 'blank' ? currentQuery.slice(-7) : currentQuery.slice(-6)}`,
+				`No Loadcell entry against ${searchMode === 'blank' ? 'Blank No' : 'Serial No'} ${searchMode === 'blank' ? currentQuery.slice(-7) : currentQuery.slice(-6)}`,
 				'error',
 				5000
 			);
@@ -265,6 +265,7 @@
 
 	<!-- SEARCH -->
 	<form
+		name="search"
 		method="GET"
 		class="bg-surface shadow-card flex gap-3 rounded-md px-6"
 		onsubmit={handleSearchSubmit}
@@ -272,11 +273,12 @@
 		<div>
 			<button
 				type="button"
-				class="font-5xl cursor-pointer rounded-md border-2 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
+				class="font-5xl cursor-pointer rounded-md border-2 px-6 py-2 text-xl hover:bg-neutral-600"
 				class:bg-neutral-800={searchMode === 'blank'}
+				class:border-neutral-700={searchMode === 'serial'}
 				class:text-neutral-100={searchMode === 'blank'}
 				class:shadow-inner={searchMode === 'blank'}
-				class:border-blue-600={searchMode === 'blank'}
+				class:border-cyan-500={searchMode === 'blank'}
 				onclick={() => (searchMode = 'blank')}
 				aria-pressed={searchMode === 'blank'}
 			>
@@ -285,11 +287,12 @@
 
 			<button
 				type="button"
-				class="font-5xl ml-2 cursor-pointer rounded-md border-2 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600"
+				class="font-5xl ml-2 cursor-pointer rounded-md border-2 px-6 py-2 text-xl hover:bg-neutral-600"
 				class:bg-neutral-800={searchMode === 'serial'}
+				class:border-neutral-700={searchMode === 'blank'}
 				class:text-neutral-100={searchMode === 'serial'}
 				class:shadow-inner={searchMode === 'serial'}
-				class:border-blue-600={searchMode === 'serial'}
+				class:border-cyan-500={searchMode === 'serial'}
 				onclick={() => (searchMode = 'serial')}
 				aria-pressed={searchMode === 'serial'}
 			>
@@ -301,7 +304,7 @@
 				type="text"
 				inputmode="numeric"
 				pattern="\d*"
-				class="w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+				class="w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 				bind:this={searchInputEl}
 				bind:value={searchValue}
 				onfocus={() => (isSearchFocused = true)}
@@ -410,6 +413,7 @@
 		{@const job = data.job}
 
 		<form
+			name="loadcell_entry_update"
 			method="POST"
 			use:enhance={() => {
 				saving = true;
@@ -434,7 +438,7 @@
 							name="job_date"
 							bind:value={job.job_date}
 							disabled
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						/>
 					</div>
 
@@ -444,7 +448,7 @@
 							type="text"
 							name="job_no"
 							bind:value={job.job_no}
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						/>
 					</div>
 
@@ -454,7 +458,7 @@
 							type="text"
 							name="model_no"
 							bind:value={job.model_no}
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						/>
 					</div>
 
@@ -465,7 +469,7 @@
 							type="number"
 							bind:value={job.blank_no}
 							disabled
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						/>
 					</div>
 				</div>
@@ -482,7 +486,7 @@
 							type="number"
 							bind:value={job.job_card_no}
 							placeholder={job.job_card_no ? '' : 'Job Card No'}
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						/>
 					</div>
 
@@ -495,7 +499,7 @@
 							bind:value={job.serial_no}
 							inputmode="numeric"
 							pattern="\d{6}"
-							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						/>
 					</div>
 
@@ -506,7 +510,7 @@
 							rows="1"
 							bind:value={job.customer}
 							placeholder={job.customer ? '' : 'Customer'}
-							class="input col-span-3 mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input col-span-3 mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						></textarea>
 					</div>
 				</div>
@@ -524,7 +528,7 @@
 							name={field}
 							bind:value={job[field]}
 							placeholder={job[field] ? '' : label}
-							class="input col-span-1 mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="input col-span-1 mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						/>
 					{/each}
 				</div>
@@ -537,7 +541,7 @@
 					<textarea
 						placeholder="Remarks"
 						name="remarks"
-						class="input col-span-2 mt-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input col-span-2 mt-2 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						>{job.remarks ?? ''}</textarea
 					>
 				</div>

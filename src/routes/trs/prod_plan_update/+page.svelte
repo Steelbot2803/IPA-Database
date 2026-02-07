@@ -139,7 +139,7 @@
 				<label for="scheduled_month" class="px-2 text-xl text-neutral-200"> Scheduled Month </label>
 				<input
 					id="scheduled_month"
-					class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+					class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 					type="month"
 					bind:value={scheduledMonth}
 				/>
@@ -160,7 +160,7 @@
 					id="search"
 					type="text"
 					name=""
-					class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+					class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 					placeholder="Search"
 					bind:value={searchTerm}
 				/>
@@ -178,7 +178,7 @@
 						bind:checked={electromech}
 					/>
 					<div
-						class="peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-blue-600 peer-checked:bg-red-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"
+						class="peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-cyan-500 peer-checked:bg-red-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"
 					></div>
 					<span class="text-xl text-neutral-200">Electromech</span>
 				</label>
@@ -207,7 +207,7 @@
 					<label for={`job_no-${index}`} class="px-2 text-xl text-neutral-200">Job No *</label>
 					<input
 						id={`job_no-${index}`}
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						placeholder="Job No *"
 						readonly
 						aria-readonly="true"
@@ -218,7 +218,7 @@
 					<label for={`model_no-${index}`} class="px-2 text-xl text-neutral-200">Model No *</label>
 					<input
 						id={`model_no-${index}`}
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						placeholder="Model No *"
 						bind:value={row.model_no}
 					/>
@@ -229,7 +229,7 @@
 					>
 					<input
 						id={`quantity-${index}`}
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						type="number"
 						placeholder="Quantity *"
 						bind:value={row.quantity}
@@ -241,7 +241,7 @@
 					>
 					<input
 						id={`planned_dispatch-${index}`}
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						type="date"
 						readonly
 						aria-readonly="true"
@@ -254,7 +254,7 @@
 					>
 					<input
 						id={`job_card_no-${index}`}
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						placeholder="Job Card No"
 						type="number"
 						bind:value={row.job_card_no}
@@ -264,7 +264,7 @@
 					<label for={`customer-${index}`} class="px-2 text-xl text-neutral-200">Customer</label>
 					<input
 						id={`customer-${index}`}
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						placeholder="Customer"
 						bind:value={row.customer}
 					/>
@@ -275,7 +275,7 @@
 					</label>
 					<input
 						id={`dispatched_qty-${index}`}
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						type="number"
 						placeholder="Dispatched Quantity"
 						bind:value={row.dispatched_qty}
@@ -287,7 +287,7 @@
 					>
 					<input
 						id={`actual_dispatch-${index}`}
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						type="date"
 						bind:value={row.actual_dispatch}
 					/>
@@ -298,7 +298,7 @@
 						id={`remarks-${index}`}
 						name={`remarks-${index}`}
 						bind:value={row.remarks}
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						rows="2"
 						placeholder="Remarks"
 					></textarea>
@@ -309,7 +309,7 @@
 					</label>
 					<input
 						id={`pending_qty-${index}`}
-						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="input mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						type="number"
 						placeholder="Pending Quantity"
 						readonly

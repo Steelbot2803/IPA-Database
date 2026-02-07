@@ -26,7 +26,7 @@
 			class:bg-neutral-800={isBatchMode === false}
 			class:text-neutral-100={isBatchMode === false}
 			class:shadow-inner={isBatchMode === false}
-			class:border-blue-600={isBatchMode === false}
+			class:border-cyan-500={isBatchMode === false}
 			onclick={() => (isBatchMode = false)}
 			aria-pressed={isBatchMode === false}
 		>
@@ -38,7 +38,7 @@
 			class:bg-neutral-800={isBatchMode === true}
 			class:text-neutral-100={isBatchMode === true}
 			class:shadow-inner={isBatchMode === true}
-			class:border-blue-600={isBatchMode === true}
+			class:border-cyan-500={isBatchMode === true}
 			onclick={() => (isBatchMode = true)}
 			aria-pressed={isBatchMode === true}
 		>
@@ -70,7 +70,7 @@
 						type="date"
 						name="received_date"
 						required
-						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 					/>
 				</div>
 
@@ -81,7 +81,7 @@
 						name="job_no"
 						placeholder="Job No *"
 						required
-						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 					/>
 				</div>
 
@@ -92,7 +92,7 @@
 						name="model_no"
 						placeholder="Model No *"
 						required
-						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 					/>
 				</div>
 
@@ -107,14 +107,14 @@
 							inputmode="numeric"
 							pattern="\d{7}"
 							required
-							class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+							class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 						/>
 						<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
 							<input
 								type="checkbox"
 								id="allow_duplicate_blank"
 								name="allow_duplicate_blank"
-								class="mt-2 accent-blue-600"
+								class="mt-2 accent-cyan-500"
 							/>
 							<label for="allow_duplicate_blank" class="px-2 text-base text-neutral-200">
 								Allow duplicate Blank No
@@ -135,7 +135,7 @@
 								inputmode="numeric"
 								pattern="\d{7}"
 								required
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 							/>
 							<input
 								name="blank_no_end"
@@ -144,7 +144,7 @@
 								inputmode="numeric"
 								pattern="\d{7}"
 								required
-								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+								class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 							/>
 						</div>
 						<div class="col-span-6 mb-2 flex items-center gap-2 px-2">
@@ -152,7 +152,7 @@
 								type="checkbox"
 								id="allow_duplicate_blank_batch"
 								name="allow_duplicate_blank"
-								class="mt-2 accent-blue-600"
+								class="mt-2 accent-cyan-500"
 							/>
 							<label for="allow_duplicate_blank_batch" class="px-2 text-base text-neutral-200">
 								Allow duplicate Blank No
@@ -173,7 +173,7 @@
 						name="job_card_no"
 						type="number"
 						placeholder="Job Card No"
-						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 					/>
 				</div>
 				<div class="col-span-2 grid grid-cols-2">
@@ -181,7 +181,7 @@
 					<textarea
 						placeholder="Remarks"
 						name="remarks"
-						class="mt-2 input col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+						class="mt-2 input col-span-12 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 					></textarea>
 				</div>
 			</div>
