@@ -1,30 +1,34 @@
 import { supabase } from '$lib/supabaseClient';
-import { error } from 'console';
-import { read } from 'fs';
+import { styles as uiStyles } from '$lib/utils/styles';
 
 export async function load() {
 	const errors: string[] = [];
 
 	/* ---------- STATUS COUNTS ---------- */
 
-	const [dispatchRes, readyRes, inProcessRes] = await Promise.all([
-		supabase
-			.from('trs_prod_status_view')
-			.select('*', { count: 'exact', head: true })
-			.eq('derived_status', 'DISPATCHED'),
-		supabase
-			.from('trs_prod_status_view')
-			.select('*', { count: 'exact', head: true })
-			.eq('derived_status', 'READY'),
-		supabase
-			.from('trs_prod_status_view')
-			.select('*', { count: 'exact', head: true })
-			.eq('derived_status', 'IN-PROCESS')
-	]);
+	const kpiRes = await supabase.from('trs_prod_status_count_view').select('*').single();
+	const kpi = [
+		{
+			key: 'dispatched_qty',
+			label: 'Dispatched',
+			value: kpiRes.data.dispatched_qty,
+			class: uiStyles.c0024
+		},
+		{
+			key: 'ready_qty',
+			label: 'Ready',
+			value: kpiRes.data.ready_qty,
+			class: uiStyles.c0026
+		},
+		{
+			key: 'in_process_qty',
+			label: 'In-Process',
+			value: kpiRes.data.in_process_qty,
+			class: uiStyles.c0027
+		}
+	];
 
-	if (dispatchRes.error) errors.push(`Dispatched Count: ${dispatchRes.error.message}`);
-	if (readyRes.error) errors.push(`Ready Count: ${readyRes.error.message}`);
-	if (inProcessRes.error) errors.push(`In-Process Count: ${inProcessRes.error.message}`);
+	if (kpiRes.error) errors.push(`KPIs: ${kpiRes.error.message}`);
 
 	/* ---------- RECENT 10 ENTRIES ---------- */
 
@@ -73,9 +77,7 @@ export async function load() {
 	if (loadcellStockRes.error) errors.push(`Loadcell Stock: ${loadcellStockRes.error.message}`);
 
 	return {
-		dispatched: dispatchRes.count ?? 0,
-		ready: readyRes.count ?? 0,
-		inProcess: inProcessRes.count ?? 0,
+		kpi: kpi,
 		recentJobs: recetJobsRes.data ?? [],
 		blankDuplicates: blankDuplicatesRes.data ?? [],
 		serialDuplicates: serialDuplicatesRes.data ?? [],

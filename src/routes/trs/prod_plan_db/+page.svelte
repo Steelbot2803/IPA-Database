@@ -11,7 +11,6 @@
 		buildPageQuery,
 		buildSortQuery,
 		defaultOperator,
-		defaultValue,
 		getSortState,
 		type ColumnMeta,
 		type Filter

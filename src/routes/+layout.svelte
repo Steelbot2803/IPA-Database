@@ -5,6 +5,8 @@
 	import logo from '$lib/assets/ipa_logo.png';
 	import Toasts from '$lib/components/Toasts.svelte';
 	import { page } from '$app/state';
+	import { navigating } from '$app/state';
+	import { Loader } from 'lucide-svelte';
 
 	let { children } = $props();
 	let isOpen = $state(false);
@@ -80,7 +82,10 @@
 					class:bg-neutral-600={isActivePath('/')}
 					class:rounded-md={isActivePath('/')}
 				>
-					Dashboard
+					<span>Dashboard</span>
+					{#if navigating?.to?.url.pathname === '/'}
+						<Loader class="animate-spin" stroke-width="5" size={28} />
+					{/if}
 				</a>
 				<nav class={uiStyles.c0017} aria-label="Production Plan Navigation">
 					<h2 class={uiStyles.c0018}>Production Plan</h2>
@@ -89,21 +94,30 @@
 						class={uiStyles.c0019}
 						class:bg-neutral-600={isActivePath('/trs/prod_plan')}
 					>
-						| Entry
+						<span>Entry</span>
+						{#if navigating?.to?.url.pathname === '/trs/prod_plan'}
+							<Loader class="animate-spin" stroke-width="5" size={20} />
+						{/if}
 					</a>
 					<a
 						href="/trs/prod_plan_update"
 						class={uiStyles.c0019}
 						class:bg-neutral-600={isActivePath('/trs/prod_plan_update')}
 					>
-						| Update
+						<span>Update</span>
+						{#if navigating?.to?.url.pathname === '/trs/prod_plan_update'}
+							<Loader class="animate-spin" stroke-width="5" size={20} />
+						{/if}
 					</a>
 					<a
 						href="/trs/prod_plan_db"
 						class={uiStyles.c0019}
 						class:bg-neutral-600={isActivePath('/trs/prod_plan_db')}
 					>
-						| Database
+						<span>Database</span>
+						{#if navigating?.to?.url.pathname === '/trs/prod_plan_db'}
+							<Loader class="animate-spin" stroke-width="5" size={20} />
+						{/if}
 					</a>
 				</nav>
 				<nav class={uiStyles.c0017} aria-label="Incoming Blanks Navigation">
@@ -113,41 +127,59 @@
 						class={uiStyles.c0019}
 						class:bg-neutral-600={isActivePath('/trs/blank')}
 					>
-						| Entry
+						<span>Entry</span>
+						{#if navigating?.to?.url.pathname === '/trs/blank'}
+							<Loader class="animate-spin" stroke-width="5" size={20} />
+						{/if}
 					</a>
 					<a
 						href="/trs/blank_update"
 						class={uiStyles.c0019}
 						class:bg-neutral-600={isActivePath('/trs/blank_update')}
 					>
-						| Update
+						<span>Update</span>
+						{#if navigating?.to?.url.pathname === '/trs/blank_update'}
+							<Loader class="animate-spin" stroke-width="5" size={20} />
+						{/if}
 					</a>
 					<a
 						href="/trs/blank_db"
 						class={uiStyles.c0019}
 						class:bg-neutral-600={isActivePath('/trs/blank_db')}
 					>
-						| Database
+						<span>Database</span>
+						{#if navigating?.to?.url.pathname === '/trs/blank_db'}
+							<Loader class="animate-spin" stroke-width="5" size={20} />
+						{/if}
 					</a>
 				</nav>
 				<nav class={uiStyles.c0017} aria-label="Jobs Navigation">
 					<h2 class={uiStyles.c0018}>Loadcells</h2>
 					<a href="/trs/new" class={uiStyles.c0019} class:bg-neutral-600={isActivePath('/trs/new')}>
-						| Entry
+						<span>Entry</span>
+						{#if navigating?.to?.url.pathname === '/trs/new'}
+							<Loader class="animate-spin" stroke-width="5" size={20} />
+						{/if}
 					</a>
 					<a
 						href="/trs/update"
 						class={uiStyles.c0019}
 						class:bg-neutral-600={isActivePath('/trs/update')}
 					>
-						| Update
+						<span>Update</span>
+						{#if navigating?.to?.url.pathname === '/trs/updateb'}
+							<Loader class="animate-spin" stroke-width="5" size={20} />
+						{/if}
 					</a>
 					<a
 						href="/trs/loadcell_db"
 						class={uiStyles.c0019}
 						class:bg-neutral-600={isActivePath('/trs/loadcell_db')}
 					>
-						| Database
+						<span>Database</span>
+						{#if navigating?.to?.url.pathname === '/trs/loadcell_db'}
+							<Loader class="animate-spin" stroke-width="5" size={20} />
+						{/if}
 					</a>
 				</nav>
 			</nav>

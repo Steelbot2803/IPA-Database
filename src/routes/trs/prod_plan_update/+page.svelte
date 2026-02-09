@@ -189,7 +189,7 @@
 		{#each visibleRows as row, index}
 			<div class={uiStyles.c0054}>
 				<div class={uiStyles.c0045}>
-					<label for={`job_no-${index}`} class={uiStyles.c0046}>Job No *</label>
+					<label for={`job_no-${index}`} class={uiStyles.c0046}>Job No</label>
 					<input
 						id={`job_no-${index}`}
 						name={`job_no-${index}`}
@@ -222,7 +222,7 @@
 					/>
 				</div>
 				<div class={uiStyles.c0045}>
-					<label for={`planned_dispatch-${index}`} class={uiStyles.c0046}>Planned Dispatch *</label>
+					<label for={`planned_dispatch-${index}`} class={uiStyles.c0046}>Planned Dispatch</label>
 					<input
 						id={`planned_dispatch-${index}`}
 						name={`planned_dispatch-${index}`}

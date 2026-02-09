@@ -16,10 +16,11 @@ export const styles = {
 	c0014: 'mb-6 text-center text-4xl',
 	c0015: 'space-y-6',
 	c0016:
-		'block border-b-2 px-3 py-2 text-center text-2xl text-neutral-200 hover:rounded-md hover:bg-neutral-600',
+		'flex justify-between block border-b-2 px-3 py-2 text-2xl text-neutral-200 hover:rounded-md hover:bg-neutral-600 items-center',
 	c0017: 'space-y-1 border-b-2 py-2',
 	c0018: 'rounded-md bg-neutral-950 px-3 py-2 text-2xl',
-	c0019: 'block rounded-md px-3 py-2 text-xl hover:bg-neutral-600',
+	c0019:
+		'flex block rounded-md px-3 py-2 text-xl hover:bg-neutral-600 justify-between items-center',
 	c0020: 'p-6',
 	c0021: 'mb-6 text-center text-5xl font-medium text-neutral-200',
 	c0022: 'kpi-grid',

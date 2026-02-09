@@ -1,12 +1,19 @@
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
-	export let data;
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from '$lib/utils/toast.js';
 	import { onMount } from 'svelte';
 
+	export let data;
+	const { kpi } = data;
 	let show = false;
+
+	const LABELS = {
+		dispatch_qty: 'Dispatched',
+		ready_qty: 'Ready',
+		in_process_qty: 'In-Process'
+	};
 
 	onMount(() => {
 		if (data.errors?.length && !show) {
@@ -31,20 +38,12 @@
 	<!-- KPI SECTION -->
 	<section class={uiStyles.c0022}>
 		<div class={uiStyles.c0023}>
-			<div class={uiStyles.c0024}>
-				<h3 class={uiStyles.c0025}>Dispatched</h3>
-				<p>{data.dispatched}</p>
-			</div>
-
-			<div class={uiStyles.c0026}>
-				<h3 class={uiStyles.c0025}>Ready</h3>
-				<p>{data.ready}</p>
-			</div>
-
-			<div class={uiStyles.c0027}>
-				<h3 class={uiStyles.c0025}>In-Process</h3>
-				<p>{data.inProcess}</p>
-			</div>
+			{#each kpi as kpi}
+				<div class={kpi.class}>
+					<h3 class={uiStyles.c0025}>{kpi.label}</h3>
+					<p>{kpi.value}</p>
+				</div>
+			{/each}
 		</div>
 	</section>
 
