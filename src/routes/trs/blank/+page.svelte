@@ -59,7 +59,7 @@
 		class={uiStyles.c0090}
 	>
 		<!-- Hidden field to indicate batch mode -->
-		<input type="hidden" name="is_batch" value={isBatchMode ? 'true' : 'false'} />
+		<input id="is_batch" type="hidden" name="is_batch" value={isBatchMode ? 'true' : 'false'} />
 
 		<!-- CORE DETAILS -->
 		<section>
@@ -67,17 +67,31 @@
 			<div class={uiStyles.c0092}>
 				<div class={uiStyles.c0045}>
 					<label for="received_date" class={uiStyles.c0046}>Received Date *</label>
-					<input type="date" name="received_date" required class={uiStyles.c0055} />
+					<input
+						id="received_date"
+						type="date"
+						name="received_date"
+						required
+						class={uiStyles.c0055}
+					/>
 				</div>
 
 				<div class={uiStyles.c0045}>
 					<label for="job_no" class={uiStyles.c0046}>Job No *</label>
-					<input type="text" name="job_no" placeholder="Job No *" required class={uiStyles.c0055} />
+					<input
+						id="job_no"
+						type="text"
+						name="job_no"
+						placeholder="Job No *"
+						required
+						class={uiStyles.c0055}
+					/>
 				</div>
 
 				<div class={uiStyles.c0045}>
 					<label for="model_no" class={uiStyles.c0046}>Model No *</label>
 					<input
+						id="model_no"
 						type="text"
 						name="model_no"
 						placeholder="Model No *"
@@ -91,6 +105,7 @@
 					<div class={uiStyles.c0045}>
 						<label for="blank_no" class={uiStyles.c0046}>Blank No *</label>
 						<input
+							id="blank_no"
 							name="blank_no"
 							type="number"
 							placeholder="Blank No (7 digits) *"
@@ -119,6 +134,7 @@
 						<div class={uiStyles.c0046}>Blank No Range *</div>
 						<div class={uiStyles.c0106}>
 							<input
+								id="blank_no_start"
 								name="blank_no_start"
 								type="number"
 								placeholder="Start"
@@ -128,6 +144,7 @@
 								class={uiStyles.c0055}
 							/>
 							<input
+								id="blank_no_end"
 								name="blank_no_end"
 								type="number"
 								placeholder="End"
@@ -160,6 +177,7 @@
 				<div class={uiStyles.c0045}>
 					<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
 					<input
+						id="job_card_no"
 						name="job_card_no"
 						type="number"
 						placeholder="Job Card No"
@@ -168,7 +186,8 @@
 				</div>
 				<div class={uiStyles.c0107}>
 					<label for="remarks" class={uiStyles.c0046}>Remarks</label>
-					<textarea placeholder="Remarks" name="remarks" class={uiStyles.c0108}></textarea>
+					<textarea id="remarks" placeholder="Remarks" name="remarks" class={uiStyles.c0108}
+					></textarea>
 				</div>
 			</div>
 		</section>

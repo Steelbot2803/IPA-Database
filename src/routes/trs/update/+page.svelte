@@ -142,7 +142,7 @@
 		}, 180);
 	}
 
-	function setSearchMode (mode: 'blank' | 'serial') {
+	function setSearchMode(mode: 'blank' | 'serial') {
 		if (searchMode === mode) return;
 
 		searchMode = mode;
@@ -312,6 +312,8 @@
 		</div>
 		<div class={uiStyles.c0073}>
 			<input
+				id="search_value"
+				name="search_value"
 				type="text"
 				inputmode="numeric"
 				pattern="\d*"
@@ -406,7 +408,7 @@
 			}}
 			class={uiStyles.c0090}
 		>
-			<input type="hidden" name="id" value={job.id} />
+			<input id="id" type="hidden" name="id" value={job.id} />
 
 			<!-- CORE INFO -->
 			<section>
@@ -416,6 +418,7 @@
 					<div class={uiStyles.c0045}>
 						<label for="job_date" class={uiStyles.c0046}>Job Date</label>
 						<input
+							id="job_date"
 							type="date"
 							name="job_date"
 							bind:value={job.job_date}
@@ -426,17 +429,30 @@
 
 					<div class={uiStyles.c0045}>
 						<label for="job_no" class={uiStyles.c0046}>Job No</label>
-						<input type="text" name="job_no" bind:value={job.job_no} class={uiStyles.c0047} />
+						<input
+							id="job_no"
+							type="text"
+							name="job_no"
+							bind:value={job.job_no}
+							class={uiStyles.c0047}
+						/>
 					</div>
 
 					<div class={uiStyles.c0045}>
 						<label for="model_no" class={uiStyles.c0046}>Model No</label>
-						<input type="text" name="model_no" bind:value={job.model_no} class={uiStyles.c0047} />
+						<input
+							id="model_no"
+							type="text"
+							name="model_no"
+							bind:value={job.model_no}
+							class={uiStyles.c0047}
+						/>
 					</div>
 
 					<div class={uiStyles.c0045}>
 						<label for="blank_no" class={uiStyles.c0046}>Blank No</label>
 						<input
+							id="blank_no"
 							name="blank_no"
 							type="number"
 							bind:value={job.blank_no}
@@ -454,6 +470,7 @@
 					<div class={uiStyles.c0045}>
 						<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
 						<input
+							id="job_card_no"
 							name="job_card_no"
 							type="number"
 							bind:value={job.job_card_no}
@@ -465,6 +482,7 @@
 					<div class={uiStyles.c0045}>
 						<label for="serial_no" class={uiStyles.c0046}>Serial No</label>
 						<input
+							id="serial_no"
 							name="serial_no"
 							type="number"
 							placeholder={job.serial_no ? '' : 'Serial No (6 digits)'}
@@ -478,6 +496,7 @@
 					<div class={uiStyles.c0045}>
 						<label for="customer" class={uiStyles.c0046}>Customer</label>
 						<textarea
+							id="customer"
 							name="customer"
 							rows="1"
 							bind:value={job.customer}
@@ -510,7 +529,7 @@
 			<section>
 				<h2 class={uiStyles.c0097}>Remarks</h2>
 				<div class={uiStyles.c0098}>
-					<textarea placeholder="Remarks" name="remarks" class={uiStyles.c0099}
+					<textarea id="remarks" placeholder="Remarks" name="remarks" class={uiStyles.c0099}
 						>{job.remarks ?? ''}</textarea
 					>
 				</div>

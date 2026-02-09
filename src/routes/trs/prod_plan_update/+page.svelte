@@ -138,6 +138,7 @@
 				<label for="scheduled_month" class={uiStyles.c0046}> Scheduled Month </label>
 				<input
 					id="scheduled_month"
+					name="scheduled_month"
 					class={uiStyles.c0047}
 					type="month"
 					bind:value={scheduledMonth}
@@ -164,6 +165,7 @@
 					<span class={uiStyles.c0051}>Main</span>
 					<input
 						id="electromech_toggle"
+						name="electromech_toggle"
 						type="checkbox"
 						class={uiStyles.c0052}
 						bind:checked={electromech}
@@ -190,6 +192,7 @@
 					<label for={`job_no-${index}`} class={uiStyles.c0046}>Job No *</label>
 					<input
 						id={`job_no-${index}`}
+						name={`job_no-${index}`}
 						class={uiStyles.c0068}
 						placeholder="Job No *"
 						readonly
@@ -201,6 +204,7 @@
 					<label for={`model_no-${index}`} class={uiStyles.c0046}>Model No *</label>
 					<input
 						id={`model_no-${index}`}
+						name={`model_no-${index}`}
 						class={uiStyles.c0047}
 						placeholder="Model No *"
 						bind:value={row.model_no}
@@ -210,6 +214,7 @@
 					<label for={`quantity-${index}`} class={uiStyles.c0046}>Total Quantity *</label>
 					<input
 						id={`quantity-${index}`}
+						name={`quantity-${index}`}
 						class={uiStyles.c0047}
 						type="number"
 						placeholder="Quantity *"
@@ -220,6 +225,7 @@
 					<label for={`planned_dispatch-${index}`} class={uiStyles.c0046}>Planned Dispatch *</label>
 					<input
 						id={`planned_dispatch-${index}`}
+						name={`planned_dispatch-${index}`}
 						class={uiStyles.c0068}
 						type="date"
 						readonly
@@ -231,6 +237,7 @@
 					<label for={`job_card_no-${index}`} class={uiStyles.c0046}>Job Card No</label>
 					<input
 						id={`job_card_no-${index}`}
+						name={`job_card_no-${index}`}
 						class={uiStyles.c0047}
 						placeholder="Job Card No"
 						type="number"
@@ -241,6 +248,7 @@
 					<label for={`customer-${index}`} class={uiStyles.c0046}>Customer</label>
 					<input
 						id={`customer-${index}`}
+						name={`customer-${index}`}
 						class={uiStyles.c0047}
 						placeholder="Customer"
 						bind:value={row.customer}
@@ -252,6 +260,7 @@
 					</label>
 					<input
 						id={`dispatched_qty-${index}`}
+						name={`dispatched_qty-${index}`}
 						class={uiStyles.c0047}
 						type="number"
 						placeholder="Dispatched Quantity"
@@ -262,6 +271,7 @@
 					<label for={`actual_dispatch-${index}`} class={uiStyles.c0046}>Actual Dispatch</label>
 					<input
 						id={`actual_dispatch-${index}`}
+						name={`actual_dispatch-${index}`}
 						class={uiStyles.c0047}
 						type="date"
 						bind:value={row.actual_dispatch}
@@ -282,6 +292,7 @@
 					<label for={`pending_qty-${index}`} class={uiStyles.c0046}> Pending Quantity </label>
 					<input
 						id={`pending_qty-${index}`}
+						name={`pending_qty-${index}`}
 						class={uiStyles.c0068}
 						type="number"
 						placeholder="Pending Quantity"

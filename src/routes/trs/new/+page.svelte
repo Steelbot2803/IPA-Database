@@ -134,12 +134,13 @@
 			<div class={uiStyles.c0092}>
 				<div class={uiStyles.c0045}>
 					<label for="job_date" class={uiStyles.c0046}>Job Date *</label>
-					<input type="date" name="job_date" class={uiStyles.c0055} />
+					<input id="job_date" type="date" name="job_date" class={uiStyles.c0055} />
 				</div>
 
 				<div class={uiStyles.c0045}>
 					<label for="job_no" class={uiStyles.c0046}>Job No</label>
 					<input
+						id="job_no"
 						type="text"
 						name="job_no"
 						placeholder="Override Blank Entry"
@@ -151,6 +152,7 @@
 				<div class={uiStyles.c0045}>
 					<label for="model_no" class={uiStyles.c0046}>Model No</label>
 					<input
+						id="model_no"
 						type="text"
 						name="model_no"
 						placeholder="Override Blank Entry"
@@ -198,7 +200,7 @@
 							pattern="\d{7}"
 							onfocus={() => (isBlankInputFocused = true)}
 							onblur={() => setTimeout(() => (isBlankInputFocused = false), 120)}
-							bind:this = {blankNoInputEl}
+							bind:this={blankNoInputEl}
 							class={uiStyles.c0055}
 						/>
 						{#if isBlankInputFocused && duplicateOptions.length > 1}
@@ -221,7 +223,7 @@
 							</div>
 						{/if}
 					</div>
-					<input type="hidden" name="blank_stock_id" value={selectedBlankID} />
+					<input id="blank_stock_id" type="hidden" name="blank_stock_id" value={selectedBlankID} />
 					<div class={uiStyles.c0103}>
 						<input
 							type="checkbox"
@@ -243,6 +245,7 @@
 				<div class={uiStyles.c0045}>
 					<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
 					<input
+						id="job_card_no"
 						name="job_card_no"
 						type="number"
 						placeholder="Override Blank Entry"
@@ -254,6 +257,7 @@
 				<div class={uiStyles.c0045}>
 					<label for="serial_no" class={uiStyles.c0046}>Serial No</label>
 					<input
+						id="serial_no"
 						name="serial_no"
 						type="number"
 						placeholder="Serial No (6 digits)"
@@ -265,7 +269,12 @@
 
 				<div class={uiStyles.c0045}>
 					<label for="customer" class={uiStyles.c0046}>Customer</label>
-					<textarea name="customer" rows="1" placeholder="Customer" class={uiStyles.c0141}
+					<textarea
+						id="customer"
+						name="customer"
+						rows="1"
+						placeholder="Customer"
+						class={uiStyles.c0141}
 					></textarea>
 				</div>
 			</div>
@@ -286,7 +295,8 @@
 		<section>
 			<h2 class={uiStyles.c0143}>Remarks</h2>
 			<div class={uiStyles.c0098}>
-				<textarea placeholder="Remarks" name="remarks" class={uiStyles.c0144}></textarea>
+				<textarea id="remarks" placeholder="Remarks" name="remarks" class={uiStyles.c0144}
+				></textarea>
 			</div>
 		</section>
 

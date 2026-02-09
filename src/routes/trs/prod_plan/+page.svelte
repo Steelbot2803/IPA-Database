@@ -98,6 +98,7 @@
 					<label for="scheduled_month" class={uiStyles.c0046}> Scheduled Month * </label>
 					<input
 						id="scheduled_month"
+						name="scheduled_month"
 						class={uiStyles.c0047}
 						type="month"
 						bind:value={scheduledMonth}
@@ -109,6 +110,7 @@
 						<span class={uiStyles.c0051}>Main</span>
 						<input
 							id="electromech_toggle"
+							name="electromech_toggle"
 							type="checkbox"
 							class={uiStyles.c0052}
 							checked={electromech}
@@ -126,16 +128,30 @@
 				{#if !electromech || isElectromech(row.customer)}
 					<div class={uiStyles.c0054}>
 						<div class={uiStyles.c0045}>
-							<label for="job_no" class={uiStyles.c0046}>Job No *</label>
-							<input class={uiStyles.c0055} placeholder="Job No *" bind:value={row.job_no} />
-						</div>
-						<div class={uiStyles.c0045}>
-							<label for="model_no" class={uiStyles.c0046}>Model No *</label>
-							<input class={uiStyles.c0055} placeholder="Model No *" bind:value={row.model_no} />
-						</div>
-						<div class={uiStyles.c0045}>
-							<label for="quantity" class={uiStyles.c0046}>Total Quantity *</label>
+							<label for={`job_no-${index}`} class={uiStyles.c0046}>Job No *</label>
 							<input
+								id={`job_no-${index}`}
+								name={`job_no-${index}`}
+								class={uiStyles.c0055}
+								placeholder="Job No *"
+								bind:value={row.job_no}
+							/>
+						</div>
+						<div class={uiStyles.c0045}>
+							<label for={`model_no-${index}`} class={uiStyles.c0046}>Model No *</label>
+							<input
+								id={`model_no-${index}`}
+								name={`model_no-${index}`}
+								class={uiStyles.c0055}
+								placeholder="Model No *"
+								bind:value={row.model_no}
+							/>
+						</div>
+						<div class={uiStyles.c0045}>
+							<label for={`quantity-${index}`} class={uiStyles.c0046}>Total Quantity *</label>
+							<input
+								id={`quantity-${index}`}
+								name={`quantity-${index}`}
 								class={uiStyles.c0055}
 								type="number"
 								placeholder="Quantity *"
@@ -143,12 +159,22 @@
 							/>
 						</div>
 						<div class={uiStyles.c0045}>
-							<label for="planned_dispatch" class={uiStyles.c0046}>Planned Dispatch *</label>
-							<input class={uiStyles.c0055} type="date" bind:value={row.planned_dispatch} />
+							<label for={`planned_dispatch-${index}`} class={uiStyles.c0046}
+								>Planned Dispatch *</label
+							>
+							<input
+								id={`planned_dispatch-${index}`}
+								name={`planned_dispatch-${index}`}
+								class={uiStyles.c0055}
+								type="date"
+								bind:value={row.planned_dispatch}
+							/>
 						</div>
 						<div class={uiStyles.c0045}>
-							<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
+							<label for={`job_card_no-${index}`} class={uiStyles.c0046}>Job Card No</label>
 							<input
+								id={`job_card_no-${index}`}
+								name={`job_card_no-${index}`}
 								class={uiStyles.c0055}
 								placeholder="Job Card No"
 								type="number"
@@ -156,8 +182,10 @@
 							/>
 						</div>
 						<div class={uiStyles.c0045}>
-							<label for="customer" class={uiStyles.c0046}>Customer</label>
+							<label for={`customer-${index}`} class={uiStyles.c0046}>Customer</label>
 							<input
+								id={`customer-${index}`}
+								name={`customer-${index}`}
 								class={uiStyles.c0055}
 								placeholder="Customer"
 								readonly={electromech}
@@ -166,8 +194,12 @@
 							/>
 						</div>
 						<div class={uiStyles.c0045}>
-							<label for="job_no" class={uiStyles.c0046}>Dispatched Quantity</label>
+							<label for={`dispatched_qty-${index}`} class={uiStyles.c0046}
+								>Dispatched Quantity</label
+							>
 							<input
+								id={`dispatched_qty-${index}`}
+								name={`dispatched_qty-${index}`}
 								class={uiStyles.c0055}
 								type="number"
 								placeholder="Dispatched Quantity"
@@ -175,13 +207,20 @@
 							/>
 						</div>
 						<div class={uiStyles.c0045}>
-							<label for="actual_dispatch" class={uiStyles.c0046}>Actual Dispatch</label>
-							<input class={uiStyles.c0055} type="date" bind:value={row.actual_dispatch} />
+							<label for={`actual_dispatch-${index}`} class={uiStyles.c0046}>Actual Dispatch</label>
+							<input
+								id={`actual_dispatch-${index}`}
+								name={`actual_dispatch-${index}`}
+								class={uiStyles.c0055}
+								type="date"
+								bind:value={row.actual_dispatch}
+							/>
 						</div>
 						<div class={uiStyles.c0056}>
-							<label for="job_no" class={uiStyles.c0046}>Remarks</label>
+							<label for={`remarks-${index}`} class={uiStyles.c0046}>Remarks</label>
 							<textarea
-								name="Remarks"
+								id={`remarks-${index}`}
+								name={`remarks-${index}`}
 								placeholder="Remarks"
 								bind:value={row.remarks}
 								class={uiStyles.c0057}

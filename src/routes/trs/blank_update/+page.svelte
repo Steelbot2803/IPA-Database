@@ -203,6 +203,8 @@
 	<form name="search" method="GET" class={uiStyles.c0070} onsubmit={handleSearchSubmit}>
 		<div class={uiStyles.c0073}>
 			<input
+				id="search_value"
+				name="search_value"
 				type="text"
 				inputmode="numeric"
 				pattern="\d*"
@@ -293,7 +295,7 @@
 			}}
 			class={uiStyles.c0090}
 		>
-			<input type="hidden" name="id" value={blank.id} />
+			<input id="id" type="hidden" name="id" value={blank.id} />
 
 			<section>
 				<h2 class={uiStyles.c0091}>Core Details</h2>
@@ -302,6 +304,7 @@
 					<div class={uiStyles.c0045}>
 						<label for="received_date" class={uiStyles.c0046}>Received Date</label>
 						<input
+							id="received_date"
 							type="date"
 							name="received_date"
 							bind:value={blank.received_date}
@@ -311,17 +314,30 @@
 
 					<div class={uiStyles.c0045}>
 						<label for="job_no" class={uiStyles.c0046}>Job No</label>
-						<input type="text" name="job_no" bind:value={blank.job_no} class={uiStyles.c0047} />
+						<input
+							id="job_no"
+							type="text"
+							name="job_no"
+							bind:value={blank.job_no}
+							class={uiStyles.c0047}
+						/>
 					</div>
 
 					<div class={uiStyles.c0045}>
 						<label for="model_no" class={uiStyles.c0046}>Model No</label>
-						<input type="text" name="model_no" bind:value={blank.model_no} class={uiStyles.c0047} />
+						<input
+							id="model_no"
+							type="text"
+							name="model_no"
+							bind:value={blank.model_no}
+							class={uiStyles.c0047}
+						/>
 					</div>
 
 					<div class={uiStyles.c0045}>
 						<label for="blank_no" class={uiStyles.c0046}>Blank No</label>
 						<input
+							id="blank_no"
 							name="blank_no"
 							type="number"
 							bind:value={blank.blank_no}
@@ -338,6 +354,7 @@
 					<div class={uiStyles.c0045}>
 						<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
 						<input
+							id="job_card_no"
 							name="job_card_no"
 							type="number"
 							bind:value={blank.job_card_no}
@@ -348,7 +365,9 @@
 
 					<div class={uiStyles.c0107}>
 						<label for="remarks" class={uiStyles.c0046}>Remarks</label>
-						<textarea name="remarks" class={uiStyles.c0108}>{blank.remarks ?? ''}</textarea>
+						<textarea id="remarks" name="remarks" class={uiStyles.c0108}
+							>{blank.remarks ?? ''}</textarea
+						>
 					</div>
 				</div>
 			</section>
