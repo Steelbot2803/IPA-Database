@@ -3,22 +3,26 @@
 	import { enhance } from '$app/forms';
 	import { toast } from '$lib/utils/toast.js';
 	import { LOADCELL_PROCESS_DATE_FIELDS } from '$lib/utils/loadcellDates.js';
+	import { Database } from 'lucide-svelte';
 
 	export let form;
 	export let data;
 	let saving = false;
 	let loadingBlank = false;
 	let blankLookupTimer: ReturnType<typeof setTimeout> | undefined;
-	let blankNoInput = data.blank?.blank_no ? String(data.blank.blank_no) : '';
+	let blankNoInput: string | number = data.blank?.blank_no ? String(data.blank.blank_no) : '';
+	let lastLookupBlankNo = '';
 	let selectedBlankID = data.blank?.id ? String(data.blank.id) : '';
 	let duplicateOptions: BlankMatch[] = [];
 	let jobNoInput = data.blank?.job_no ?? '';
 	let modelNoInput = data.blank?.model_no ?? '';
 	let jobCardNoInput = data.blank?.job_card_no ?? '';
+	let isBlankInputFocused = false;
+	let blankNoInputEl: HTMLInputElement | null = null;
 
 	type BlankMatch = {
 		id: number;
-		blank_no: number;
+		blank_no: string;
 		job_no: string;
 		model_no: string;
 		job_card_no: number | null;
@@ -37,7 +41,20 @@
 	const dateFields = LOADCELL_PROCESS_DATE_FIELDS;
 
 	function formatOptionLabel(entry: BlankMatch) {
-		return `${entry.job_no ?? '—'} . ${entry.job_card_no ?? '—'} . ${entry.model_no ?? '—'} `;
+		return `Blank ${entry.blank_no} · ${entry.job_no ?? '—'} · ${entry.job_card_no ?? '—'} · ${entry.model_no ?? '—'}`;
+	}
+
+	function normalizeBlankNoInput(value: string | number | null | undefined) {
+		return String(value ?? '').trim();
+	}
+
+	function clearLinkedFields() {
+		lastLookupBlankNo = '';
+		selectedBlankID = '';
+		duplicateOptions = [];
+		jobNoInput = '';
+		modelNoInput = '';
+		jobCardNoInput = '';
 	}
 
 	function applySelectedBlank(matchId: string) {
@@ -46,18 +63,19 @@
 
 		if (!found) return;
 
-		jobNoInput = data.blank?.job_no ?? '';
-		modelNoInput = data.blank?.model_no ?? '';
-		jobCardNoInput = data.blank?.job_card_no ?? '';
+		jobNoInput = found.job_no ?? '';
+		modelNoInput = found.model_no ?? '';
+		jobCardNoInput = found.job_card_no ? String(found.job_card_no) : '';
 	}
 
 	async function fetchBlankMatches(blankNo: string) {
+		if (blankNo === lastLookupBlankNo) return;
 		if (!/^\d{7}$/.test(blankNo)) {
-			duplicateOptions = [];
-			selectedBlankID = '';
+			clearLinkedFields();
 			return;
 		}
 
+		lastLookupBlankNo = blankNo;
 		loadingBlank = true;
 
 		try {
@@ -66,8 +84,7 @@
 			});
 
 			if (!res.ok) {
-				duplicateOptions = [];
-				selectedBlankID = '';
+				clearLinkedFields();
 				return;
 			}
 
@@ -78,14 +95,10 @@
 				selectedBlankID = String(duplicateOptions[0].id);
 				applySelectedBlank(selectedBlankID);
 			} else {
-				selectedBlankID = '';
-				jobNoInput = '';
-				modelNoInput = '';
-				jobCardNoInput = '';
+				clearLinkedFields();
 			}
 		} catch {
-			duplicateOptions = [];
-			selectedBlankID = '';
+			clearLinkedFields();
 		} finally {
 			loadingBlank = false;
 		}
@@ -94,7 +107,7 @@
 	$: {
 		if (blankLookupTimer) clearTimeout(blankLookupTimer);
 
-		const trimmedBlankNo = blankNoInput.trim();
+		const trimmedBlankNo = normalizeBlankNoInput(blankNoInput);
 		blankLookupTimer = setTimeout(() => {
 			void fetchBlankMatches(trimmedBlankNo);
 		}, 220);
@@ -125,56 +138,90 @@
 				</div>
 
 				<div class={uiStyles.c0045}>
-					<label for="job_no" class={uiStyles.c0046}>Job No *</label>
+					<label for="job_no" class={uiStyles.c0046}>Job No</label>
 					<input
 						type="text"
 						name="job_no"
-						placeholder="Job No *"
+						placeholder="Override Blank Entry"
 						bind:value={jobNoInput}
 						class={uiStyles.c0055}
 					/>
 				</div>
 
 				<div class={uiStyles.c0045}>
-					<label for="model_no" class={uiStyles.c0046}>Model No *</label>
+					<label for="model_no" class={uiStyles.c0046}>Model No</label>
 					<input
 						type="text"
 						name="model_no"
-						placeholder="Model No *"
+						placeholder="Override Blank Entry"
 						bind:value={modelNoInput}
 						class={uiStyles.c0055}
 					/>
 				</div>
 
 				<div class={uiStyles.c0045}>
-					<label for="blank_no" class={uiStyles.c0046}>Blank No *</label>
-					<input
-						type="number"
-						placeholder="Blank No (7 digits) *"
-						bind:value={blankNoInput}
-						inputmode="numeric"
-						pattern="\d{7}"
-						class={uiStyles.c0055}
-					/>
-					{#if loadingBlank}
-						<p class={uiStyles.c0051}>Loading related blank entries...</p>
-					{/if}
-
-					{#if duplicateOptions.length > 1}
-						<div class={uiStyles.c0045}>
-							<label for="blank_match" class={uiStyles.c0046}>Select matching blank entry</label>
-							<select
-								id="blank_match"
-								bind:value={selectedBlankID}
-								onchange={(event) => applySelectedBlank((event.target as HTMLSelectElement).value)}
-								class={uiStyles.c0055}
+					<div class="flex items-center justify-between px-2">
+						<label for="blank_no" class={uiStyles.c0046}>Blank No *</label>
+						{#if loadingBlank}
+							<span class="text-neutral-400"
+								><svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-database-search-icon lucide-database-search"
+									><path d="M21 11.693V5" /><path d="m22 22-1.875-1.875" /><path
+										d="M3 12a9 3 0 0 0 8.697 2.998"
+									/><path d="M3 5v14a9 3 0 0 0 9.28 2.999" /><circle
+										cx="18"
+										cy="18"
+										r="3"
+									/><ellipse cx="12" cy="5" rx="9" ry="3" /></svg
+								></span
 							>
+						{/if}
+					</div>
+					<div class="relative">
+						<input
+							id="blank_no"
+							name="blank_no"
+							type="text"
+							maxlength="7"
+							placeholder="Blank No (7 digits) *"
+							bind:value={blankNoInput}
+							inputmode="numeric"
+							pattern="\d{7}"
+							onfocus={() => (isBlankInputFocused = true)}
+							onblur={() => setTimeout(() => (isBlankInputFocused = false), 120)}
+							bind:this = {blankNoInputEl}
+							class={uiStyles.c0055}
+						/>
+						{#if isBlankInputFocused && duplicateOptions.length > 1}
+							<div class={uiStyles.c0154}>
 								{#each duplicateOptions as option}
-									<option value={option.id}>{formatOptionLabel(option)}</option>
+									<button
+										type="button"
+										class={uiStyles.c0155}
+										onmousedown={(event) => {
+											event.preventDefault();
+											applySelectedBlank(String(option.id));
+											isBlankInputFocused = false;
+											blankNoInputEl?.blur();
+										}}
+									>
+										<span>{formatOptionLabel(option)}</span>
+										<span class="ml-2 text-cyan-500"><Database size={16} /></span>
+									</button>
 								{/each}
-							</select>
-						</div>
-					{/if}
+							</div>
+						{/if}
+					</div>
+					<input type="hidden" name="blank_stock_id" value={selectedBlankID} />
 					<div class={uiStyles.c0103}>
 						<input
 							type="checkbox"
@@ -198,7 +245,7 @@
 					<input
 						name="job_card_no"
 						type="number"
-						placeholder="Job Card No"
+						placeholder="Override Blank Entry"
 						bind:value={jobCardNoInput}
 						class={uiStyles.c0055}
 					/>

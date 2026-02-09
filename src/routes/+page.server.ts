@@ -39,7 +39,7 @@ export async function load() {
 	/* ---------- DUPLICATE BLANK NO ---------- */
 
 	const blankDuplicatesRes = await supabase
-		.from('duplicate_blank_no')
+		.from('lc_duplicate_blank_no')
 		.select('*')
 		.order('blank_no', { ascending: true });
 

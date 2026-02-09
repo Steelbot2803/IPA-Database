@@ -188,5 +188,9 @@ export const styles = {
 	c0151:
 		'focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none',
 	c0152:
-		'mt-2 input focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none'
+		'mt-2 input focus:ring-cyan-500 focus:border-cyan-500 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 focus:ring-2 focus:outline-none',
+	c0154:
+		'absolute z-20 mt-1.5 max-h-60 w-full overflow-y-auto rounded-md border border-neutral-700 bg-neutral-900 text-base shadow-lg ring-1 ring-neutral-700',
+	c0155:
+		'flex w-full items-center justify-between px-3 py-2 text-left text-neutral-200 hover:bg-neutral-800'
 } as const;

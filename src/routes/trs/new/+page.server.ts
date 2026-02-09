@@ -26,10 +26,12 @@ export const actions = {
 	create: async ({ request }) => {
 		const f = Object.fromEntries(await request.formData());
 		const blank_no = f.blank_no?.toString();
+		const blank_stock_id = f.blank_stock_id?.toString();
 
 		/* ---------- REQUIRED FIELDS ---------- */
-		if (!f.job_date || !f.job_no || !f.model_no || !f.blank_no) {
-			return fail(400, { warn: 'Missing required fields' });
+
+		if (!f.job_date) {
+			return fail(400, { error: 'Missing Job Date' });
 		}
 
 		if (!isNDigits(f.blank_no.toString(), 7)) {
@@ -40,13 +42,22 @@ export const actions = {
 			return fail(400, { warn: 'Serial No must be exactly 6 digits' });
 		}
 
-		const { data: blankStock, error: stockErr } = await supabase
+		const blankStockQuery = supabase
 			.from('blank_stock')
-			.select('id')
+			.select('id, blank_no, job_no, job_card_no, model_no')
 			.eq('blank_no', blank_no)
 			.order('id', { ascending: false })
-			.limit(1)
-			.maybeSingle();
+			.limit(1);
+
+		const { data: blankStock, error: stockErr } = blank_stock_id
+			? await supabase
+					.from('blank_stock')
+					.select('id, blank_no, job_no, job_card_no, model_no')
+					.eq('id', blank_stock_id)
+					.eq('blank_no', blank_no)
+					.limit(1)
+					.maybeSingle()
+			: await blankStockQuery.maybeSingle();
 
 		if (stockErr || !blankStock) {
 			return fail(400, { error: 'Blank not available in stock' });
@@ -72,7 +83,7 @@ export const actions = {
 			job_date: f.job_date,
 			job_no: f.job_no,
 			model_no: f.model_no,
-			blank_no: f.blank_no,
+			blank_no: f.blank_no || blankStock.blank_no,
 
 			job_card_no: f.job_card_no || null,
 			serial_no: f.serial_no || null,

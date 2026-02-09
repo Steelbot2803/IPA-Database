@@ -11,8 +11,8 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 	const supabase = getSupabase(cookies);
 	const { data, error } = await supabase
-		.from('blank_status_view')
-		.select('*')
+		.from('blank_stock')
+		.select('id, blank_no, job_no, model_no, job_card_no')
 		.eq('blank_no', blankNo)
 		.order('id', { ascending: false })
 		.limit(20);
