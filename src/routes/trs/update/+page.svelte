@@ -423,12 +423,12 @@
 							name="job_date"
 							bind:value={job.job_date}
 							disabled
-							class={uiStyles.c0047}
+							class={uiStyles.c0068}
 						/>
 					</div>
 
 					<div class={uiStyles.c0045}>
-						<label for="job_no" class={uiStyles.c0046}>Job No</label>
+						<label for="job_no" class={uiStyles.c0046}>Job No *</label>
 						<input
 							id="job_no"
 							type="text"
@@ -439,7 +439,7 @@
 					</div>
 
 					<div class={uiStyles.c0045}>
-						<label for="model_no" class={uiStyles.c0046}>Model No</label>
+						<label for="model_no" class={uiStyles.c0046}>Model No *</label>
 						<input
 							id="model_no"
 							type="text"
@@ -457,7 +457,7 @@
 							type="number"
 							bind:value={job.blank_no}
 							disabled
-							class={uiStyles.c0047}
+							class={uiStyles.c0068}
 						/>
 					</div>
 				</div>
