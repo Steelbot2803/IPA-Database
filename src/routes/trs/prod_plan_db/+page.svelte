@@ -179,7 +179,13 @@
 	<div class={uiStyles.c0063}>
 		<div class={uiStyles.c0045}>
 			<label for="scheduled_month" class={uiStyles.c0046}>Scheduled Month</label>
-			<input id="scheduled_month" class={uiStyles.c0047} type="month" bind:value={scheduledMonth} />
+			<input
+				id="scheduled_month"
+				name="scheduled_month"
+				class={uiStyles.c0047}
+				type="month"
+				bind:value={scheduledMonth}
+			/>
 		</div>
 		<div class={uiStyles.c0064}>
 			<button type="button" onclick={loadMonth} disabled={loading} class={uiStyles.c0065}>
@@ -192,6 +198,7 @@
 				<span class={uiStyles.c0051}>Main</span>
 				<input
 					id="electromech_toggle"
+					name="electromech_toggle"
 					type="checkbox"
 					class={uiStyles.c0052}
 					checked={electromech}
@@ -243,7 +250,12 @@
 								</button>
 								{#if activeFilter === column}
 									<div bind:this={popoverEl} class={uiStyles.c0121}>
-										<select class={uiStyles.c0122} bind:value={filters[column].op}>
+										<select
+											id={`filter-op-${column}`}
+											name={`filter-op-${column}`}
+											class={uiStyles.c0122}
+											bind:value={filters[column].op}
+										>
 											{#each OPERATORS[columnMeta[column].type] as op}
 												<option value={op.value}>{op.label}</option>
 											{/each}
@@ -251,23 +263,31 @@
 
 										{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
 											<input
+												id={`filter-start-${column}`}
+												name={`filter-start-${column}`}
 												class={uiStyles.c0123}
 												type="date"
 												bind:value={filters[column].value[0]}
 											/>
 											<input
+												id={`filter-end-${column}`}
+												name={`filter-end-${column}`}
 												class={uiStyles.c0123}
 												type="date"
 												bind:value={filters[column].value[1]}
 											/>
 										{:else if columnMeta[column].type === 'date'}
 											<input
+												id={`filter-value-${column}`}
+												name={`filter-value-${column}`}
 												class={uiStyles.c0123}
 												type="date"
 												bind:value={filters[column].value}
 											/>
 										{:else}
 											<input
+												id={`filter-value-${column}`}
+												name={`filter-value-${column}`}
 												class={uiStyles.c0123}
 												type={columnMeta[column].type === 'number' ? 'number' : 'text'}
 												bind:value={filters[column].value}

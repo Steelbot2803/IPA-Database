@@ -201,6 +201,8 @@
 							{#if activeFilter === column}
 								<div bind:this={popoverEl} class={uiStyles.c0121}>
 									<select
+										id={`filter-op-${column}`}
+										name={`filter-op-${column}`}
 										class={uiStyles.c0150}
 										bind:value={filters[column].op}
 										onchange={() => {
@@ -215,26 +217,43 @@
 									</select>
 
 									{#if columnMeta[column].type === 'enum'}
-										<select class={uiStyles.c0151} bind:value={filters[column].value}>
+										<select
+											id={`filter-value-${column}`}
+											name={`filter-value-${column}`}
+											class={uiStyles.c0151}
+											bind:value={filters[column].value}
+										>
 											{#each columnMeta[column].values as v}
 												<option value={v}>{v}</option>
 											{/each}
 										</select>
 									{:else if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
 										<input
+											id={`filter-start-${column}`}
+											name={`filter-start-${column}`}
 											class={uiStyles.c0152}
 											type="date"
 											bind:value={filters[column].value[0]}
 										/>
 										<input
+											id={`filter-end-${column}`}
+											name={`filter-end-${column}`}
 											class={uiStyles.c0152}
 											type="date"
 											bind:value={filters[column].value[1]}
 										/>
 									{:else if columnMeta[column].type === 'date'}
-										<input class={uiStyles.c0152} type="date" bind:value={filters[column].value} />
+										<input
+											id={`filter-value-${column}`}
+											name={`filter-value-${column}`}
+											class={uiStyles.c0152}
+											type="date"
+											bind:value={filters[column].value}
+										/>
 									{:else}
 										<input
+											id={`filter-value-${column}`}
+											name={`filter-value-${column}`}
 											class={uiStyles.c0152}
 											type={columnMeta[column].type === 'number' ? 'number' : 'text'}
 											bind:value={filters[column].value}
