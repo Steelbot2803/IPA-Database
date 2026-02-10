@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
-	import { goto } from '$app/navigation';
+	import { goto, afterNavigate } from '$app/navigation';
 	import { browser } from '$app/environment';
-	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { isElectromech } from '$lib/utils/customerFilters.js';
 	import {
@@ -11,6 +10,7 @@
 		buildPageQuery,
 		buildSortQuery,
 		defaultOperator,
+		defaultValue,
 		getSortState,
 		type ColumnMeta,
 		type Filter
@@ -89,7 +89,10 @@
 
 	$: electromech = data.electromech ?? false;
 
-	$: ({ sortColumn, sortAscending } = getSortState(page.url.searchParams));
+	function syncSortStateFromUrl() {
+		if (!browser) return;
+		({ sortColumn, sortAscending } = getSortState(new URLSearchParams(window.location.search)));
+	}
 
 	let filters: Record<string, Filter> = data.filters ?? {};
 	let columnMeta: Record<string, ColumnMeta> = data.columnMeta;
@@ -117,6 +120,10 @@
 		sortAscending = true;
 		const params = new URLSearchParams(window.location.search);
 		params.set('scheduled_month', scheduledMonth);
+		params.delete('filters');
+		params.delete('sort');
+		params.delete('order');
+		params.set('page', '1');
 		goto(`?${params.toString()}`, { replaceState: true, noScroll: true });
 		closePopover();
 	}
@@ -125,7 +132,24 @@
 
 	function ensureFilter(column: string) {
 		if (!filters[column]) {
-			filters[column] = { op: defaultOperator(columnMeta[column].type), value: '' };
+			filters[column] = {
+				op: defaultOperator(columnMeta[column].type),
+				value: defaultValue(columnMeta[column])
+			};
+		}
+	}
+
+	function normalizeFilterValue(column: string) {
+		if (!filters[column]) return;
+
+		if (columnMeta[column].type === 'date' && filters[column].op === 'between') {
+			const existing = filters[column].value;
+			filters[column].value = [existing?.[0] ?? '', existing?.[1] ?? ''];
+			return;
+		}
+
+		if (Array.isArray(filters[column].value)) {
+			filters[column].value = filters[column].value[0] ?? '';
 		}
 	}
 
@@ -142,6 +166,10 @@
 	}
 
 	onMount(() => {
+		syncSortStateFromUrl();
+		afterNavigate(() => {
+			syncSortStateFromUrl();
+		});
 		window.addEventListener('keydown', onKeyDown);
 		window.addEventListener('mousedown', onClickOutside, true);
 		return () => {
@@ -254,6 +282,7 @@
 											name={`filter-op-${column}`}
 											class={uiStyles.c0122}
 											bind:value={filters[column].op}
+											onchange={() => normalizeFilterValue(column)}
 										>
 											{#each OPERATORS[columnMeta[column].type] as op}
 												<option value={op.value}>{op.label}</option>

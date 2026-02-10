@@ -192,8 +192,7 @@
 						<input
 							id="blank_no"
 							name="blank_no"
-							type="text"
-							maxlength="7"
+							type="number"
 							placeholder="Blank No (7 digits) *"
 							bind:value={blankNoInput}
 							inputmode="numeric"
