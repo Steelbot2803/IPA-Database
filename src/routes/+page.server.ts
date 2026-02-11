@@ -1,5 +1,6 @@
 import { supabase } from '$lib/supabaseClient';
 import { styles as uiStyles } from '$lib/utils/styles';
+import { toUserError } from '$lib/utils/userError';
 
 export async function load() {
 	const errors: string[] = [];
@@ -7,28 +8,40 @@ export async function load() {
 	/* ---------- STATUS COUNTS ---------- */
 
 	const kpiRes = await supabase.from('trs_prod_status_count_view').select('*').single();
+	const kpiData = kpiRes.data ?? {
+		dispatched_qty: 0,
+		ready_qty: 0,
+		in_process_qty: 0
+	};
 	const kpi = [
 		{
 			key: 'dispatched_qty',
 			label: 'Dispatched',
-			value: kpiRes.data.dispatched_qty,
+			value: kpiData.dispatched_qty,
 			class: uiStyles.c0024
 		},
 		{
 			key: 'ready_qty',
 			label: 'Ready',
-			value: kpiRes.data.ready_qty,
+			value: kpiData.ready_qty,
 			class: uiStyles.c0026
 		},
 		{
 			key: 'in_process_qty',
 			label: 'In-Process',
-			value: kpiRes.data.in_process_qty,
+			value: kpiData.in_process_qty,
 			class: uiStyles.c0027
 		}
 	];
 
-	if (kpiRes.error) errors.push(`KPIs: ${kpiRes.error.message}`);
+	if (kpiRes.error) {
+		errors.push(
+			toUserError(
+				'Could not load dashboard KPI summary from trs_prod_status_count_view',
+				kpiRes.error.message
+			)
+		);
+	}
 
 	/* ---------- RECENT 10 ENTRIES ---------- */
 
@@ -38,7 +51,14 @@ export async function load() {
 		.order('updated_at', { ascending: false })
 		.limit(10);
 
-	if (recetJobsRes.error) errors.push(`Recent Jobs: ${recetJobsRes.error.message}`);
+	if (recetJobsRes.error) {
+		errors.push(
+			toUserError(
+				'Could not load recent jobs from trs_prod_status_view',
+				recetJobsRes.error.message
+			)
+		);
+	}
 
 	/* ---------- DUPLICATE BLANK NO ---------- */
 
@@ -47,16 +67,28 @@ export async function load() {
 		.select('*')
 		.order('blank_no', { ascending: true });
 
-	if (blankDuplicatesRes.error)
-		errors.push(`Blank Duplicates: ${blankDuplicatesRes.error.message}`);
+	if (blankDuplicatesRes.error) {
+		errors.push(
+			toUserError(
+				'Could not load duplicate blank numbers from lc_duplicate_blank_no',
+				blankDuplicatesRes.error.message
+			)
+		);
+	}
 
 	const serialDuplicatesRes = await supabase
 		.from('duplicate_serial_no')
 		.select('*')
 		.order('serial_no', { ascending: true });
 
-	if (serialDuplicatesRes.error)
-		errors.push(`Serial Duplicates: ${serialDuplicatesRes.error.message}`);
+	if (serialDuplicatesRes.error) {
+		errors.push(
+			toUserError(
+				'Could not load duplicate serial numbers from duplicate_serial_no',
+				serialDuplicatesRes.error.message
+			)
+		);
+	}
 
 	/* ---------- BLANK STOCK BY MODEL NO ---------- */
 
@@ -65,7 +97,14 @@ export async function load() {
 		.select('*')
 		.order('model_no', { ascending: true });
 
-	if (blankStockRes.error) errors.push(`Blank Stock: ${blankStockRes.error.message}`);
+	if (blankStockRes.error) {
+		errors.push(
+			toUserError(
+				'Could not load blank stock summary from blank_stock_by_model_no_view',
+				blankStockRes.error.message
+			)
+		);
+	}
 
 	/* ---------- LOADCELL STOCK BY MODEL NO ---------- */
 
@@ -74,7 +113,14 @@ export async function load() {
 		.select('*')
 		.order('model_no', { ascending: true });
 
-	if (loadcellStockRes.error) errors.push(`Loadcell Stock: ${loadcellStockRes.error.message}`);
+	if (loadcellStockRes.error) {
+		errors.push(
+			toUserError(
+				'Could not load loadcell stock summary from loadcell_stock_by_model_no_view',
+				loadcellStockRes.error.message
+			)
+		);
+	}
 
 	return {
 		kpi: kpi,

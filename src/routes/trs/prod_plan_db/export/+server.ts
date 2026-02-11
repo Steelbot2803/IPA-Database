@@ -1,5 +1,6 @@
 import type { RequestHandler } from './$types';
 import { getSupabase } from '$lib/supabaseServer';
+import { toUserError } from '$lib/utils/userError';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 const TITLE = 'PRODUCTION PLAN - TRANSDUCER';
@@ -184,7 +185,12 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		.order('job_no', { ascending: true });
 
 	if (error) {
-		return new Response(error.message, { status: 500 });
+		return new Response(
+			toUserError(`Could not export production plan data from the ${table} table`, error.message),
+			{
+				status: 500
+			}
+		);
 	}
 
 	const normalizedRows = ((data ?? []) as ExportRow[]).map(normalizeRow);
