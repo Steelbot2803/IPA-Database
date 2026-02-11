@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
 	import { enhance } from '$app/forms';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import { toast } from '$lib/utils/toast';
 	import { onMount } from 'svelte';
-	import { History, Database } from 'lucide-svelte';
+	import { History, Database, RefreshCw } from 'lucide-svelte';
 
 	const initialBlankNo = page.url.searchParams.get('blank_no') ?? '';
 	let searchValue = initialBlankNo;
@@ -77,7 +77,7 @@
 	}
 
 	async function loadDbSuggestions(term: string) {
-		if (suggestionAbortController) suggestionAbortController.abort;
+		if (suggestionAbortController) suggestionAbortController.abort();
 
 		suggestionAbortController = new AbortController();
 		const params = new URLSearchParams({ q: term, limit: '10' });
@@ -118,8 +118,8 @@
 		searchInputEl?.blur();
 	}
 
-	function runReactiveSearch(query: string, historyValue = '') {
-		if (query === page.url.searchParams.toString()) {
+	function runReactiveSearch(query: string, historyValue = '', forceRefresh = false) {
+		if (!forceRefresh && query === page.url.searchParams.toString()) {
 			searching = false;
 			return;
 		}
@@ -128,6 +128,13 @@
 		searchTimer = setTimeout(async () => {
 			searching = true;
 			saveSearch(historyValue);
+
+			if (forceRefresh && query === page.url.searchParams.toString()) {
+				await invalidateAll();
+				searching = false;
+				return;
+			}
+
 			await goto(query ? `${page.url.pathname}?${query}` : page.url.pathname, {
 				replaceState: true,
 				keepFocus: true,
@@ -179,7 +186,7 @@
 		}
 		const query = trimmedValue ? `blank_no=${encodeURIComponent(trimmedValue)}` : '';
 		lastSearchQuery = query;
-		runReactiveSearch(query, trimmedValue);
+		runReactiveSearch(query, trimmedValue, true);
 	}
 
 	type Blank = {
@@ -242,9 +249,15 @@
 				</div>
 			{/if}
 
-			<button class={uiStyles.c0078} disabled={searching}>
-				{searching ? 'Searching...' : 'Refresh'}
-			</button>
+			<div class={uiStyles.c0073}>
+				<button class={uiStyles.c0078} disabled={searching}>
+					{#if searching}
+						<RefreshCw class="animate-spin" size="24" />
+					{:else}
+						<RefreshCw size="24" />
+					{/if}
+				</button>
+			</div>
 		</div>
 	</form>
 

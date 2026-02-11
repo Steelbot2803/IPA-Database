@@ -73,10 +73,10 @@ export const styles = {
 	c0061: 'font-5xl cursor-pointer rounded-md bg-neutral-800 px-2 py-2 hover:bg-neutral-600',
 	c0062:
 		'font-5xl cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50',
-	c0063: 'grid grid-cols-8 items-end gap-4',
-	c0064: 'col-span-1',
+	c0063: 'grid grid-cols-8 items-end gap-2',
+	c0064: 'flex col-span-1 gap-2',
 	c0065:
-		'rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 text-neutral-200 transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-50',
+		'cursor-pointer rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 text-neutral-200 transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-50',
 	c0066: 'col-span-3',
 	c0067:
 		'font-5xl rounded-md border-2 border-red-600 bg-red-800 py-2 text-center text-2xl text-red-100',
@@ -86,16 +86,16 @@ export const styles = {
 	c0070: 'bg-surface shadow-card flex gap-3 rounded-md px-6',
 	c0071: 'font-5xl cursor-pointer rounded-md border-2 px-6 py-2 text-xl hover:bg-neutral-600',
 	c0072: 'font-5xl ml-2 cursor-pointer rounded-md border-2 px-6 py-2 text-xl hover:bg-neutral-600',
-	c0073: 'relative w-1/2',
+	c0073: 'relative flex w-1/2 gap-2',
 	c0074:
 		'w-1/3 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none',
 	c0075:
-		'absolute z-20 mt-1.5 max-h-72 w-1/3 overflow-y-auto rounded-md border border-neutral-700 bg-neutral-900 text-xl shadow-lg ring-2 ring-neutral-700',
+		'absolute z-20 mt-13.5 max-h-72 w-1/3 overflow-y-auto rounded-md border border-neutral-700 bg-neutral-900 text-xl shadow-lg ring-2 ring-neutral-700',
 	c0076:
 		'flex w-full justify-between rounded-md px-3 py-2 text-left text-neutral-200 hover:bg-neutral-800',
 	c0077: 'inline-flex items-center gap-1 text-cyan-500',
 	c0078:
-		'font-5xl ml-2 cursor-pointer rounded-md border border-neutral-700 bg-neutral-800 px-6 py-2 text-xl hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50',
+		'ml-1 cursor-pointer rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50 items-center',
 	c0079: 'rounded-md bg-green-800 px-4 py-3 text-green-100 shadow-md',
 	c0080: 'max-w-base fixed top-8 right-12 z-50 flex flex-col gap-2',
 	c0081: 'rounded-md bg-red-800 px-4 py-3 text-red-100 shadow-lg',
@@ -193,5 +193,7 @@ export const styles = {
 	c0154:
 		'absolute z-20 mt-1.5 max-h-60 w-full overflow-y-auto rounded-md border border-neutral-700 bg-neutral-900 text-base shadow-lg ring-1 ring-neutral-700',
 	c0155:
-		'flex w-full items-center justify-between px-3 py-2 text-left text-neutral-200 hover:bg-neutral-800'
+		'flex w-full items-center justify-between px-3 py-2 text-left text-neutral-200 hover:bg-neutral-800',
+	c0156:
+		'rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 justify-center hover:bg-neutral-600 cursor-pointer'
 } as const;

@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { toast } from '$lib/utils/toast';
 	import { isElectromech } from '$lib/utils/customerFilters';
+	import { RefreshCw } from 'lucide-svelte';
 
 	type JobRow = {
 		id: number;
@@ -146,7 +147,11 @@
 			</div>
 			<div class={uiStyles.c0064}>
 				<button type="button" onclick={loadRows} disabled={loading} class={uiStyles.c0065}>
-					{loading ? 'Loading...' : 'Load'}
+					{#if loading}
+						<RefreshCw class="animate-spin" size="24" />
+					{:else}
+						<RefreshCw size="24" />
+					{/if}
 				</button>
 			</div>
 			<div class={uiStyles.c0066}>

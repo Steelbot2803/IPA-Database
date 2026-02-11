@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
-	import { goto, afterNavigate } from '$app/navigation';
+	import { goto, afterNavigate, invalidateAll } from '$app/navigation';
 	import { browser } from '$app/environment';
+	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { isElectromech } from '$lib/utils/customerFilters.js';
 	import {
@@ -23,7 +24,11 @@
 		ChevronLast,
 		ChevronLeft,
 		ChevronRight,
-		Funnel
+		Funnel,
+		RefreshCw,
+		Check,
+		FileSpreadsheet,
+		FileText
 	} from 'lucide-svelte';
 
 	export let data;
@@ -32,6 +37,55 @@
 	let selectedPlan: ProdPlan = null;
 	let scheduledMonth = data.scheduledMonth;
 	let loading = false;
+	type DownloadState = 'idle' | 'loading' | 'done';
+	let downloadState: Record<'csv' | 'pdf', DownloadState> = {
+		csv: 'idle',
+		pdf: 'idle'
+	};
+
+	function getExportUrl(format: 'csv' | 'pdf'): string {
+		return `/trs/prod_plan_db/export?scheduled_month=${encodeURIComponent(scheduledMonth)}${electromech ? '&electromech=1' : ''}&format=${format}`;
+	}
+
+	function filenameFromDisposition(contentDisposition: string | null, fallback: string): string {
+		if (!contentDisposition) return fallback;
+		const match = contentDisposition.match(/filename=\"?([^\";]+)\"?/i);
+		return match?.[1] ?? fallback;
+	}
+
+	async function handleDownload(format: 'csv' | 'pdf') {
+		if (downloadState[format] === 'loading') return;
+
+		downloadState = { ...downloadState, [format]: 'loading' };
+
+		try {
+			const res = await fetch(getExportUrl(format));
+			if (!res.ok) throw new Error(`Failed to download ${format.toUpperCase()}`);
+
+			const blob = await res.blob();
+			const fallbackName = `production-plan-${scheduledMonth}.${format}`;
+			const filename = filenameFromDisposition(
+				res.headers.get('Content-Disposition'),
+				fallbackName
+			);
+			const objectUrl = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = objectUrl;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			URL.revokeObjectURL(objectUrl);
+
+			downloadState = { ...downloadState, [format]: 'done' };
+		} catch {
+			downloadState = { ...downloadState, [format]: 'idle' };
+		} finally {
+			setTimeout(() => {
+				downloadState = { ...downloadState, [format]: 'idle' };
+			}, 1200);
+		}
+	}
 
 	$: totalPages = Math.ceil(data.total / data.pageSize);
 
@@ -46,8 +100,14 @@
 		const params = new URLSearchParams(window.location.search);
 		params.set('scheduled_month', scheduledMonth);
 		params.set('page', '1');
+		const nextQuery = params.toString();
 		try {
-			await goto(`?${params.toString()}`);
+			if (nextQuery === page.url.searchParams.toString()) {
+				await invalidateAll();
+				return;
+			}
+
+			await goto(`?${nextQuery}`);
 		} finally {
 			loading = false;
 		}
@@ -216,8 +276,54 @@
 		</div>
 		<div class={uiStyles.c0064}>
 			<button type="button" onclick={loadMonth} disabled={loading} class={uiStyles.c0065}>
-				{loading ? 'Loading...' : 'Load'}
+				{#if loading}
+					<RefreshCw class="animate-spin" size="24" />
+				{:else}
+					<RefreshCw size="24" />
+				{/if}
 			</button>
+			<div class="ml-12 flex items-center gap-2">
+				<div class="group relative">
+					<button
+						class={uiStyles.c0156}
+						type="button"
+						onclick={() => handleDownload('csv')}
+						disabled={downloadState.csv === 'loading'}
+						aria-label="Download CSV Format"
+					>
+						{#if downloadState.csv === 'done'}
+							<Check size={24} class="mr-1 inline text-green-500" />
+						{:else}
+							<FileSpreadsheet size={24} class="text-cyan-500" />
+						{/if}
+					</button>
+					<span
+						class="text-s pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+					>
+						Download CSV
+					</span>
+				</div>
+				<div class="group relative">
+					<button
+						class={uiStyles.c0156}
+						type="button"
+						onclick={() => handleDownload('pdf')}
+						disabled={downloadState.pdf === 'loading'}
+						aria-label="Download PDF Format"
+					>
+						{#if downloadState.pdf === 'done'}
+							<Check size={24} class="mr-1 inline text-green-500" />
+						{:else}
+							<FileText size={24} class="text-cyan-500" aria-label="Download PDF Format" />
+						{/if}
+					</button>
+					<span
+						class="text-s pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+					>
+						Download PDF
+					</span>
+				</div>
+			</div>
 		</div>
 		<div class={uiStyles.c0066}></div>
 		<div class={uiStyles.c0049}>
