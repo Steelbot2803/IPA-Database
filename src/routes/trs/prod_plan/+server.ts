@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getSupabase } from '$lib/supabaseServer';
+import { toUserError } from '$lib/utils/userError';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const supabase = getSupabase(cookies);
@@ -43,7 +44,11 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		.insert(cleaned)
 		.order('id', { ascending: false });
 
-	if (dbError) throw error(500, dbError.message);
+	if (dbError)
+		throw error(
+			500,
+			toUserError('Could not save production plan rows in the trs_prod_plan table', dbError.message)
+		);
 
 	return json({
 		success: true,

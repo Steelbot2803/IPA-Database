@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
+import { toUserError } from '$lib/utils/userError';
 import { isNDigits } from '$lib/utils/validators';
 
 export const actions = {
@@ -64,7 +65,12 @@ export const actions = {
 
 			const { error: batchInsertErr } = await supabase.from('blank_stock').insert(entries);
 			if (batchInsertErr) {
-				return fail(500, { error: batchInsertErr.message });
+				return fail(500, {
+					error: toUserError(
+						'Could not create the requested blank stock batch in the blank_stock table',
+						batchInsertErr.message
+					)
+				});
 			}
 
 			return { success: true, count: entries.length };
@@ -100,7 +106,12 @@ export const actions = {
 		});
 
 		if (insertErr) {
-			return fail(500, { error: insertErr.message });
+			return fail(500, {
+				error: toUserError(
+					'Could not save this blank stock entry to the blank_stock table',
+					insertErr.message
+				)
+			});
 		}
 
 		return { success: true };

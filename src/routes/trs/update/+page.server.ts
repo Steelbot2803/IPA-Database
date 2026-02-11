@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
+import { toUserError } from '$lib/utils/userError';
 import { redirect } from '@sveltejs/kit';
 
 /* ---------- LOAD JOB BY BLANK NO ---------- */
@@ -120,7 +121,12 @@ export const actions = {
 		const { error } = await supabase.from('trs_prod').update(updatePayload).eq('id', f.id);
 
 		if (error) {
-			return fail(500, { error: error.message });
+			return fail(500, {
+				error: toUserError(
+					'Could not update this TRS production entry in the trs_prod table',
+					error.message
+				)
+			});
 		}
 
 		throw redirect(303, `/trs/update?success=true`);

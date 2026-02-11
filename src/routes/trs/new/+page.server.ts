@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
+import { toUserError } from '$lib/utils/userError';
 import { isNDigits } from '$lib/utils/validators';
 
 export async function load({ url }) {
@@ -108,7 +109,12 @@ export const actions = {
 		});
 
 		if (insertErr) {
-			return fail(500, { error: insertErr.message });
+			return fail(500, {
+				error: toUserError(
+					'Could not create this TRS production entry in the trs_prod table',
+					insertErr.message
+				)
+			});
 		}
 
 		return { success: true };

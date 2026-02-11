@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
+import { toUserError } from '$lib/utils/userError';
 
 export async function load({ url }) {
 	const blank_no = url.searchParams.get('blank_no');
@@ -85,7 +86,12 @@ export const actions = {
 		const { error } = await supabase.from('blank_stock').update(payload).eq('id', f.id);
 
 		if (error) {
-			return fail(500, { error: error.message });
+			return fail(500, {
+				error: toUserError(
+					'Could not update this blank stock entry in the blank_stock table',
+					error.message
+				)
+			});
 		}
 
 		throw redirect(303, '/trs/blank_update?success=true');
