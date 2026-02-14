@@ -34,7 +34,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			actual_dispatch: r.actual_dispatch || null,
 			customer: r.customer || null,
 			remarks: r.remarks || null,
-			dimension: r.dimension || null,
 			dispatched_qty: dispatchedQtyValue
 		};
 	});
@@ -47,7 +46,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	if (dbError)
 		throw error(
 			500,
-			toUserError('Could not save production plan rows in the trs_prod_plan table', dbError.message)
+			toUserError('Could not save production plan', dbError.message)
 		);
 
 	return json({

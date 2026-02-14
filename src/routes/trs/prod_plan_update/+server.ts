@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		throw error(
 			500,
 			toUserError(
-				'Could not load production plan rows from the trs_prod_plan table',
+				'Could not load production plan',
 				dbError.message
 			)
 		);
@@ -54,7 +54,6 @@ export const PATCH: RequestHandler = async ({ request, cookies }) => {
 			actual_dispatch: r.actual_dispatch || null,
 			customer: r.customer || null,
 			remarks: r.remarks || null,
-			dimension: r.dimension || null,
 			dispatched_qty: dispatchedQtyValue
 		};
 	});
@@ -67,7 +66,7 @@ export const PATCH: RequestHandler = async ({ request, cookies }) => {
 		throw error(
 			500,
 			toUserError(
-				'Could not update production plan rows in the trs_prod_plan table',
+				'Could not update production plan',
 				dbError.message
 			)
 		);

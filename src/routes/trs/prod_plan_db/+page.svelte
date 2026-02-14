@@ -239,19 +239,19 @@
 	});
 
 	const fields: [keyof ProdPlan, string][] = [
-		['id', 'ID'],
+		['derived_status', 'Status'],
 		['scheduled_month', 'Scheduled Month'],
 		['planned_dispatch', 'Planned Dispatch'],
 		['actual_dispatch', 'Actual Dispatch'],
 		['job_no', 'Job No'],
 		['job_card_no', 'Job Card No'],
 		['model_no', 'Model No'],
-		['dimension', 'Dimension'],
 		['quantity', 'Quantity'],
 		['pending_qty', 'Pending Quantity'],
 		['dispatched_qty', 'Dispatched Quantity'],
 		['customer', 'Customer'],
-		['remarks', 'Remarks']
+		['remarks', 'Remarks'],
+		['id', 'ID']
 	];
 </script>
 

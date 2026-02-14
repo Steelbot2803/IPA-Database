@@ -13,7 +13,6 @@
 		actual_dispatch: Date;
 		customer: string;
 		remarks: string;
-		dimension: string;
 		dispatched_qty: number | '';
 	};
 
@@ -27,7 +26,6 @@
 			actual_dispatch: new Date(),
 			customer: '',
 			remarks: '',
-			dimension: '',
 			dispatched_qty: ''
 		};
 	}

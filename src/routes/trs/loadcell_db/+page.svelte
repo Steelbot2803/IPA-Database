@@ -148,7 +148,7 @@
 	});
 
 	const fields: [keyof Job, string][] = [
-		['id', 'ID'],
+		['derived_status', 'Status'],
 		['job_date', 'Job Date'],
 		['job_no', 'Job No'],
 		['job_card_no', 'Job Card No'],
@@ -174,7 +174,7 @@
 		['tinning', 'Tinning'],
 		['ready_date', 'Ready Date'],
 		['dispatch_date', 'Dispatch Date'],
-		['derived_status', 'Status']
+		['id', 'ID']
 	];
 </script>
 

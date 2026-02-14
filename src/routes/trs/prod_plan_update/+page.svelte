@@ -16,7 +16,6 @@
 		actual_dispatch: string;
 		customer: string;
 		remarks: string;
-		dimension: string;
 		dispatched_qty: number | '';
 		pending_qty: number | '';
 	};
@@ -93,7 +92,6 @@
 				actual_dispatch,
 				customer,
 				remarks,
-				dimension,
 				dispatched_qty
 			}) => ({
 				id,
@@ -103,7 +101,6 @@
 				actual_dispatch,
 				customer,
 				remarks,
-				dimension,
 				dispatched_qty
 			})
 		);
