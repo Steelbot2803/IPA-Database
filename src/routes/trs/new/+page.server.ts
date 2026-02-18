@@ -3,36 +3,18 @@ import { supabase } from '$lib/supabaseClient';
 import { toUserError } from '$lib/utils/userError';
 import { isNDigits } from '$lib/utils/validators';
 
-export async function load({ url }) {
-	const blank_no = url.searchParams.get('blank_no');
-
-	if (!blank_no) {
-		return { blank: null };
-	}
-
-	const { data, error } = await supabase
-		.from('blank_status_view')
-		.select('*')
-		.eq('blank_no', blank_no)
-		.limit(1);
-
-	if (error || !data || data.length === 0) {
-		return { blank: null };
-	}
-
-	return { blank: data[0] };
-}
-
 export const actions = {
 	create: async ({ request }) => {
 		const f = Object.fromEntries(await request.formData());
-		const blank_no = f.blank_no?.toString();
-		const blank_stock_id = f.blank_stock_id?.toString();
 
 		/* ---------- REQUIRED FIELDS ---------- */
 
-		if (!f.job_date) {
-			return fail(400, { error: 'Missing Job Date' });
+		if (!f.recieved_date) {
+			return fail(400, { error: 'Missing Recieved Date' });
+		}
+
+		if (!f.blank_no) {
+			return fail(400, { error: 'Missing Blank No' });
 		}
 
 		if (!isNDigits(f.blank_no.toString(), 7)) {
@@ -41,27 +23,6 @@ export const actions = {
 
 		if (f.serial_no && !isNDigits(f.serial_no.toString(), 6)) {
 			return fail(400, { warn: 'Serial No must be exactly 6 digits' });
-		}
-
-		const blankStockQuery = supabase
-			.from('blank_stock')
-			.select('id, blank_no, job_no, job_card_no, model_no')
-			.eq('blank_no', blank_no)
-			.order('id', { ascending: false })
-			.limit(1);
-
-		const { data: blankStock, error: stockErr } = blank_stock_id
-			? await supabase
-					.from('blank_stock')
-					.select('id, blank_no, job_no, job_card_no, model_no')
-					.eq('id', blank_stock_id)
-					.eq('blank_no', blank_no)
-					.limit(1)
-					.maybeSingle()
-			: await blankStockQuery.maybeSingle();
-
-		if (stockErr || !blankStock) {
-			return fail(400, { error: 'Blank not available in stock' });
 		}
 
 		/* ---------- DUPLICATE CHECK ---------- */
@@ -81,10 +42,11 @@ export const actions = {
 
 		/* ---------- INSERT ---------- */
 		const { error: insertErr } = await supabase.from('trs_prod').insert({
-			job_date: f.job_date,
-			job_no: f.job_no,
+			recieved_date: f.recieved_date,
+			job_date: f.job_date || null,
+			job_no: f.job_no || null,
 			model_no: f.model_no,
-			blank_no: f.blank_no || blankStock.blank_no,
+			blank_no: f.blank_no,
 
 			job_card_no: f.job_card_no || null,
 			serial_no: f.serial_no || null,
@@ -110,10 +72,7 @@ export const actions = {
 
 		if (insertErr) {
 			return fail(500, {
-				error: toUserError(
-					'Could not create this TRS production entry in the trs_prod table',
-					insertErr.message
-				)
+				error: toUserError('Could not create entry', insertErr.message)
 			});
 		}
 

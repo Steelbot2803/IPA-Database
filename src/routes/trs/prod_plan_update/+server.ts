@@ -17,14 +17,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		.eq('scheduled_month', scheduledMonth)
 		.order('planned_dispatch', { ascending: true });
 
-	if (dbError)
-		throw error(
-			500,
-			toUserError(
-				'Could not load production plan',
-				dbError.message
-			)
-		);
+	if (dbError) throw error(500, toUserError('Could not load production plan', dbError.message));
 
 	return json({ rows: data ?? [] });
 };
@@ -62,14 +55,7 @@ export const PATCH: RequestHandler = async ({ request, cookies }) => {
 		.from('trs_prod_plan')
 		.upsert(cleaned, { onConflict: 'id' });
 
-	if (dbError)
-		throw error(
-			500,
-			toUserError(
-				'Could not update production plan',
-				dbError.message
-			)
-		);
+	if (dbError) throw error(500, toUserError('Could not update production plan', dbError.message));
 
 	return json({
 		success: true,

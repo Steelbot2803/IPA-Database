@@ -93,8 +93,17 @@ export const actions = {
 			return fail(400, { error: 'Row ID missing. Cannot update.' });
 		}
 
+		if (!f.job_date) {
+			return fail(400, { error: 'Missing Job Date' });
+		}
+
+		if (!f.model_no) {
+			return fail(400, { error: 'Missing Model No' });
+		}
+
 		const updatePayload = {
-			job_no: f.job_no,
+			job_date: f.job_date,
+			job_no: f.job_no || null,
 			job_card_no: f.job_card_no || null,
 			model_no: f.model_no,
 			serial_no: f.serial_no || null,
@@ -122,10 +131,7 @@ export const actions = {
 
 		if (error) {
 			return fail(500, {
-				error: toUserError(
-					'Could not update this TRS production entry in the trs_prod table',
-					error.message
-				)
+				error: toUserError('Could not update entry', error.message)
 			});
 		}
 

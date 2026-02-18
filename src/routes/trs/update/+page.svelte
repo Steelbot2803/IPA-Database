@@ -223,6 +223,7 @@
 
 	type Job = {
 		id: string;
+		recieved_date: Date;
 		job_date: Date;
 		job_no: string;
 		job_card_no: number | null;
@@ -377,6 +378,7 @@
 				<table class={uiStyles.c0085}>
 					<thead class={uiStyles.c0086}>
 						<tr>
+							<th>Recieved Date</th>
 							<th>Job Date</th>
 							<th>Job No</th>
 							<th>Model No</th>
@@ -388,7 +390,8 @@
 					<tbody>
 						{#each data.jobs as job}
 							<tr class={uiStyles.c0087}>
-								<td class={uiStyles.c0088}>{job.job_date}</td>
+								<td class={uiStyles.c0088}>{job.recieved_date}</td>
+								<td>{job.job_date}</td>
 								<td>{job.job_no}</td>
 								<td>{job.model_no}</td>
 								<td>{job.blank_no}</td>
@@ -428,40 +431,6 @@
 
 				<div class={uiStyles.c0092}>
 					<div class={uiStyles.c0045}>
-						<label for="job_date" class={uiStyles.c0046}>Job Date</label>
-						<input
-							id="job_date"
-							type="date"
-							name="job_date"
-							bind:value={job.job_date}
-							disabled
-							class={uiStyles.c0068}
-						/>
-					</div>
-
-					<div class={uiStyles.c0045}>
-						<label for="job_no" class={uiStyles.c0046}>Job No *</label>
-						<input
-							id="job_no"
-							type="text"
-							name="job_no"
-							bind:value={job.job_no}
-							class={uiStyles.c0047}
-						/>
-					</div>
-
-					<div class={uiStyles.c0045}>
-						<label for="model_no" class={uiStyles.c0046}>Model No *</label>
-						<input
-							id="model_no"
-							type="text"
-							name="model_no"
-							bind:value={job.model_no}
-							class={uiStyles.c0047}
-						/>
-					</div>
-
-					<div class={uiStyles.c0045}>
 						<label for="blank_no" class={uiStyles.c0046}>Blank No</label>
 						<input
 							id="blank_no"
@@ -472,21 +441,37 @@
 							class={uiStyles.c0068}
 						/>
 					</div>
-				</div>
-			</section>
 
-			<!-- ADDITIONAL DETAILS -->
-			<section>
-				<h2 class={uiStyles.c0091}>Additional Details</h2>
-				<div class={uiStyles.c0092}>
 					<div class={uiStyles.c0045}>
-						<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
+						<label for="recieved_date" class={uiStyles.c0046}>Recieved Date</label>
 						<input
-							id="job_card_no"
-							name="job_card_no"
-							type="number"
-							bind:value={job.job_card_no}
-							placeholder={job.job_card_no ? '' : 'Job Card No'}
+							id="recieved_date"
+							type="date"
+							name="recieved_date"
+							bind:value={job.recieved_date}
+							disabled
+							class={uiStyles.c0068}
+						/>
+					</div>
+
+					<div class={uiStyles.c0045}>
+						<label for="job_date" class={uiStyles.c0046}>Job Date *</label>
+						<input
+							id="job_date"
+							type="date"
+							name="job_date"
+							bind:value={job.job_date}
+							class={uiStyles.c0047}
+						/>
+					</div>
+
+					<div class={uiStyles.c0045}>
+						<label for="job_no" class={uiStyles.c0046}>Job No</label>
+						<input
+							id="job_no"
+							type="text"
+							name="job_no"
+							bind:value={job.job_no}
 							class={uiStyles.c0047}
 						/>
 					</div>
@@ -506,6 +491,17 @@
 					</div>
 
 					<div class={uiStyles.c0045}>
+						<label for="model_no" class={uiStyles.c0046}>Model No *</label>
+						<input
+							id="model_no"
+							type="text"
+							name="model_no"
+							bind:value={job.model_no}
+							class={uiStyles.c0047}
+						/>
+					</div>
+
+					<div class={uiStyles.c0045}>
 						<label for="customer" class={uiStyles.c0046}>Customer</label>
 						<textarea
 							id="customer"
@@ -515,6 +511,18 @@
 							placeholder={job.customer ? '' : 'Customer'}
 							class={uiStyles.c0093}
 						></textarea>
+					</div>
+
+					<div class={uiStyles.c0045}>
+						<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
+						<input
+							id="job_card_no"
+							name="job_card_no"
+							type="number"
+							bind:value={job.job_card_no}
+							placeholder={job.job_card_no ? '' : 'Job Card No'}
+							class={uiStyles.c0047}
+						/>
 					</div>
 				</div>
 			</section>

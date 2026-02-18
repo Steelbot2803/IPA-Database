@@ -11,7 +11,8 @@ export async function load() {
 	const kpiData = kpiRes.data ?? {
 		dispatched_qty: 0,
 		ready_qty: 0,
-		in_process_qty: 0
+		in_process_qty: 0,
+		blank_stock_qty: 0
 	};
 	const kpi = [
 		{
@@ -31,16 +32,17 @@ export async function load() {
 			label: 'In-Process',
 			value: kpiData.in_process_qty,
 			class: uiStyles.c0027
+		},
+		{
+			key: 'blank_stock_qty',
+			label: 'Blank-Stock',
+			value: kpiData.blank_stock_qty,
+			class: uiStyles.c0157
 		}
 	];
 
 	if (kpiRes.error) {
-		errors.push(
-			toUserError(
-				'Could not load dashboard KPI summary from trs_prod_status_count_view',
-				kpiRes.error.message
-			)
-		);
+		errors.push(toUserError('Could not load dashboard KPI summary', kpiRes.error.message));
 	}
 
 	/* ---------- RECENT 10 ENTRIES ---------- */
@@ -52,12 +54,17 @@ export async function load() {
 		.limit(10);
 
 	if (recetJobsRes.error) {
-		errors.push(
-			toUserError(
-				'Could not load recent jobs from trs_prod_status_view',
-				recetJobsRes.error.message
-			)
-		);
+		errors.push(toUserError('Could not load recent jobs', recetJobsRes.error.message));
+	}
+
+	const monthlyKPIsRes = await supabase
+		.from('monthly_kpis')
+		.select('*')
+		.order('year', { ascending: false })
+		.order('month', { ascending: true });
+
+	if (monthlyKPIsRes.error) {
+		errors.push(toUserError('Could not load KPIs', monthlyKPIsRes.error.message));
 	}
 
 	/* ---------- DUPLICATE BLANK NO ---------- */
@@ -69,10 +76,7 @@ export async function load() {
 
 	if (blankDuplicatesRes.error) {
 		errors.push(
-			toUserError(
-				'Could not load duplicate blank numbers from lc_duplicate_blank_no',
-				blankDuplicatesRes.error.message
-			)
+			toUserError('Could not load duplicate blank numbers', blankDuplicatesRes.error.message)
 		);
 	}
 
@@ -83,10 +87,7 @@ export async function load() {
 
 	if (serialDuplicatesRes.error) {
 		errors.push(
-			toUserError(
-				'Could not load duplicate serial numbers from duplicate_serial_no',
-				serialDuplicatesRes.error.message
-			)
+			toUserError('Could not load duplicate serial numbers', serialDuplicatesRes.error.message)
 		);
 	}
 
@@ -98,12 +99,7 @@ export async function load() {
 		.order('model_no', { ascending: true });
 
 	if (blankStockRes.error) {
-		errors.push(
-			toUserError(
-				'Could not load blank stock summary from blank_stock_by_model_no_view',
-				blankStockRes.error.message
-			)
-		);
+		errors.push(toUserError('Could not load blank stock summary', blankStockRes.error.message));
 	}
 
 	/* ---------- LOADCELL STOCK BY MODEL NO ---------- */
@@ -115,16 +111,14 @@ export async function load() {
 
 	if (loadcellStockRes.error) {
 		errors.push(
-			toUserError(
-				'Could not load loadcell stock summary from loadcell_stock_by_model_no_view',
-				loadcellStockRes.error.message
-			)
+			toUserError('Could not load loadcell stock summary', loadcellStockRes.error.message)
 		);
 	}
 
 	return {
 		kpi: kpi,
 		recentJobs: recetJobsRes.data ?? [],
+		monthlyKPIs: monthlyKPIsRes.data,
 		blankDuplicates: blankDuplicatesRes.data ?? [],
 		serialDuplicates: serialDuplicatesRes.data ?? [],
 		blankStock: blankStockRes.data ?? [],

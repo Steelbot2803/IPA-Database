@@ -149,6 +149,7 @@
 
 	const fields: [keyof Job, string][] = [
 		['derived_status', 'Status'],
+		['recieved_date', 'Recieved Date'],
 		['job_date', 'Job Date'],
 		['job_no', 'Job No'],
 		['job_card_no', 'Job Card No'],

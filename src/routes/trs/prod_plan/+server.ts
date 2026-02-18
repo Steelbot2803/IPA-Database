@@ -43,11 +43,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		.insert(cleaned)
 		.order('id', { ascending: false });
 
-	if (dbError)
-		throw error(
-			500,
-			toUserError('Could not save production plan', dbError.message)
-		);
+	if (dbError) throw error(500, toUserError('Could not save production plan', dbError.message));
 
 	return json({
 		success: true,

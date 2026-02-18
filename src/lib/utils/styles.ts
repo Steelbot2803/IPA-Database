@@ -25,9 +25,9 @@ export const styles = {
 	c0021: 'mb-6 text-center text-5xl font-medium text-neutral-200',
 	c0022: 'kpi-grid',
 	c0023:
-		'kpi total-jobs mb-4 grid min-w-full grid-cols-3 gap-4 text-2xl font-medium text-neutral-200',
+		'kpi total-jobs mb-4 grid min-w-full grid-cols-4 gap-4 text-2xl font-medium text-neutral-200',
 	c0024: 'kpi dispatched rounded-md border-2 border-green-600/40 bg-green-900/20 p-4',
-	c0025: 'mb-2',
+	c0025: 'mb-2 text-center',
 	c0026: 'kpi ready rounded-md border-2 border-yellow-600/40 bg-yellow-900/20 p-4',
 	c0027: 'kpi inprocess rounded-md border-2 border-red-600/40 bg-red-900/20 p-4',
 	c0028: 'mt-4 grid min-w-full grid-cols-3 gap-6 rounded-md p-4 text-xl text-neutral-200',
@@ -36,9 +36,11 @@ export const styles = {
 	c0031:
 		'mb-4 w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-teal-900/20 p-4',
 	c0032: 'w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-teal-900/20 p-4',
-	c0033: 'col-span-2 flex flex-col gap-4 rounded-md border-2 border-cyan-500/40 p-4 text-center',
-	c0034: 'mb-4 w-full rounded-md bg-cyan-500/20 p-4 text-2xl font-medium text-neutral-200',
-	c0035: 'w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-cyan-500/20 p-4',
+	c0033: 'col-span-2 flex flex-col gap-4 rounded-md border-2 border-cyan-500/40 p-4',
+	c0034:
+		'mb-4 w-full rounded-md bg-cyan-500/20 p-4 text-2xl font-medium text-neutral-200 text-center',
+	c0035:
+		'w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-cyan-500/20 p-4 text-center',
 	c0036: 'grid grid-cols-2 gap-4',
 	c0037: 'flex flex-col gap-4',
 	c0038: 'w-full rounded-md bg-purple-900/20 p-4 text-center text-2xl font-medium text-neutral-200',
@@ -195,5 +197,10 @@ export const styles = {
 	c0155:
 		'flex w-full items-center justify-between px-3 py-2 text-left text-neutral-200 hover:bg-neutral-800',
 	c0156:
-		'rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 justify-center hover:bg-neutral-600 cursor-pointer'
+		'rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 justify-center hover:bg-neutral-600 cursor-pointer',
+	c0157: 'kpi blankstock rounded-md border-2 border-blue-600/40 bg-blue-900/20 p-4',
+	c0158:
+		'mb-4 w-full rounded-md bg-orange-500/20 p-4 text-2xl font-medium text-neutral-200 text-center flex justify-between',
+	c0159:
+		'w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-orange-500/20 p-4 text-center'
 } as const;

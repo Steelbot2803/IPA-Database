@@ -4,6 +4,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from '$lib/utils/toast.js';
 	import { onMount } from 'svelte';
+	import { Calendar } from 'lucide-svelte';
 
 	export let data;
 	const { kpi } = data;
@@ -23,6 +24,22 @@
 			show = true;
 		}
 	});
+
+	const monthLabels = [
+		'',
+		'January',
+		'Ferbuary',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	];
 </script>
 
 <form
@@ -41,7 +58,7 @@
 			{#each kpi as kpi}
 				<div class={kpi.class}>
 					<h3 class={uiStyles.c0025}>{kpi.label}</h3>
-					<p>{kpi.value}</p>
+					<p class="text-center">{kpi.value}</p>
 				</div>
 			{/each}
 		</div>
@@ -88,6 +105,38 @@
 				</table>
 			</div>
 			<div class={uiStyles.c0033}>
+				<div>
+					<h2 class={uiStyles.c0158}>
+						Monthly KPIs <div>
+							<label for="year" class="p-2">Year</label><button
+								type="button"
+								class="cursor-pointer rounded-md border-2 border-orange-500 p-2 hover:bg-orange-500"
+								><Calendar size={20} /></button
+							>
+						</div>
+					</h2>
+					<table class={uiStyles.c0159}>
+						<thead>
+							<tr>
+								<th>Month</th>
+								<th>Planned vs Dispatched (%)</th>
+								<th>Planned vs Produced (%)</th>
+								<th>Produced vs Dispatched (%)</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each data.monthlyKPIs as job}
+								<tr>
+									<td>{monthLabels[job.month]}</td>
+									<td>{job.plnvdsp}</td>
+									<td>{job.plnvpro}</td>
+									<td>{job.provdsp}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+
 				<!-- Recent Entries Section -->
 				<div>
 					<h2 class={uiStyles.c0034}>Recent Entries</h2>

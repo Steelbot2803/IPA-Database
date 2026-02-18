@@ -120,39 +120,6 @@
 						{/if}
 					</a>
 				</nav>
-				<nav class={uiStyles.c0017} aria-label="Incoming Blanks Navigation">
-					<h2 class={uiStyles.c0018}>Blanks</h2>
-					<a
-						href="/trs/blank"
-						class={uiStyles.c0019}
-						class:bg-neutral-600={isActivePath('/trs/blank')}
-					>
-						<span>Entry</span>
-						{#if navigating?.to?.url.pathname === '/trs/blank'}
-							<Loader class="animate-spin" stroke-width="5" size={20} />
-						{/if}
-					</a>
-					<a
-						href="/trs/blank_update"
-						class={uiStyles.c0019}
-						class:bg-neutral-600={isActivePath('/trs/blank_update')}
-					>
-						<span>Update</span>
-						{#if navigating?.to?.url.pathname === '/trs/blank_update'}
-							<Loader class="animate-spin" stroke-width="5" size={20} />
-						{/if}
-					</a>
-					<a
-						href="/trs/blank_db"
-						class={uiStyles.c0019}
-						class:bg-neutral-600={isActivePath('/trs/blank_db')}
-					>
-						<span>Database</span>
-						{#if navigating?.to?.url.pathname === '/trs/blank_db'}
-							<Loader class="animate-spin" stroke-width="5" size={20} />
-						{/if}
-					</a>
-				</nav>
 				<nav class={uiStyles.c0017} aria-label="Jobs Navigation">
 					<h2 class={uiStyles.c0018}>Loadcells</h2>
 					<a href="/trs/new" class={uiStyles.c0019} class:bg-neutral-600={isActivePath('/trs/new')}>
