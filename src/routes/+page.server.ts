@@ -63,9 +63,29 @@ export async function load() {
 		.order('year', { ascending: false })
 		.order('month', { ascending: true });
 
-	if (monthlyKPIsRes.error) {
-		errors.push(toUserError('Could not load KPIs', monthlyKPIsRes.error.message));
+	const distinctYearsKPIsRes = await supabase
+		.from('unique_years_kpis_view')
+		.select('*')
+		.order('distinct_year', { ascending: false });
+
+	if (monthlyKPIsRes.error || distinctYearsKPIsRes.error) {
+		errors.push(
+			toUserError(
+				'Could not load Monthly KPIs table completely',
+				monthlyKPIsRes.error?.message || distinctYearsKPIsRes.error?.message
+			)
+		);
 	}
+
+	const monthlyKPIs = (monthlyKPIsRes.data ?? []).map((row) => ({
+		...row,
+		month: Number(row.month),
+		year: Number(row.year)
+	}));
+
+	const KPIsYears = (distinctYearsKPIsRes.data ?? [])
+		.map((row) => row.distinct_year)
+		.filter((year) => Number.isFinite(year));
 
 	/* ---------- DUPLICATE BLANK NO ---------- */
 
@@ -117,8 +137,9 @@ export async function load() {
 
 	return {
 		kpi: kpi,
+		monthlyKPIs,
+		KPIsYears,
 		recentJobs: recetJobsRes.data ?? [],
-		monthlyKPIs: monthlyKPIsRes.data,
 		blankDuplicates: blankDuplicatesRes.data ?? [],
 		serialDuplicates: serialDuplicatesRes.data ?? [],
 		blankStock: blankStockRes.data ?? [],

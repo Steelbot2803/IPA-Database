@@ -4,17 +4,12 @@
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from '$lib/utils/toast.js';
 	import { onMount } from 'svelte';
-	import { Calendar } from 'lucide-svelte';
+	import { Calendar, TriangleAlert } from 'lucide-svelte';
+	import { derived, writable } from 'svelte/store';
 
 	export let data;
 	const { kpi } = data;
 	let show = false;
-
-	const LABELS = {
-		dispatch_qty: 'Dispatched',
-		ready_qty: 'Ready',
-		in_process_qty: 'In-Process'
-	};
 
 	onMount(() => {
 		if (data.errors?.length && !show) {
@@ -25,10 +20,48 @@
 		}
 	});
 
+	let selectedYear: number | null = null;
+	let isYearPickerOpen = false;
+
+	$: normalizedMonthlyKPIs = (data.monthlyKPIs ?? [])
+		.map((row) => ({ ...row, year: Number(row.year), month: Number(row.month) }))
+		.filter((row) => Number.isFinite(row.year) && Number.isFinite(row.month));
+
+	$: yearsFromKpiView = (data.KPIsYears ?? [])
+		.map((year) => Number(year))
+		.filter((year) => Number.isFinite(year));
+
+	$: yearsFromMonthlyKpis = Array.from(new Set(normalizedMonthlyKPIs.map((row) => row.year)));
+
+	$: availableYears = [...new Set([...yearsFromKpiView, ...yearsFromMonthlyKpis])].sort(
+		(a, b) => b - a
+	);
+
+	$: if (
+		availableYears.length > 0 &&
+		(selectedYear === null || !availableYears.includes(selectedYear))
+	) {
+		selectedYear = availableYears[0];
+	}
+
+	$: currentYearLabel = selectedYear ?? 'Year';
+	$: monthlyKPIsByYear = normalizedMonthlyKPIs
+		.filter((row) => row.year === selectedYear)
+		.sort((a, b) => a.month - b.month);
+
+	function toggleYearPicker() {
+		isYearPickerOpen = !isYearPickerOpen;
+	}
+
+	function chooseYear(year: number) {
+		selectedYear = Number(year);
+		isYearPickerOpen = false;
+	}
+
 	const monthLabels = [
 		'',
 		'January',
-		'Ferbuary',
+		'February',
 		'March',
 		'April',
 		'May',
@@ -71,69 +104,118 @@
 			<div class={uiStyles.c0029}>
 				<h2 class={uiStyles.c0030}>Blank Stock</h2>
 				<table class={uiStyles.c0031}>
-					<thead>
-						<tr>
-							<th>Model No</th>
-							<th>Quantity</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each data.blankStock as bstk}
+					{#if data.blankStock.length === 0}
+						<thead>
 							<tr>
-								<td>{bstk.model_no}</td>
-								<td>{bstk.quantity}</td>
+								<th>No Blank Stock</th>
 							</tr>
-						{/each}
-					</tbody>
+						</thead>
+					{:else}
+						<thead>
+							<tr>
+								<th>Model No</th>
+								<th>Quantity</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each data.blankStock as bstk}
+								<tr>
+									<td>{bstk.model_no}</td>
+									<td>{bstk.quantity}</td>
+								</tr>
+							{/each}
+						</tbody>
+					{/if}
 				</table>
 				<h2 class={uiStyles.c0030}>Loadcell Stock</h2>
 				<table class={uiStyles.c0032}>
-					<thead>
-						<tr>
-							<th>Model No</th>
-							<th>Quantity</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each data.loadcellStock as lcstk}
+					{#if data.loadcellStock.length === 0}
+						<thead>
 							<tr>
-								<td>{lcstk.model_no}</td>
-								<td>{lcstk.quantity}</td>
+								<th>No Loadcell Stock</th>
 							</tr>
-						{/each}
-					</tbody>
+						</thead>
+					{:else}
+						<thead>
+							<tr>
+								<th>Model No</th>
+								<th>Quantity</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each data.loadcellStock as lcstk}
+								<tr>
+									<td>{lcstk.model_no}</td>
+									<td>{lcstk.quantity}</td>
+								</tr>
+							{/each}
+						</tbody>
+					{/if}
 				</table>
 			</div>
 			<div class={uiStyles.c0033}>
 				<div>
 					<h2 class={uiStyles.c0158}>
-						Monthly KPIs <div>
-							<label for="year" class="p-2">Year</label><button
+						Monthly KPIs <div class="relative">
+							<span>{currentYearLabel}</span>
+							<button
 								type="button"
-								class="cursor-pointer rounded-md border-2 border-orange-500 p-2 hover:bg-orange-500"
-								><Calendar size={20} /></button
+								class={uiStyles.c0160}
+								aria-haspopup="listbox"
+								aria-expanded={isYearPickerOpen}
+								onclick={toggleYearPicker}
 							>
+								<Calendar size={20} /></button
+							>
+							{#if isYearPickerOpen}
+								<ul class={uiStyles.c161} role="listbox">
+									{#each availableYears as year}
+										<li>
+											<button
+												type="button"
+												class="w-full px-3 py-2 text-center hover:bg-orange-500 {year ===
+												currentYearLabel
+													? 'bg-orange-800 text-neutral-200'
+													: ''}"
+												onclick={() => chooseYear(year)}
+												role="option"
+												aria-selected={year === currentYearLabel}
+											>
+												{year}
+											</button>
+										</li>
+									{/each}
+								</ul>
+							{/if}
 						</div>
 					</h2>
 					<table class={uiStyles.c0159}>
-						<thead>
-							<tr>
-								<th>Month</th>
-								<th>Planned vs Dispatched (%)</th>
-								<th>Planned vs Produced (%)</th>
-								<th>Produced vs Dispatched (%)</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each data.monthlyKPIs as kpim}
+						{#if monthlyKPIsByYear.length === 0}
+							<thead>
 								<tr>
-									<td>{monthLabels[kpim.month]}</td>
-									<td>{kpim.plnvdsp}</td>
-									<td>{kpim.plnvpro}</td>
-									<td>{kpim.provdsp}</td>
+									<th>No KPI data for the selected year</th>
 								</tr>
-							{/each}
-						</tbody>
+							</thead>
+						{:else}
+							<thead>
+								<tr>
+									<th>Month</th>
+									<th>Planned vs Dispatched (%)</th>
+									<th>Planned vs Produced (%)</th>
+									<th>Produced vs Dispatched (%)</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each monthlyKPIsByYear as kpimy}
+									<tr>
+										<td>{monthLabels[kpimy.month]}</td>
+										<td>{kpimy.plnvdsp}</td>
+										<td>{kpimy.plnvpro}</td>
+										<td>{kpimy.provdsp}</td>
+									</tr>
+								{/each}
+							</tbody>
+						{/if}
 					</table>
 				</div>
 
@@ -170,12 +252,20 @@
 				<div class={uiStyles.c0036}>
 					<!-- Duplicate Blank Numbers -->
 					<div class={uiStyles.c0037}>
-						<h2 class={uiStyles.c0038}>⚠ Duplicate Blank Numbers</h2>
+						<h2 class={uiStyles.c0038}>
+							<TriangleAlert size={24} color="#cca000" />
+							<span class="mr-2 ml-2">Duplicate Blank Numbers</span>
+							<TriangleAlert size={24} color="#cca000" />
+						</h2>
 						<div class={uiStyles.c0039}>
-							{#if data.blankDuplicates.length === 0}
-								<p>No duplicates found.</p>
-							{:else}
-								<table class={uiStyles.c0040}>
+							<table class={uiStyles.c0040}>
+								{#if data.blankDuplicates.length === 0}
+									<thead>
+										<tr>
+											<th>No duplicate Blank numbers found</th>
+										</tr>
+									</thead>
+								{:else}
 									<thead>
 										<tr>
 											<th>Blank No</th>
@@ -190,19 +280,27 @@
 											</tr>
 										{/each}
 									</tbody>
-								</table>
-							{/if}
+								{/if}
+							</table>
 						</div>
 					</div>
 
 					<!-- Duplicate Serial Numbers -->
 					<div class={uiStyles.c0037}>
-						<h2 class={uiStyles.c0038}>⚠ Duplicate Serial Numbers</h2>
+						<h2 class={uiStyles.c0038}>
+							<TriangleAlert size={24} color="#cca000" />
+							<span class="mr-2 ml-2">Duplicate Serial Numbers</span>
+							<TriangleAlert size={24} color="#cca000" />
+						</h2>
 						<div class={uiStyles.c0039}>
-							{#if data.serialDuplicates.length === 0}
-								<p>No duplicates found.</p>
-							{:else}
-								<table class={uiStyles.c0041}>
+							<table class={uiStyles.c0041}>
+								{#if data.serialDuplicates.length === 0}
+								<thead>
+										<tr>
+											<th>No duplicate Serial numbers found</th>
+										</tr>
+									</thead>
+								{:else}
 									<thead>
 										<tr>
 											<th>Serial No</th>
@@ -217,8 +315,8 @@
 											</tr>
 										{/each}
 									</tbody>
-								</table>
-							{/if}
+								{/if}
+							</table>
 						</div>
 					</div>
 				</div>

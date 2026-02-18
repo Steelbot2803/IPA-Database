@@ -10,7 +10,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 	const supabase = getSupabase(cookies);
 	const column = mode === 'serial' ? 'serial_no' : 'blank_no';
 
-	let query = supabase
+	const query = supabase
 		.from('trs_prod')
 		.select(column)
 		.not(column, 'is', null)
