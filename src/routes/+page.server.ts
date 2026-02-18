@@ -58,7 +58,7 @@ export async function load() {
 	}
 
 	const monthlyKPIsRes = await supabase
-		.from('monthly_kpis')
+		.from('yearly_monthly_kpis_view')
 		.select('*')
 		.order('year', { ascending: false })
 		.order('month', { ascending: true });

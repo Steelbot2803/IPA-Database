@@ -125,12 +125,12 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each data.monthlyKPIs as job}
+							{#each data.monthlyKPIs as kpim}
 								<tr>
-									<td>{monthLabels[job.month]}</td>
-									<td>{job.plnvdsp}</td>
-									<td>{job.plnvpro}</td>
-									<td>{job.provdsp}</td>
+									<td>{monthLabels[kpim.month]}</td>
+									<td>{kpim.plnvdsp}</td>
+									<td>{kpim.plnvpro}</td>
+									<td>{kpim.provdsp}</td>
 								</tr>
 							{/each}
 						</tbody>
