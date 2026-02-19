@@ -5,7 +5,6 @@
 	import { toast } from '$lib/utils/toast.js';
 	import { onMount } from 'svelte';
 	import { Calendar, TriangleAlert } from 'lucide-svelte';
-	import { derived, writable } from 'svelte/store';
 
 	export let data;
 	const { kpi } = data;
@@ -18,10 +17,38 @@
 			});
 			show = true;
 		}
+
+		document.addEventListener('click', handleDocumentClick);
+		window.addEventListener('keydown', handleEscapeKey);
+
+		return () => {
+			document.removeEventListener('click', handleDocumentClick);
+			window.removeEventListener('keydown', handleEscapeKey);
+		};
 	});
 
 	let selectedYear: number | null = null;
 	let isYearPickerOpen = false;
+	let yearPickerContainer: HTMLDivElement | null = null;
+
+	function closeYearPicker() {
+		isYearPickerOpen = false;
+	}
+
+	function handleDocumentClick(event: MouseEvent) {
+		if (!isYearPickerOpen || !yearPickerContainer) return;
+
+		const target = event.target as Node | null;
+		if (target && !yearPickerContainer.contains(target)) {
+			closeYearPicker();
+		}
+	}
+
+	function handleEscapeKey(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			closeYearPicker();
+		}
+	}
 
 	$: normalizedMonthlyKPIs = (data.monthlyKPIs ?? [])
 		.map((row) => ({ ...row, year: Number(row.year), month: Number(row.month) }))
@@ -128,7 +155,7 @@
 					{/if}
 				</table>
 				<h2 class={uiStyles.c0030}>Loadcell Stock</h2>
-				<table class={uiStyles.c0032}>
+				<table class={uiStyles.c0031}>
 					{#if data.loadcellStock.length === 0}
 						<thead>
 							<tr>
@@ -156,7 +183,7 @@
 			<div class={uiStyles.c0033}>
 				<div>
 					<h2 class={uiStyles.c0158}>
-						Monthly KPIs <div class="relative">
+						Monthly KPIs <div class="relative" bind:this={yearPickerContainer}>
 							<span>{currentYearLabel}</span>
 							<button
 								type="button"
@@ -200,9 +227,9 @@
 							<thead>
 								<tr>
 									<th>Month</th>
-									<th>Planned vs Dispatched (%)</th>
-									<th>Planned vs Produced (%)</th>
-									<th>Produced vs Dispatched (%)</th>
+									<th>Planned vs<br> Dispatched (%)</th>
+									<th>Planned vs<br> Produced (%)</th>
+									<th>Produced vs<br> Dispatched (%)</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -295,7 +322,7 @@
 						<div class={uiStyles.c0039}>
 							<table class={uiStyles.c0041}>
 								{#if data.serialDuplicates.length === 0}
-								<thead>
+									<thead>
 										<tr>
 											<th>No duplicate Serial numbers found</th>
 										</tr>

@@ -30,13 +30,13 @@ export const styles = {
 	c0025: 'mb-2 text-center',
 	c0026: 'kpi ready rounded-md border-2 border-yellow-600 bg-yellow-950 p-4',
 	c0027: 'kpi inprocess rounded-md border-2 border-red-600 bg-red-950 p-4',
-	c0028: 'mt-4 grid min-w-full grid-cols-4 gap-6 rounded-md p-4 text-xl text-neutral-200',
-	c0029: 'col-span-1 rounded-md border-2 border-teal-600 p-4 text-center',
+	c0028: 'mt-4 grid min-w-full grid-cols-9 gap-6 rounded-md p-4 text-xl text-neutral-200',
+	c0029: 'col-span-3 rounded-md border-2 border-teal-600 p-4 text-center',
 	c0030: 'mb-4 w-full rounded-md bg-teal-950 p-4 text-2xl font-medium text-neutral-200',
 	c0031:
 		'mb-4 w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-teal-950 p-4',
-	c0032: 'w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-teal-950 p-4',
-	c0033: 'col-span-3 flex flex-col gap-4 rounded-md border-2 border-cyan-600 p-4',
+	c0032: '',
+	c0033: 'col-span-6 flex flex-col gap-4 rounded-md border-2 border-cyan-600 p-4',
 	c0034:
 		'mb-4 w-full rounded-md bg-cyan-950 p-4 text-2xl font-medium text-neutral-200 text-center',
 	c0035:

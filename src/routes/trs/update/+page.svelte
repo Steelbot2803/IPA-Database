@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import { toast } from '$lib/utils/toast.js';
 	import { LOADCELL_PROCESS_DATE_FIELDS } from '$lib/utils/loadcellDates.js';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { History, Database, RefreshCw } from 'lucide-svelte';
+
+	export let data;
 
 	const initialBlankNo = page.url.searchParams.get('blank_no') ?? '';
 	const initialSerialNo = page.url.searchParams.get('serial_no') ?? '';
@@ -26,11 +28,10 @@
 	let serialSearchHistory: string[] = [];
 	let searchInputEl: HTMLInputElement | null = null;
 	let lastNotFoundQuery = '';
-	let lastSuccessQuery = '';
 
 	const BLANK_SEARCH_HISTORY_KEY = 'trs-update-blank-search-history';
 	const SERIAL_SEARCH_HISTORY_KEY = 'trs-update-serial-search-history';
-	const MAX_HISTORY = 8;
+	const MAX_HISTORY = 5;
 	const MIN_BLANK_SEARCH_LEN = 7;
 	const MIN_SERIAL_SEARCH_LEN = 6;
 
@@ -57,6 +58,16 @@
 		.slice(0, 10);
 
 	$: showSuggestions = isSearchFocused && suggestionOptions.length > 0;
+
+	async function clearURLParams() {
+		await goto(page.url.pathname, {
+			replaceState: true,
+			keepFocus: true,
+			noScroll: true
+		});
+		await tick();
+		await invalidateAll();
+	}
 
 	function parseHistoryValue(stored: string | null): string[] {
 		if (!stored) return [];
@@ -157,6 +168,29 @@
 		searchInputEl?.blur();
 	}
 
+	function showNotFoundToastForCurrentQuery() {
+		const currentQuery = page.url.searchParams.toString();
+		const queryValue =
+			page.url.searchParams.get(searchMode === 'blank' ? 'blank_no' : 'serial_no') ?? '';
+		const minLen = searchMode === 'blank' ? MIN_BLANK_SEARCH_LEN : MIN_SERIAL_SEARCH_LEN;
+		const isToastEligible = queryValue.length >= minLen;
+
+		if (
+			page.data.notFound &&
+			currentQuery &&
+			isToastEligible &&
+			lastNotFoundQuery !== currentQuery
+		) {
+			lastNotFoundQuery = currentQuery;
+			toast.show(
+				`No Loadcell entry against ${searchMode === 'blank' ? 'Blank No' : 'Serial No'} ${queryValue}`,
+				'error',
+				5000
+			);
+			clearURLParams();
+		}
+	}
+
 	function runReactiveSearch(query: string, historyValue = '', forceRefresh = false) {
 		if (!forceRefresh && query === page.url.searchParams.toString()) {
 			searching = false;
@@ -171,6 +205,8 @@
 
 			if (forceRefresh && query === page.url.searchParams.toString()) {
 				await invalidateAll();
+				await tick();
+				showNotFoundToastForCurrentQuery();
 				searching = false;
 				return;
 			}
@@ -180,6 +216,8 @@
 				keepFocus: true,
 				noScroll: true
 			});
+			await tick();
+			showNotFoundToastForCurrentQuery();
 			searching = false;
 		}, 250);
 	}
@@ -249,30 +287,6 @@
 		ready_date: Date | null;
 		dispatch_date: Date | null;
 	};
-
-	export let data;
-
-	$: {
-		const currentQuery = page.url.searchParams.toString();
-		const queryValue =
-			page.url.searchParams.get(searchMode === 'blank' ? 'blank_no' : 'serial_no') ?? '';
-		const minLen = searchMode === 'blank' ? MIN_BLANK_SEARCH_LEN : MIN_SERIAL_SEARCH_LEN;
-		const isToastEligible = queryValue.length >= minLen;
-
-		if (data.notFound && currentQuery && isToastEligible && lastNotFoundQuery !== currentQuery) {
-			lastNotFoundQuery = currentQuery;
-			toast.show(
-				`No Loadcell entry against ${searchMode === 'blank' ? 'Blank No' : 'Serial No'} ${queryValue}`,
-				'error',
-				5000
-			);
-		}
-
-		if (data.success && lastSuccessQuery !== currentQuery) {
-			lastSuccessQuery = currentQuery;
-			toast.show('Loadcell entry updated successfully', 'success', 5000);
-		}
-	}
 
 	const dateFields = LOADCELL_PROCESS_DATE_FIELDS.map(([field, label]) => [
 		field as keyof Job,
@@ -414,11 +428,46 @@
 		<form
 			name="loadcell_entry_update"
 			method="POST"
-			use:enhance={() => {
-				saving = true;
-				return async ({ update }) => {
-					saving = false;
-					await update();
+			use:enhance={({ formData, cancel }) => {
+				const modelNo = String(formData.get('model_no') ?? '').trim();
+				const jobDate = String(formData.get('job_date') ?? '').trim();
+
+				if (!jobDate) {
+					toast.show('Missing Job Date', 'error', 5000);
+					cancel();
+					return;
+				}
+
+				if (!modelNo) {
+					toast.show('Missing Model No', 'error', 5000);
+					cancel();
+					return;
+				}
+
+				return async ({ result }) => {
+					try {
+						if (result.type === 'failure' && result.data?.error) {
+							toast.show(String(result.data.error), 'error', 5000);
+						} else if (result.type === 'success' && result.data?.info) {
+							toast.show(String(result.data.info), 'info', 5000);
+						} else if (result.type === 'success' && result.data?.success) {
+							toast.show('Loadcell entry updated successfully', 'success', 5000);
+						}
+
+						if (result.type === 'failure' && result.data?.error) {
+							await clearURLParams();
+							return;
+						}
+
+						if (result.type === 'success' && (result.data?.success || result.data?.info)) {
+							await clearURLParams();
+							return;
+						}
+
+						await applyAction(result);
+					} finally {
+						saving = false;
+					}
 				};
 			}}
 			class={uiStyles.c0090}

@@ -1,7 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
 import { toUserError } from '$lib/utils/userError';
-import { redirect } from '@sveltejs/kit';
 
 /* ---------- LOAD JOB BY BLANK NO ---------- */
 export async function load({ url }) {
@@ -93,20 +92,24 @@ export const actions = {
 			return fail(400, { error: 'Row ID missing. Cannot update.' });
 		}
 
-		if (!f.job_date) {
-			return fail(400, { error: 'Missing Job Date' });
-		}
+		const { data: currentJob, error: currentJobErr } = await supabase
+			.from('trs_prod')
+			.select('*')
+			.eq('id', f.id)
+			.single();
 
-		if (!f.model_no) {
-			return fail(400, { error: 'Missing Model No' });
+		if (currentJobErr || !currentJob) {
+			return fail(500, {
+				error: toUserError('Could not load existing entry for comparison', currentJobErr?.message)
+			});
 		}
 
 		const updatePayload = {
 			job_date: f.job_date,
 			job_no: f.job_no || null,
-			job_card_no: f.job_card_no || null,
+			job_card_no: f.job_card_no ? Number(f.job_card_no) : null,
 			model_no: f.model_no,
-			serial_no: f.serial_no || null,
+			serial_no: f.serial_no ? Number(f.serial_no) : null,
 			customer: f.customer || null,
 			remarks: f.remarks || null,
 
@@ -127,6 +130,22 @@ export const actions = {
 			dispatch_date: f.dispatch_date || null
 		};
 
+		const normalize = (value: unknown) => {
+			if (value === null || value === '') return null;
+			if (typeof value === 'string' && value.includes('T')) return value.slice(0, 10);
+			return value;
+		};
+
+		const hasChanges = Object.entries(updatePayload).some(([key, value]) => {
+			return normalize(currentJob[key as keyof typeof currentJob]) !== normalize(value);
+		});
+
+		if (!hasChanges) {
+			return {
+				info: 'Nothing changed or added'
+			};
+		}
+
 		const { error } = await supabase.from('trs_prod').update(updatePayload).eq('id', f.id);
 
 		if (error) {
@@ -135,6 +154,6 @@ export const actions = {
 			});
 		}
 
-		throw redirect(303, `/trs/update?success=true`);
+		return { success: true };
 	}
 };
