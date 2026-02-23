@@ -1,7 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
 import { toUserError } from '$lib/utils/userError';
-import { error, info, warn } from 'console';
 
 function parseDispatchIdentifiers(raw: string) {
 	const tokens = raw
@@ -20,7 +19,7 @@ function parseDispatchIdentifiers(raw: string) {
 		const rangeMatch = token.match(/^(\d+)\s*-\s*(\d+)$/);
 		if (!rangeMatch) {
 			return {
-				error: `Invalid entry: "${token}". Enter CSV or ranges such as 2600001,2600005-2600010.`
+				error: `Invalid entry: "${token}". Enter CSV or ranges such as 000126, 2600005-2600010.`
 			};
 		}
 
@@ -35,7 +34,7 @@ function parseDispatchIdentifiers(raw: string) {
 
 		if (end - start > 1000) {
 			return {
-				error: `Range too large: "${token}". Choose a range of less than 5000 values or split the range into smaller sub-ranges.`
+				error: `Range too large: "${token}". Split into sub-ranges of 1000 values each.`
 			};
 		}
 
@@ -140,7 +139,6 @@ export const actions = {
 	main: async ({ request }) => {
 		const f = Object.fromEntries(await request.formData());
 
-		/* ---- HARD REQUIREMENT ---- */
 		if (!f.id) {
 			return fail(422, { error: 'Row ID missing. Cannot update.' });
 		}
@@ -211,7 +209,6 @@ export const actions = {
 	},
 	dispatchOnly: async ({ request }) => {
 		const form = await request.formData();
-		const dispatchMode = form.get('dispatch_mode') === 'serial' ? 'serial' : 'blank';
 		const rawValues = String(form.get('dispatch_values') ?? '').trim();
 		const dispatchDate = String(form.get('dispatch_date') ?? '').trim();
 
@@ -225,31 +222,56 @@ export const actions = {
 			return fail(422, { error: parsed.error });
 		}
 
-		const column = dispatchMode === 'serial' ? 'serial_no' : 'blank_no';
+		const ids = new Set<number>();
+		const matchedSerial = new Set<number>();
+		const matchedBlank = new Set<number>();
 
-		const { data: matchingRows, error: fetchError } = await supabase
+		const { data: serialRows, error: serialFetchErr } = await supabase
 			.from('trs_prod')
-			.select('id')
-			.in(column, parsed.values);
+			.select('id, serial_no')
+			.in('serial_no', parsed.values);
 
-		if (fetchError) {
+		if (serialFetchErr) {
 			return fail(500, {
-				error: toUserError('Could not load dispatch targets.', fetchError.message)
+				error: toUserError('Could not load Serial No dispatch targets.', serialFetchErr.message)
 			});
 		}
 
-		if (!matchingRows || matchingRows.length === 0) {
+		if (serialRows) {
+			for (const row of serialRows) {
+				ids.add(row.id);
+				if (typeof row.serial_no === 'number') matchedSerial.add(row.serial_no);
+			}
+		}
+
+		const { data: blankRows, error: blankFetchError } = await supabase
+			.from('trs_prod')
+			.select('id, blank_no')
+			.in('blank_no', parsed.values);
+
+		if (blankFetchError) {
+			return fail(500, {
+				error: toUserError('Could not load Blank No dispatch targets.', blankFetchError.message)
+			});
+		}
+
+		if (blankRows) {
+			for (const row of blankRows) {
+				ids.add(row.id);
+				if (typeof row.blank_no === 'number') matchedBlank.add(row.blank_no);
+			}
+		}
+
+		if (ids.size === 0) {
 			return fail(404, {
-				error: `No rows found for the provided ${dispatchMode === 'serial' ? 'Serial' : 'Blank'} Nos.`
+				error: 'No rows found for the provided values.'
 			});
 		}
-
-		const ids = matchingRows.map((row) => row.id);
 
 		const { error: updateErr } = await supabase
 			.from('trs_prod')
 			.update({ dispatch_date: dispatchDate })
-			.in('id', ids);
+			.in('id', Array.from(ids));
 
 		if (updateErr) {
 			return fail(500, {
@@ -259,8 +281,8 @@ export const actions = {
 
 		return {
 			success: true,
-			updatedCount: ids.length,
-			message: `Dispatch date updated for ${ids.length} entr${ids.length === 1 ? 'y' : 'ies'}.`
+			updatedCount: ids.size,
+			message: `Dispatch date updated for ${ids.size} entr${ids.size === 1 ? 'y' : 'ies'}.`
 		};
 	}
 };

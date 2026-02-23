@@ -30,7 +30,6 @@
 	let searchInputEl: HTMLInputElement | null = null;
 	let lastNotFoundQuery = '';
 	let updateViewMode: 'main' | 'dispatch' = 'main';
-	let dispatchMode: 'serial' | 'blank' = 'serial';
 	let dispatchValues = '';
 	let dispatchDate = '';
 
@@ -128,7 +127,7 @@
 		});
 
 		try {
-			const res = await fetch(`/trs/update?${params.toString()}`, {
+			const res = await fetch(`/trs/lc_update?${params.toString()}`, {
 				headers: { accept: 'application/json' },
 				signal: suggestionAbortController.signal
 			});
@@ -460,7 +459,7 @@
 									<td>{job.blank_no}</td>
 									<td>{job.serial_no ?? '—'}</td>
 									<td>
-										<a href={`/trs/update?id=${job.id}`} class={uiStyles.c0089}> Edit </a>
+										<a href={`/trs/lc_update?id=${job.id}`} class={uiStyles.c0089}> Edit </a>
 									</td>
 								</tr>
 							{/each}
@@ -656,7 +655,7 @@
 
 				<!-- ACTION -->
 				<div class={uiStyles.c0060}>
-					<a href="/trs/update" class={uiStyles.c0100}>Cancel</a>
+					<a href="/trs/lc_update" class={uiStyles.c0100}>Cancel</a>
 					<button formaction="?/main" class={uiStyles.c0062} disabled={saving}>
 						{saving ? 'Saving...' : 'Update Entry'}
 					</button>
@@ -695,75 +694,37 @@
 			}}
 			class="bg-surface shadow-card gap-3 space-y-8 rounded-md px-6"
 		>
-			<div class="inline-flex w-full gap-3">
-				<button
-					type="button"
-					class={uiStyles.c0071}
-					class:bg-neutral-800={dispatchMode === 'blank'}
-					class:border-neutral-700={dispatchMode === 'serial'}
-					class:text-neutral-100={dispatchMode === 'blank'}
-					class:shadow-inner={dispatchMode === 'blank'}
-					class:border-cyan-500={dispatchMode === 'blank'}
-					onclick={() => (dispatchMode = 'blank')}
-					aria-pressed={dispatchMode === 'blank'}
-				>
-					Blank No
-				</button>
-
-				<button
-					type="button"
-					class={uiStyles.c0071}
-					class:bg-neutral-800={dispatchMode === 'serial'}
-					class:border-neutral-700={dispatchMode === 'blank'}
-					class:text-neutral-100={dispatchMode === 'serial'}
-					class:shadow-inner={dispatchMode === 'serial'}
-					class:border-cyan-500={dispatchMode === 'serial'}
-					onclick={() => (dispatchMode = 'serial')}
-					aria-pressed={dispatchMode === 'serial'}
-				>
-					Serial No
-				</button>
-
-				<div class="rounded-md border border-neutral-700 bg-neutral-800">
-					<label for="dispatch_date" class="ml-2 inline-block items-center px-1 text-xl"
-						>Dispatch Date</label
-					>
-					<input
-						id="dispatch_date"
-						name="dispatch_date"
-						type="date"
-						class="rounded-md border-none bg-neutral-800 px-3 py-2 text-xl text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-						bind:value={dispatchDate}
-						placeholder="Dispatch Date"
-					/>
-				</div>
-			</div>
-			<input type="hidden" id="dispatch_mode" name="dispatch_mode" value="={dispatchMode}" />
-			<div class="mt-12">
-				<h2 class={uiStyles.c0091}>Dispatch Date Bulk Entry</h2>
-				<div class={uiStyles.c0092}>
-					<div class={uiStyles.c0045}>
-						<label for="blank_no" class={uiStyles.c0046}
-							>{dispatchMode === 'serial'
-								? 'Serial No List / Range'
-								: 'Blank No List / Range'}</label
+			<div>
+				<h1 class={uiStyles.c0091}>Dispatch Date Bulk Entry</h1>
+				<div class="w-full gap-3">
+					<div class="items-center grid grid-cols-2">
+						<label for="dispatch_values" class={uiStyles.c0046}
+							>Serial or Blank No List / Range</label
 						>
+						<div>
+							<label for="dispatch_values" class={uiStyles.c0046}>Dispatch Date</label>
+							<input
+								id="dispatch_date"
+								name="dispatch_date"
+								type="date"
+								class="rounded-md border border-neutral-700 bg-neutral-800 px-3 text-xl text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+								bind:value={dispatchDate}
+								placeholder="Dispatch Date"
+							/>
+						</div>
 						<textarea
 							name="dispatch_values"
 							id="dispatch_values"
 							rows="4"
-							cols="128"
-							placeholder={dispatchMode === 'serial'
-								? 'Serial No values example: 000126, 000426 - 001026...'
-								: 'Blank No values example: 2600001, 2600004 - 2600010...'}
-							class={uiStyles.c0099}
+							placeholder="Mixed values example: 000126, 000426-001026, 2600001, 2600004-2600010"
+							class="col-span-2 mt-2 w-3/4 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 							bind:value={dispatchValues}
 						></textarea>
 					</div>
 				</div>
 			</div>
 			<div class={uiStyles.c0060}>
-				<a href="/trs/update" class={uiStyles.c0100}>Cancel</a>
+				<a href="/trs/lc_update" class={uiStyles.c0100}>Cancel</a>
 				<button formaction="?/dispatchOnly" class={uiStyles.c0062} disabled={saving}>
 					{dispatchSaving
 						? 'Updating...'
