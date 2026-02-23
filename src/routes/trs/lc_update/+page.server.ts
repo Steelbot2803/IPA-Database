@@ -1,8 +1,61 @@
 import { fail } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
 import { toUserError } from '$lib/utils/userError';
+import { error, info, warn } from 'console';
 
-/* ---------- LOAD JOB BY BLANK NO ---------- */
+function parseDispatchIdentifiers(raw: string) {
+	const tokens = raw
+		.split(',')
+		.map((token) => token.trim())
+		.filter(Boolean);
+
+	const values = new Set<number>();
+
+	for (const token of tokens) {
+		if (/^\d+$/.test(token)) {
+			values.add(Number(token));
+			continue;
+		}
+
+		const rangeMatch = token.match(/^(\d+)\s*-\s*(\d+)$/);
+		if (!rangeMatch) {
+			return {
+				error: `Invalid entry: "${token}". Enter CSV or ranges such as 2600001,2600005-2600010.`
+			};
+		}
+
+		const start = Number(rangeMatch[1]);
+		const end = Number(rangeMatch[2]);
+
+		if (end < start) {
+			return {
+				error: `Invalid range: "${token}". End value must be greater than or equal to Start value.`
+			};
+		}
+
+		if (end - start > 1000) {
+			return {
+				error: `Range too large: "${token}". Choose a range of less than 5000 values or split the range into smaller sub-ranges.`
+			};
+		}
+
+		for (let value = start; value <= end; value += 1) {
+			values.add(value);
+		}
+	}
+
+	if (values.size === 0) {
+		return { error: 'Provide atleast one value.' };
+	}
+
+	if (values.size > 2500) {
+		return { error: 'Too many values. Only 2500 values allowed per request' };
+	}
+
+	return { values: Array.from(values) };
+}
+
+/* ---------- LOAD JOB ---------- */
 export async function load({ url }) {
 	const blank_no = url.searchParams.get('blank_no');
 	const serial_no = url.searchParams.get('serial_no');
@@ -84,12 +137,12 @@ export async function load({ url }) {
 
 /* ---------- UPDATE JOB ---------- */
 export const actions = {
-	default: async ({ request }) => {
+	main: async ({ request }) => {
 		const f = Object.fromEntries(await request.formData());
 
 		/* ---- HARD REQUIREMENT ---- */
 		if (!f.id) {
-			return fail(400, { error: 'Row ID missing. Cannot update.' });
+			return fail(422, { error: 'Row ID missing. Cannot update.' });
 		}
 
 		const { data: currentJob, error: currentJobErr } = await supabase
@@ -155,5 +208,59 @@ export const actions = {
 		}
 
 		return { success: true };
+	},
+	dispatchOnly: async ({ request }) => {
+		const form = await request.formData();
+		const dispatchMode = form.get('dispatch_mode') === 'serial' ? 'serial' : 'blank';
+		const rawValues = String(form.get('dispatch_values') ?? '').trim();
+		const dispatchDate = String(form.get('dispatch_date') ?? '').trim();
+
+		if (!dispatchDate) {
+			return fail(422, { info: "Todays's date has been used as the Dispatch Date." });
+		}
+
+		const parsed = parseDispatchIdentifiers(rawValues);
+
+		if ('error' in parsed) {
+			return fail(422, { error: parsed.error });
+		}
+
+		const column = dispatchMode === 'serial' ? 'serial_no' : 'blank_no';
+
+		const { data: matchingRows, error: fetchError } = await supabase
+			.from('trs_prod')
+			.select('id')
+			.in(column, parsed.values);
+
+		if (fetchError) {
+			return fail(500, {
+				error: toUserError('Could not load dispatch targets.', fetchError.message)
+			});
+		}
+
+		if (!matchingRows || matchingRows.length === 0) {
+			return fail(404, {
+				error: `No rows found for the provided ${dispatchMode === 'serial' ? 'Serial' : 'Blank'} Nos.`
+			});
+		}
+
+		const ids = matchingRows.map((row) => row.id);
+
+		const { error: updateErr } = await supabase
+			.from('trs_prod')
+			.update({ dispatch_date: dispatchDate })
+			.in('id', ids);
+
+		if (updateErr) {
+			return fail(500, {
+				error: toUserError('Could not update dispatch dates', updateErr.message)
+			});
+		}
+
+		return {
+			success: true,
+			updatedCount: ids.length,
+			message: `Dispatch date updated for ${ids.length} entr${ids.length === 1 ? 'y' : 'ies'}.`
+		};
 	}
 };

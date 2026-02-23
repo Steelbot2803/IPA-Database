@@ -8,15 +8,15 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const rows = await request.json();
 
 	if (!Array.isArray(rows) || rows.length === 0) {
-		throw error(400, 'No rows submitted');
+		throw error(422, 'No rows submitted');
 	}
 
 	const cleaned = rows.map((r, i) => {
-		if (!r.job_no) throw error(400, `Row ${i + 1}: job_no missing`);
-		if (!r.model_no) throw error(400, `Row ${i + 1}: model_no missing`);
-		if (!r.quantity || r.quantity <= 0) throw error(400, `Row ${i + 1}: qty invalid`);
-		if (!r.planned_dispatch) throw error(400, `Row ${i + 1}: committed date missing`);
-		if (!r.scheduled_month) throw error(400, `Row ${i + 1}: scheduled month missing`);
+		if (!r.job_no) throw error(422, `Row ${i + 1}: job_no missing`);
+		if (!r.model_no) throw error(422, `Row ${i + 1}: model_no missing`);
+		if (!r.quantity || r.quantity <= 0) throw error(422, `Row ${i + 1}: qty invalid`);
+		if (!r.planned_dispatch) throw error(422, `Row ${i + 1}: committed date missing`);
+		if (!r.scheduled_month) throw error(422, `Row ${i + 1}: scheduled month missing`);
 
 		const jobCardNo = r.job_card_no ? String(r.job_card_no).trim() : '';
 		const dispatchedQtyValue =

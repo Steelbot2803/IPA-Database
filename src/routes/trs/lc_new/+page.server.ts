@@ -10,19 +10,19 @@ export const actions = {
 		/* ---------- REQUIRED FIELDS ---------- */
 
 		if (!f.recieved_date) {
-			return fail(400, { error: 'Missing Recieved Date' });
+			return fail(422, { error: 'Missing Recieved Date' });
 		}
 
 		if (!f.blank_no) {
-			return fail(400, { error: 'Missing Blank No' });
+			return fail(422, { error: 'Missing Blank No' });
 		}
 
 		if (!isNDigits(f.blank_no.toString(), 7)) {
-			return fail(400, { warn: 'Blank No must be exactly 7 digits' });
+			return fail(422, { warn: 'Blank No must be exactly 7 digits' });
 		}
 
 		if (f.serial_no && !isNDigits(f.serial_no.toString(), 6)) {
-			return fail(400, { warn: 'Serial No must be exactly 6 digits' });
+			return fail(422, { warn: 'Serial No must be exactly 6 digits' });
 		}
 
 		/* ---------- DUPLICATE CHECK ---------- */
@@ -35,7 +35,7 @@ export const actions = {
 		const allowDuplicate = f.allow_duplicate_blank === 'on';
 
 		if (existing?.length && !allowDuplicate) {
-			return fail(400, {
+			return fail(422, {
 				error: 'Blank No already exists. Enable override to proceed.'
 			});
 		}

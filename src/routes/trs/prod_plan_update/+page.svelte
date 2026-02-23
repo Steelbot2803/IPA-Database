@@ -120,7 +120,7 @@
 		}
 
 		const { updated } = await res.json();
-		toast.show(`Updated ${updated} entries successfully`, 'success');
+		toast.show(`Updated ${updated} entr${updated === 1 ? 'y' : 'ies'} successfully`, 'success');
 		await loadRows();
 	}
 

@@ -195,7 +195,7 @@
 								<Calendar size={20} /></button
 							>
 							{#if isYearPickerOpen}
-								<ul class={uiStyles.c161} role="listbox">
+								<ul class={uiStyles.c0161} role="listbox">
 									{#each availableYears as year}
 										<li>
 											<button
@@ -227,9 +227,9 @@
 							<thead>
 								<tr>
 									<th>Month</th>
-									<th>Planned vs<br> Dispatched (%)</th>
-									<th>Planned vs<br> Produced (%)</th>
-									<th>Produced vs<br> Dispatched (%)</th>
+									<th>Planned vs<br /> Dispatched (%)</th>
+									<th>Planned vs<br /> Produced (%)</th>
+									<th>Produced vs<br /> Dispatched (%)</th>
 								</tr>
 							</thead>
 							<tbody>

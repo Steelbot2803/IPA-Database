@@ -3,7 +3,7 @@ export const styles = {
 	c0002: 'flex items-start justify-between gap-3',
 	c0003: 'leading-snug',
 	c0004: 'text-neutral-200 hover:text-white',
-	c0005: 'absolute bottom-0 left-0 h-1 bg-neutral-400',
+	c0005: 'absolute bottom-0 left-0 h-1 bg-neutral-422',
 	c0006: 'fixed top-3 left-2 z-50 rounded-md',
 	c0007: 'w-6 space-y-1',
 	c0008: 'h-1 w-6 bg-cyan-500 transition-transform duration-300 rounded',
@@ -37,13 +37,13 @@ export const styles = {
 		'mb-4 w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-teal-950 p-4',
 	c0032: '',
 	c0033: 'col-span-6 flex flex-col gap-4 rounded-md border-2 border-cyan-600 p-4',
-	c0034:
-		'mb-4 w-full rounded-md bg-cyan-950 p-4 text-2xl font-medium text-neutral-200 text-center',
+	c0034: 'mb-4 w-full rounded-md bg-cyan-950 p-4 text-2xl font-medium text-neutral-200 text-center',
 	c0035:
 		'w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-cyan-950 p-4 text-center',
 	c0036: 'grid grid-cols-2 gap-4',
 	c0037: 'flex flex-col gap-4',
-	c0038: 'w-full rounded-md bg-purple-950 p-4 text-center text-2xl font-2xl text-neutral-200 items-center flex justify-center',
+	c0038:
+		'w-full rounded-md bg-purple-950 p-4 text-center text-2xl font-2xl text-neutral-200 items-center flex justify-center',
 	c0039: 'w-full rounded-md bg-purple-950 p-4 text-center text-xl text-neutral-200',
 	c0040: 'w-full border-separate border-spacing-y-2',
 	c0041: 'w-full border-separate border-spacing-y-2 overflow-x-auto',
@@ -62,7 +62,7 @@ export const styles = {
 	c0052: 'peer sr-only',
 	c0053:
 		"peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-cyan-500 peer-checked:bg-red-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full",
-	c0054: 'mb-4 grid grid-cols-8 gap-4 border-b-2 border-neutral-400 py-3',
+	c0054: 'mb-4 grid grid-cols-8 gap-4 border-b-2 border-neutral-422 py-3',
 	c0055:
 		'mt-2 input w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none',
 	c0056: 'col-span-7',
@@ -203,6 +203,12 @@ export const styles = {
 		'mb-4 w-full rounded-md bg-orange-950 p-4 text-2xl font-medium text-neutral-200 text-center flex justify-between',
 	c0159:
 		'w-full border-separate border-spacing-y-2 overflow-x-auto rounded-md bg-orange-950 p-4 text-center',
-	c0160: 'cursor-pointer rounded-md border-2 border-orange-600 p-2 bg-orange-950 hover:bg-orange-500',
-	c161: 'absolute z-20 mt-1 max-h-72 w-full overflow-y-auto rounded-md border-2 border-orange-600 bg-orange-950 text-2xl shadow-lg'
+	c0160:
+		'cursor-pointer rounded-md border-2 border-orange-600 p-2 bg-orange-950 hover:bg-orange-500',
+	c0161:
+		'absolute z-20 mt-1 max-h-72 w-full overflow-y-auto rounded-md border-2 border-orange-600 bg-orange-950 text-2xl shadow-lg',
+	c0162:
+		'absolute right-0 top-18 flex cursor-pointer items-center rounded-md border border-neutral-700 bg-neutral-800 px-6 py-2',
+	c0163:
+		"peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-cyan-500 peer-checked:bg-green-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"
 } as const;

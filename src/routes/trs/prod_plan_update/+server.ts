@@ -8,7 +8,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 	const scheduledMonth = url.searchParams.get('scheduled_month');
 
 	if (!scheduledMonth) {
-		throw error(400, 'scheduled_month parameter required!');
+		throw error(422, 'scheduled_month parameter required!');
 	}
 
 	const { data, error: dbError } = await supabase
@@ -27,11 +27,11 @@ export const PATCH: RequestHandler = async ({ request, cookies }) => {
 	const rows = await request.json();
 
 	if (!Array.isArray(rows) || rows.length === 0) {
-		throw error(400, 'No rows submitted');
+		throw error(422, 'No rows submitted');
 	}
 
 	const cleaned = rows.map((r, i) => {
-		if (!r.id) throw error(400, `Row ${i + 1}: id missing`);
+		if (!r.id) throw error(422, `Row ${i + 1}: id missing`);
 
 		const jobCardNo = r.job_card_no ? String(r.job_card_no).trim() : '';
 		const dispatchedQtyValue =

@@ -90,12 +90,12 @@
 				<nav class={uiStyles.c0017} aria-label="Production Plan Navigation">
 					<h2 class={uiStyles.c0018}>Production Plan</h2>
 					<a
-						href="/trs/prod_plan"
+						href="/trs/prod_plan_new"
 						class={uiStyles.c0019}
-						class:bg-neutral-600={isActivePath('/trs/prod_plan')}
+						class:bg-neutral-600={isActivePath('/trs/prod_plan_new')}
 					>
 						<span>Entry</span>
-						{#if navigating?.to?.url.pathname === '/trs/prod_plan'}
+						{#if navigating?.to?.url.pathname === '/trs/prod_plan_new'}
 							<Loader class="animate-spin" stroke-width="5" size={20} />
 						{/if}
 					</a>
@@ -122,29 +122,33 @@
 				</nav>
 				<nav class={uiStyles.c0017} aria-label="Jobs Navigation">
 					<h2 class={uiStyles.c0018}>Loadcells</h2>
-					<a href="/trs/new" class={uiStyles.c0019} class:bg-neutral-600={isActivePath('/trs/new')}>
+					<a
+						href="/trs/lc_new"
+						class={uiStyles.c0019}
+						class:bg-neutral-600={isActivePath('/trs/lc_new')}
+					>
 						<span>Entry</span>
-						{#if navigating?.to?.url.pathname === '/trs/new'}
+						{#if navigating?.to?.url.pathname === '/trs/lc_new'}
 							<Loader class="animate-spin" stroke-width="5" size={20} />
 						{/if}
 					</a>
 					<a
-						href="/trs/update"
+						href="/trs/lc_update"
 						class={uiStyles.c0019}
-						class:bg-neutral-600={isActivePath('/trs/update')}
+						class:bg-neutral-600={isActivePath('/trs/lc_update')}
 					>
 						<span>Update</span>
-						{#if navigating?.to?.url.pathname === '/trs/updateb'}
+						{#if navigating?.to?.url.pathname === '/trs/lc_update'}
 							<Loader class="animate-spin" stroke-width="5" size={20} />
 						{/if}
 					</a>
 					<a
-						href="/trs/loadcell_db"
+						href="/trs/lc_db"
 						class={uiStyles.c0019}
-						class:bg-neutral-600={isActivePath('/trs/loadcell_db')}
+						class:bg-neutral-600={isActivePath('/trs/lc_db')}
 					>
 						<span>Database</span>
-						{#if navigating?.to?.url.pathname === '/trs/loadcell_db'}
+						{#if navigating?.to?.url.pathname === '/trs/lc_db'}
 							<Loader class="animate-spin" stroke-width="5" size={20} />
 						{/if}
 					</a>
