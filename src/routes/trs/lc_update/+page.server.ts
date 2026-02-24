@@ -54,6 +54,108 @@ function parseDispatchIdentifiers(raw: string) {
 	return { values: Array.from(values) };
 }
 
+type DispatchCandidate = {
+	id: string;
+	blank_no: number | null;
+	serial_no: number | null;
+	job_no: string | null;
+	model_no: string | null;
+	job_date: string | null;
+	dispatch_date: string | null;
+};
+
+type DuplicateGroup = {
+	key: string;
+	label: string;
+	options: DispatchCandidate[];
+};
+
+function toUUID(value: unknown): string | null {
+	if (typeof value !== 'string') return null;
+
+	const trimmed = value.trim();
+	return trimmed.length > 0 ? trimmed : null;
+}
+
+async function buildDispatchTargets(values: number[]) {
+	const ids = new Set<string>();
+	const duplicateGroups = new Map<string, DuplicateGroup>();
+
+	const { data: serialRows, error: serialFetchErr } = await supabase
+		.from('trs_prod')
+		.select('id, blank_no, serial_no, job_no, model_no, job_date, dispatch_date')
+		.in('serial_no', values);
+
+	if (serialFetchErr) {
+		return {
+			error: toUserError('Could not load Serial no Dispatch targets.', serialFetchErr.message)
+		};
+	}
+
+	const serialGroups = new Map<number, DispatchCandidate[]>();
+
+	for (const row of serialRows ?? []) {
+		const normalizedID = toUUID(row.id);
+		if (normalizedID !== null) ids.add(normalizedID);
+		if (typeof row.serial_no !== 'number') continue;
+		if (normalizedID === null) continue;
+
+		const existing = serialGroups.get(row.serial_no) ?? [];
+		existing.push({ ...row, id: normalizedID });
+		serialGroups.set(row.serial_no, existing);
+	}
+
+	for (const [serialNo, options] of serialGroups.entries()) {
+		if (options.length <= 1) continue;
+
+		const key = `serial: ${serialNo}`;
+		duplicateGroups.set(key, {
+			key,
+			label: `Serial No ${serialNo}`,
+			options
+		});
+	}
+
+	const { data: blankRows, error: blankFetchErr } = await supabase
+		.from('trs_prod')
+		.select('id, blank_no, serial_no, job_no, model_no, job_date, dispatch_date')
+		.in('blank_no', values);
+
+	if (blankFetchErr) {
+		return {
+			error: toUserError('Could not load Blank No Dispatch targets.', blankFetchErr.message)
+		};
+	}
+
+	const blankGroups = new Map<number, DispatchCandidate[]>();
+	for (const row of blankRows ?? []) {
+		const normalizedID = toUUID(row.id);
+		if (normalizedID !== null) ids.add(normalizedID);
+		if (typeof row.blank_no !== 'number') continue;
+		if (normalizedID === null) continue;
+
+		const existing = blankGroups.get(row.blank_no) ?? [];
+		existing.push({ ...row, id: normalizedID });
+		blankGroups.set(row.blank_no, existing);
+	}
+
+	for (const [blankNo, options] of blankGroups.entries()) {
+		if (options.length <= 1) continue;
+
+		const key = `blank:${blankNo}`;
+		duplicateGroups.set(key, {
+			key,
+			label: `Blank No ${blankNo}`,
+			options
+		});
+	}
+
+	return {
+		ids,
+		duplicateGroups: Array.from(duplicateGroups.values())
+	};
+}
+
 /* ---------- LOAD JOB ---------- */
 export async function load({ url }) {
 	const blank_no = url.searchParams.get('blank_no');
@@ -61,6 +163,11 @@ export async function load({ url }) {
 	const id = url.searchParams.get('id');
 	const success = url.searchParams.get('success');
 	const isDigits = (value: string | null) => (value ? /^\d+$/.test(value) : false);
+	const toNumericValue = (value: string | null) => {
+		if (!isDigits(value)) return null;
+		const parsed = Number(value);
+		return Number.isFinite(parsed) ? parsed : null;
+	};
 
 	if (id) {
 		const { data: job, error } = await supabase.from('trs_prod').select('*').eq('id', id).single();
@@ -82,6 +189,8 @@ export async function load({ url }) {
 
 	const hasBlankNo = isDigits(blank_no);
 	const hasSerialNo = isDigits(serial_no);
+	const normalizedBlankNo = toNumericValue(blank_no);
+	const normalizedSerialNo = toNumericValue(serial_no);
 
 	if (!hasBlankNo && !hasSerialNo) {
 		return {
@@ -94,19 +203,19 @@ export async function load({ url }) {
 	let jobs;
 	let error;
 
-	if (hasBlankNo && blank_no) {
+	if (hasBlankNo && normalizedBlankNo !== null) {
 		({ data: jobs, error } = await supabase
 			.from('trs_prod')
 			.select('*')
-			.eq('blank_no', blank_no)
+			.eq('blank_no', normalizedBlankNo)
 			.order('id', { ascending: false }));
 	}
 
-	if (hasSerialNo && serial_no && (jobs == null || jobs.length === 0)) {
+	if (hasSerialNo && normalizedSerialNo !== null && (jobs == null || jobs.length === 0)) {
 		({ data: jobs, error } = await supabase
 			.from('trs_prod')
 			.select('*')
-			.eq('serial_no', serial_no)
+			.eq('serial_no', normalizedSerialNo)
 			.order('id', { ascending: false }));
 	}
 
@@ -207,10 +316,11 @@ export const actions = {
 
 		return { success: true };
 	},
-	dispatchOnly: async ({ request }) => {
+	dispatch: async ({ request }) => {
 		const form = await request.formData();
 		const rawValues = String(form.get('dispatch_values') ?? '').trim();
 		const dispatchDate = String(form.get('dispatch_date') ?? '').trim();
+		const duplicateSelectionRaw = String(form.get('duplicate_selection') ?? '').trim();
 
 		if (!dispatchDate) {
 			return fail(422, { info: "Todays's date has been used as the Dispatch Date." });
@@ -222,50 +332,71 @@ export const actions = {
 			return fail(422, { error: parsed.error });
 		}
 
-		const ids = new Set<number>();
-		const matchedSerial = new Set<number>();
-		const matchedBlank = new Set<number>();
+		const targetResult = await buildDispatchTargets(parsed.values);
 
-		const { data: serialRows, error: serialFetchErr } = await supabase
-			.from('trs_prod')
-			.select('id, serial_no')
-			.in('serial_no', parsed.values);
+		if ('error' in targetResult) return fail(500, { error: targetResult.error });
 
-		if (serialFetchErr) {
-			return fail(500, {
-				error: toUserError('Could not load Serial No dispatch targets.', serialFetchErr.message)
-			});
-		}
-
-		if (serialRows) {
-			for (const row of serialRows) {
-				ids.add(row.id);
-				if (typeof row.serial_no === 'number') matchedSerial.add(row.serial_no);
-			}
-		}
-
-		const { data: blankRows, error: blankFetchError } = await supabase
-			.from('trs_prod')
-			.select('id, blank_no')
-			.in('blank_no', parsed.values);
-
-		if (blankFetchError) {
-			return fail(500, {
-				error: toUserError('Could not load Blank No dispatch targets.', blankFetchError.message)
-			});
-		}
-
-		if (blankRows) {
-			for (const row of blankRows) {
-				ids.add(row.id);
-				if (typeof row.blank_no === 'number') matchedBlank.add(row.blank_no);
-			}
-		}
+		const ids = targetResult.ids;
+		const duplicateGroups = targetResult.duplicateGroups;
 
 		if (ids.size === 0) {
-			return fail(404, {
-				error: 'No rows found for the provided values.'
+			return fail(422, {
+				error: 'No entries found for the provided values.'
 			});
+		}
+
+		if (duplicateGroups.length > 0) {
+			let parsedSelection: Record<string, string> = {};
+
+			if (duplicateSelectionRaw) {
+				try {
+					const maybeParsed = JSON.parse(duplicateSelectionRaw);
+					if (maybeParsed && typeof maybeParsed === 'object' && !Array.isArray(maybeParsed)) {
+						parsedSelection = Object.entries(maybeParsed).reduce(
+							(acc, [key, value]) => {
+								const normalizedValue = toUUID(value);
+								if (normalizedValue) {
+									acc[key] = normalizedValue;
+								}
+								return acc;
+							},
+							{} as Record<string, string>
+						);
+					}
+				} catch {
+					return fail(422, {
+						error: 'Invalid duplicate selection. Please re-select duplicate entries.'
+					});
+				}
+			}
+
+			const missingSelection = duplicateGroups.some((group) => parsedSelection[group.key] == null);
+
+			if (missingSelection) {
+				return fail(409, {
+					requiresSelection: true,
+					error:
+						'Duplicate Serial / Blank No found. Select a row for each duplicate before updating.',
+					duplicates: duplicateGroups
+				});
+			}
+
+			for (const group of duplicateGroups) {
+				const selectedId = parsedSelection[group.key];
+				const isValidSelection = group.options.some((option) => option.id === selectedId);
+
+				if (!isValidSelection) {
+					return fail(422, {
+						error: `Invalid selection for ${group.label}. Please select one of the listed options.`
+					});
+				}
+
+				for (const option of group.options) {
+					ids.delete(option.id);
+				}
+
+				ids.add(selectedId);
+			}
 		}
 
 		const { error: updateErr } = await supabase

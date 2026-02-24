@@ -32,6 +32,23 @@
 	let updateViewMode: 'main' | 'dispatch' = 'main';
 	let dispatchValues = '';
 	let dispatchDate = '';
+	let duplicateModalOpen = false;
+	type DispatchCandidate = {
+		id: string;
+		blank_no: number;
+		serial_no: number | null;
+		job_no: string | null;
+		model_no: string | null;
+		job_date: string | null;
+		dispatch_date: string | null;
+	};
+	type DuplicateGroup = {
+		key: string;
+		label: string;
+		options: DispatchCandidate[];
+	};
+	let duplicateGroups: DuplicateGroup[] = [];
+	let duplicateSelections: Record<string, string[]> = {};
 
 	const BLANK_SEARCH_HISTORY_KEY = 'trs-update-blank-search-history';
 	const SERIAL_SEARCH_HISTORY_KEY = 'trs-update-serial-search-history';
@@ -62,6 +79,10 @@
 		.slice(0, 10);
 
 	$: showSuggestions = isSearchFocused && suggestionOptions.length > 0;
+	$: duplicateSelectionPayload = JSON.stringify(duplicateSelections);
+	$: canConfirmDuplicates =
+		duplicateGroups.length > 0 &&
+		duplicateGroups.every((group) => (duplicateSelections[group.key] ?? []).length > 0);
 
 	async function clearURLParams() {
 		await goto(page.url.pathname, {
@@ -272,6 +293,32 @@
 		setUpdateViewMode(target.checked ? 'dispatch' : 'main');
 	}
 
+	function closeDuplicateModal() {
+		duplicateSelections = {};
+		duplicateModalOpen = false;
+	}
+
+	function openDuplicateModal(groups: DuplicateGroup[]) {
+		duplicateGroups = groups;
+		duplicateSelections = groups.reduce(
+			(acc, group) => {
+				acc[group.key] = [];
+				return acc;
+			},
+			{} as Record<string, string[]>
+		);
+		duplicateModalOpen = true;
+	}
+
+	function toggleDuplicateSelection(groupKey: string, optionID: string, checked: boolean) {
+		const existing = duplicateSelections[groupKey] ?? [];
+		const nextSelections = checked
+			? Array.from(new Set([...existing, optionID]))
+			: existing.filter((value) => value !== optionID);
+
+		duplicateSelections = { ...duplicateSelections, [groupKey]: nextSelections };
+	}
+
 	function countDispatchNumbers(input: string): number {
 		if (!input) return 0;
 
@@ -350,7 +397,13 @@
 
 	{#if updateViewMode === 'main'}
 		<!-- SEARCH -->
-		<form name="search" method="GET" class={uiStyles.c0070} onsubmit={handleSearchSubmit}>
+		<form
+			id="search"
+			name="search"
+			method="GET"
+			class={uiStyles.c0070}
+			onsubmit={handleSearchSubmit}
+		>
 			<div>
 				<button
 					type="button"
@@ -434,7 +487,7 @@
 
 		<!-- IF DUPLICATE BLANK NO -->
 		{#if data.jobs && data.jobs.length >= 1}
-			<div class={uiStyles.c0082}>
+			<div class="rounded-md border border-neutral-700">
 				<h2 class={uiStyles.c0083}>Multiple entries found — select one</h2>
 				<div class={uiStyles.c0084}>
 					<table class={uiStyles.c0085}>
@@ -452,7 +505,7 @@
 						<tbody>
 							{#each data.jobs as job}
 								<tr class={uiStyles.c0087}>
-									<td class={uiStyles.c0088}>{job.recieved_date}</td>
+									<td class="p-2">{job.recieved_date}</td>
 									<td>{job.job_date}</td>
 									<td>{job.job_no}</td>
 									<td>{job.model_no}</td>
@@ -474,6 +527,7 @@
 			{@const job = data.job}
 
 			<form
+				id="loadcell_entry_update"
 				name="loadcell_entry_update"
 				method="POST"
 				action="?/main"
@@ -664,27 +718,45 @@
 		{/if}
 	{:else}
 		<form
+			id="bulk_dispatch_date_update"
+			name="bulk_dispatch_date_update"
 			method="POST"
-			action="?/dispatchOnly"
-			use:enhance={() => {
+			action="?/dispatch"
+			use:enhance={({ formData, cancel }) => {
+				formData.set('duplicate_selection', JSON.stringify(duplicateSelections));
 				if (!dispatchDate) {
 					toast.show('Dispatch Date is required.', 'error', 5000);
+					cancel();
 					return;
 				}
 
 				if (dispatchValues.length === 0) {
 					toast.show('Enter values in CSV or range format.', 'error', 5000);
+					cancel();
 					return;
 				}
 
 				dispatchSaving = true;
 				return async ({ result }) => {
 					try {
+						if (
+							result.type === 'failure' &&
+							result.status === 409 &&
+							result.data?.requiresSelection &&
+							Array.isArray(result.data?.duplicates)
+						) {
+							openDuplicateModal(result.data.duplicates as DuplicateGroup[]);
+							toast.show('Please select which duplicate rows to update.', 'info', 5000);
+							return;
+						}
 						if (result.type === 'failure' && result.data?.error) {
 							toast.show(String(result.data.error), 'error', 5000);
 						} else if (result.type === 'success' && result.data?.message) {
 							toast.show(String(result.data.message), 'success', 5000);
 							dispatchValues = '';
+							duplicateGroups = [];
+							duplicateSelections = {};
+							duplicateModalOpen = false;
 						}
 						await applyAction(result);
 					} finally {
@@ -697,7 +769,7 @@
 			<div>
 				<h1 class={uiStyles.c0091}>Dispatch Date Bulk Entry</h1>
 				<div class="w-full gap-3">
-					<div class="items-center grid grid-cols-2">
+					<div class="grid grid-cols-2 items-center">
 						<label for="dispatch_values" class={uiStyles.c0046}
 							>Serial or Blank No List / Range</label
 						>
@@ -720,17 +792,72 @@
 							class="col-span-2 mt-2 w-3/4 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 							bind:value={dispatchValues}
 						></textarea>
+						<input type="hidden" name="duplicate_selection" value={duplicateSelectionPayload} />
 					</div>
 				</div>
 			</div>
 			<div class={uiStyles.c0060}>
 				<a href="/trs/lc_update" class={uiStyles.c0100}>Cancel</a>
-				<button formaction="?/dispatchOnly" class={uiStyles.c0062} disabled={saving}>
+				<button formaction="?/dispatch" class={uiStyles.c0062} disabled={dispatchSaving}>
 					{dispatchSaving
 						? 'Updating...'
-						: `Update Dispatch ${countDispatchNumbers(dispatchValues) > 1 ? 'Dates' : 'Date'}`}
+						: `Update Entr${countDispatchNumbers(dispatchValues) > 1 ? 'ies' : 'y'}`}
 				</button>
 			</div>
 		</form>
+		{#if duplicateModalOpen}
+			<div class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-800/95 p-4">
+				<div
+					class="max-h-[85vh] w-full max-w-4xl overflow-auto rounded-md border border-neutral-700 bg-neutral-900 p-4"
+				>
+					<h2 class="mb-3 text-2xl font-semibold text-cyan-300">Select duplicate rows to update</h2>
+					<p class="mb-4 text-sm text-neutral-300">
+						Some Blank/Serial numbers match multiple rows. Choose exactly one row per duplicate
+						group.
+					</p>
+					{#each duplicateGroups as group}
+						<div class="mb-4 rounded-md border border-neutral-700 p-3">
+							<h3 class="font-5xl mb-2 text-xl text-neutral-200">{group.label}</h3>
+							<div class="space-y-2">
+								{#each group.options as option}
+									<label
+										class="flex cursor-pointer items-center gap-2 rounded-md border border-neutral-700 px-2 py-3 hover:bg-neutral-800"
+									>
+										<input
+											type="checkbox"
+											name={group.key}
+											value={option.id}
+											checked={(duplicateSelections[group.key] ?? []).includes(option.id)}
+											onchange={(event) =>
+												toggleDuplicateSelection(
+													group.key,
+													option.id,
+													(event.currentTarget as HTMLInputElement).checked
+												)}
+										/>
+										<span class="text-sm text-neutral-200">
+											ID {option.id} · Job {option.job_no ?? '—'} · Model {option.model_no ?? '—'} · Blank
+											{option.blank_no ?? '—'} · Serial {option.serial_no ?? '—'}
+										</span>
+									</label>
+								{/each}
+							</div>
+						</div>
+					{/each}
+
+					<div class="mt-4 flex justify-end gap-3">
+						<button type="button" class={uiStyles.c0100} onclick={closeDuplicateModal}>Close</button
+						>
+						<button
+							type="submit"
+							class={uiStyles.c0062}
+							disabled={!canConfirmDuplicates || dispatchSaving}
+						>
+							Update Entry
+						</button>
+					</div>
+				</div>
+			</div>
+		{/if}
 	{/if}
 </div>
