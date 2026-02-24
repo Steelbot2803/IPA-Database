@@ -1,9 +1,16 @@
-export const styles = {
+type StyleMap = Record<string, string>;
+
+// Toast notifications
+const toastStyles: StyleMap = {
 	c0001: 'max-w-base fixed top-8 right-4 z-50 flex flex-col gap-3 text-xl',
 	c0002: 'flex items-start justify-between gap-3',
 	c0003: 'leading-snug',
 	c0004: 'text-neutral-200 hover:text-white',
 	c0005: 'absolute bottom-0 left-0 h-1 bg-neutral-422',
+};
+
+// App shell and navigation
+const layoutStyles: StyleMap = {
 	c0006: 'fixed top-3 left-2 z-50 rounded-md',
 	c0007: 'w-6 space-y-1',
 	c0008: 'h-1 w-6 bg-cyan-500 transition-transform duration-300 rounded',
@@ -22,6 +29,10 @@ export const styles = {
 	c0019:
 		'flex block rounded-md px-3 py-2 text-xl hover:bg-neutral-600 justify-between items-center',
 	c0020: 'p-6',
+};
+
+// Dashboard and KPI widgets
+const dashboardStyles: StyleMap = {
 	c0021: 'mb-6 text-center text-5xl font-medium text-neutral-200',
 	c0022: 'kpi-grid',
 	c0023:
@@ -47,6 +58,10 @@ export const styles = {
 	c0039: 'w-full rounded-md bg-purple-950 p-4 text-center text-xl text-neutral-200',
 	c0040: 'w-full border-separate border-spacing-y-2',
 	c0041: 'w-full border-separate border-spacing-y-2 overflow-x-auto',
+};
+
+// Shared forms and input controls
+const formStyles: StyleMap = {
 	c0042: 'min-w-full space-y-6 text-neutral-200',
 	c0043: 'bg-surface shadow-card space-y-6 rounded-md p-6',
 	c0044: 'mb-4 grid grid-cols-8 items-end gap-4',
@@ -108,6 +123,10 @@ export const styles = {
 	c0086: 'text-neutral-200',
 	c0087: 'rounded-md border-none hover:border-neutral-700 hover:bg-neutral-800 spacing-y-4',
 	// c0088: '',
+};
+
+// Database tables, filters, and actions
+const tableStyles: StyleMap = {
 	c0089: 'font-5xl rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600',
 	c0090: 'bg-surface shadow-card space-y-8 rounded-md p-6',
 	c0091: 'mb-4 text-2xl text-neutral-200',
@@ -160,6 +179,10 @@ export const styles = {
 	c0128:
 		'flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0',
 	c0129: 'px-4 text-xl',
+};
+
+// Modal and dialog layouts
+const modalStyles: StyleMap = {
 	c0130:
 		'fixed inset-0 z-50 flex items-center justify-center bg-neutral-800/95 p-4 text-neutral-200',
 	c0131:
@@ -170,6 +193,10 @@ export const styles = {
 	c0135: 'grid grid-cols-12 gap-8 text-center text-xl',
 	c0136: 'col-span-4 rounded-md bg-neutral-800/80 p-4',
 	c0137: 'rounded-md bg-neutral-700/80 p-4 text-xl text-neutral-200',
+};
+
+// Additional utilities and newer screens
+const miscStyles: StyleMap = {
 	c0138: 'p-2',
 	c0139: 'mt-2 accent-neutral-800',
 	c0140: 'px-1 text-base text-neutral-200 mt-2',
@@ -211,4 +238,24 @@ export const styles = {
 		'absolute right-0 top-18 flex cursor-pointer items-center rounded-md border border-neutral-700 bg-neutral-800 px-6 py-2',
 	c0163:
 		"peer peer-checked:after:border-buffer peer-checked:bg-brand relative mx-3 h-5 w-9 rounded-full bg-cyan-500 peer-checked:bg-green-600 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-250 after:ease-in-out after:will-change-transform after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"
+};
+
+export const styles = {
+	...toastStyles,
+	...layoutStyles,
+	...dashboardStyles,
+	...formStyles,
+	...tableStyles,
+	...modalStyles,
+	...miscStyles
+} as const;
+
+export const styleGroups = {
+	toast: toastStyles,
+	layout: layoutStyles,
+	dashboard: dashboardStyles,
+	forms: formStyles,
+	tables: tableStyles,
+	modals: modalStyles,
+	misc: miscStyles
 } as const;
