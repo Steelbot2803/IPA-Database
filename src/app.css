@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+	color-scheme: dark;
+}
+
+:root.light {
+	color-scheme: light;
+}
+
+:root.light body {
+	background: #f5f7fb;
+	color: #111827;
+	filter: invert(1) hue-rotate(180deg);
+}
+
+:root.light img,
+:root.light video,
+:root.light canvas,
+:root.light [data-no-theme-invert='true'] {
+	filter: invert(1) hue-rotate(180deg);
+}

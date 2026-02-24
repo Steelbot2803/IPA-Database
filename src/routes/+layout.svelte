@@ -6,12 +6,45 @@
 	import Toasts from '$lib/components/Toasts.svelte';
 	import { page } from '$app/state';
 	import { navigating } from '$app/state';
-	import { Loader } from 'lucide-svelte';
+	import { Loader, Sun, Moon } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
 	let { children } = $props();
 	let isOpen = $state(false);
 	let sidebarElement: HTMLElement | undefined;
 	let toggleButtonElement: HTMLButtonElement | undefined;
+
+	type Theme = 'dark' | 'light';
+	const THEME_STORAGE_KEY = 'theme-preference';
+
+	let theme = $state<Theme>('dark');
+
+	function applyTheme(nextTheme: Theme) {
+		if (!browser) return;
+
+		theme = nextTheme;
+		document.documentElement.classList.toggle('light', nextTheme === 'light');
+		document.documentElement.dataset.theme = nextTheme;
+		localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+	}
+
+	function toggleTheme() {
+		applyTheme(theme === 'dark' ? 'light' : 'dark');
+	}
+
+	onMount(() => {
+		const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+		if (storedTheme === 'dark' || storedTheme === 'light') {
+			applyTheme(storedTheme);
+			return;
+		}
+
+		const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+			? 'dark'
+			: 'light';
+		applyTheme(preferredTheme);
+	});
 
 	function handleClickOutside(event: MouseEvent) {
 		if (!isOpen) return;
@@ -82,6 +115,21 @@
 		>
 			<img src={logo} alt="IPA LOGO" class={uiStyles.c0013} />
 			<h1 class={uiStyles.c0014}>Transducer</h1>
+
+			<button
+				type="button"
+				onclick={toggleTheme}
+				class="mb-4 flex w-full items-center justify-center gap-2 rounded-md border border-neutral-700 bg-neutral-900/80 px-3 py-2 text-lg text-neutral-200 transition hover:bg-neutral-700"
+				aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+			>
+				{#if theme === 'dark'}
+					<Sun size={18} />
+					<span>Light Mode</span>
+				{:else}
+					<Moon size={18} />
+					<span>Dark Mode</span>
+				{/if}
+			</button>
 
 			<nav class={uiStyles.c0015} aria-label="Main Navigation">
 				<a
