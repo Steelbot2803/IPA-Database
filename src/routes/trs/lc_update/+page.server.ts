@@ -346,22 +346,22 @@ export const actions = {
 		}
 
 		if (duplicateGroups.length > 0) {
-			let parsedSelection: Record<string, string> = {};
+			const parsedSelection: Record<string, string[]> = {};
+			const jsonSelection: Record<string, string[]> = {};
 
 			if (duplicateSelectionRaw) {
 				try {
 					const maybeParsed = JSON.parse(duplicateSelectionRaw);
 					if (maybeParsed && typeof maybeParsed === 'object' && !Array.isArray(maybeParsed)) {
-						parsedSelection = Object.entries(maybeParsed).reduce(
-							(acc, [key, value]) => {
-								const normalizedValue = toUUID(value);
-								if (normalizedValue) {
-									acc[key] = normalizedValue;
-								}
-								return acc;
-							},
-							{} as Record<string, string>
-						);
+						Object.entries(maybeParsed).forEach(([key, value]) => {
+							const rawValues = Array.isArray(value) ? value : [value];
+							const normalizedValues = rawValues
+								.map((entry) => toUUID(entry))
+								.filter((entry): entry is string => entry !== null);
+							if (normalizedValues.length > 0) {
+								jsonSelection[key] = Array.from(new Set(normalizedValues));
+							}
+						});
 					}
 				} catch {
 					return fail(422, {
@@ -370,7 +370,22 @@ export const actions = {
 				}
 			}
 
-			const missingSelection = duplicateGroups.some((group) => parsedSelection[group.key] == null);
+			for (const group of duplicateGroups) {
+				const fromCheckboxes = form
+					.getAll(group.key)
+					.map((entry) => toUUID(entry))
+					.filter((entry): entry is string => entry !== null);
+
+				const merged = Array.from(
+					new Set([...(jsonSelection[group.key] ?? []), ...fromCheckboxes])
+				);
+
+				if (merged.length > 0) parsedSelection[group.key] = merged;
+			}
+
+			const missingSelection = duplicateGroups.some(
+				(group) => (parsedSelection[group.key] ?? []).length === 0
+			);
 
 			if (missingSelection) {
 				return fail(409, {
@@ -382,12 +397,13 @@ export const actions = {
 			}
 
 			for (const group of duplicateGroups) {
-				const selectedId = parsedSelection[group.key];
-				const isValidSelection = group.options.some((option) => option.id === selectedId);
+				const selectedIDs = parsedSelection[group.key] ?? [];
+				const groupOptionIDs = new Set(group.options.map((option) => option.id));
+				const invalidSelection = selectedIDs.some((selectedID) => !groupOptionIDs.has(selectedID));
 
-				if (!isValidSelection) {
+				if (invalidSelection) {
 					return fail(422, {
-						error: `Invalid selection for ${group.label}. Please select one of the listed options.`
+						error: `Invalid selection for ${group.label}. Please select from the listed options.`
 					});
 				}
 
@@ -395,7 +411,9 @@ export const actions = {
 					ids.delete(option.id);
 				}
 
-				ids.add(selectedId);
+				for (const selectedID of selectedIDs) {
+					ids.add(selectedID);
+				}
 			}
 		}
 

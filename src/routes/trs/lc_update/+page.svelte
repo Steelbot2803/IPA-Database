@@ -79,7 +79,6 @@
 		.slice(0, 10);
 
 	$: showSuggestions = isSearchFocused && suggestionOptions.length > 0;
-	$: duplicateSelectionPayload = JSON.stringify(duplicateSelections);
 	$: canConfirmDuplicates =
 		duplicateGroups.length > 0 &&
 		duplicateGroups.every((group) => (duplicateSelections[group.key] ?? []).length > 0);
@@ -371,8 +370,15 @@
 		label
 	]);
 
+	function getTodayDate() {
+		return new Date().toISOString().slice(0, 10);
+	}
+
 	onMount(() => {
 		loadSearchHistory();
+		if (!dispatchDate) {
+			return (dispatchDate = getTodayDate());
+		}
 	});
 </script>
 
@@ -724,6 +730,7 @@
 			action="?/dispatch"
 			use:enhance={({ formData, cancel }) => {
 				formData.set('duplicate_selection', JSON.stringify(duplicateSelections));
+
 				if (!dispatchDate) {
 					toast.show('Dispatch Date is required.', 'error', 5000);
 					cancel();
@@ -757,6 +764,7 @@
 							duplicateGroups = [];
 							duplicateSelections = {};
 							duplicateModalOpen = false;
+							return;
 						}
 						await applyAction(result);
 					} finally {
@@ -792,7 +800,6 @@
 							class="col-span-2 mt-2 w-3/4 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 							bind:value={dispatchValues}
 						></textarea>
-						<input type="hidden" name="duplicate_selection" value={duplicateSelectionPayload} />
 					</div>
 				</div>
 			</div>
@@ -810,11 +817,7 @@
 				<div
 					class="max-h-[85vh] w-full max-w-4xl overflow-auto rounded-md border border-neutral-700 bg-neutral-900 p-4"
 				>
-					<h2 class="mb-3 text-2xl font-semibold text-cyan-300">Select duplicate rows to update</h2>
-					<p class="mb-4 text-sm text-neutral-300">
-						Some Blank/Serial numbers match multiple rows. Choose exactly one row per duplicate
-						group.
-					</p>
+					<h2 class="font-5xl mb-3 text-2xl text-cyan-300">Select duplicate rows to update</h2>
 					{#each duplicateGroups as group}
 						<div class="mb-4 rounded-md border border-neutral-700 p-3">
 							<h3 class="font-5xl mb-2 text-xl text-neutral-200">{group.label}</h3>
@@ -825,6 +828,7 @@
 									>
 										<input
 											type="checkbox"
+											form="bulk_dispatch_date_update"
 											name={group.key}
 											value={option.id}
 											checked={(duplicateSelections[group.key] ?? []).includes(option.id)}
@@ -835,9 +839,10 @@
 													(event.currentTarget as HTMLInputElement).checked
 												)}
 										/>
-										<span class="text-sm text-neutral-200">
-											ID {option.id} · Job {option.job_no ?? '—'} · Model {option.model_no ?? '—'} · Blank
-											{option.blank_no ?? '—'} · Serial {option.serial_no ?? '—'}
+										<span class="text-neutral-200">
+											Job Date: {option.job_date ?? '—'} · Job No: {option.job_no ?? '—'} · Model No:
+											{option.model_no ?? '—'} · Blank No:
+											{option.blank_no ?? '—'} · Serial No: {option.serial_no ?? '—'}
 										</span>
 									</label>
 								{/each}
@@ -850,10 +855,11 @@
 						>
 						<button
 							type="submit"
+							form="bulk_dispatch_date_update"
 							class={uiStyles.c0062}
 							disabled={!canConfirmDuplicates || dispatchSaving}
 						>
-							Update Entry
+							Update
 						</button>
 					</div>
 				</div>
