@@ -62,6 +62,7 @@ type DispatchCandidate = {
 	model_no: string | null;
 	job_date: string | null;
 	dispatch_date: string | null;
+	derived_status: string | null;
 };
 
 type DuplicateGroup = {
@@ -82,8 +83,8 @@ async function buildDispatchTargets(values: number[]) {
 	const duplicateGroups = new Map<string, DuplicateGroup>();
 
 	const { data: serialRows, error: serialFetchErr } = await supabase
-		.from('trs_prod')
-		.select('id, blank_no, serial_no, job_no, model_no, job_date, dispatch_date')
+		.from('trs_prod_status_view')
+		.select('id, blank_no, serial_no, job_no, model_no, job_date, dispatch_date, derived_status')
 		.in('serial_no', values);
 
 	if (serialFetchErr) {
@@ -117,8 +118,8 @@ async function buildDispatchTargets(values: number[]) {
 	}
 
 	const { data: blankRows, error: blankFetchErr } = await supabase
-		.from('trs_prod')
-		.select('id, blank_no, serial_no, job_no, model_no, job_date, dispatch_date')
+		.from('trs_prod_status_view')
+		.select('id, blank_no, serial_no, job_no, model_no, job_date, dispatch_date, derived_status')
 		.in('blank_no', values);
 
 	if (blankFetchErr) {
@@ -170,7 +171,11 @@ export async function load({ url }) {
 	};
 
 	if (id) {
-		const { data: job, error } = await supabase.from('trs_prod').select('*').eq('id', id).single();
+		const { data: job, error } = await supabase
+			.from('trs_prod_status_view')
+			.select('*')
+			.eq('id', id)
+			.single();
 
 		if (error || !job) {
 			return {
@@ -205,7 +210,7 @@ export async function load({ url }) {
 
 	if (hasBlankNo && normalizedBlankNo !== null) {
 		({ data: jobs, error } = await supabase
-			.from('trs_prod')
+			.from('trs_prod_status_view')
 			.select('*')
 			.eq('blank_no', normalizedBlankNo)
 			.order('id', { ascending: false }));
@@ -213,7 +218,7 @@ export async function load({ url }) {
 
 	if (hasSerialNo && normalizedSerialNo !== null && (jobs == null || jobs.length === 0)) {
 		({ data: jobs, error } = await supabase
-			.from('trs_prod')
+			.from('trs_prod_status_view')
 			.select('*')
 			.eq('serial_no', normalizedSerialNo)
 			.order('id', { ascending: false }));
@@ -253,7 +258,7 @@ export const actions = {
 		}
 
 		const { data: currentJob, error: currentJobErr } = await supabase
-			.from('trs_prod')
+			.from('trs_prod_status_view')
 			.select('*')
 			.eq('id', f.id)
 			.single();
@@ -306,7 +311,10 @@ export const actions = {
 			};
 		}
 
-		const { error } = await supabase.from('trs_prod').update(updatePayload).eq('id', f.id);
+		const { error } = await supabase
+			.from('trs_prod_status_view')
+			.update(updatePayload)
+			.eq('id', f.id);
 
 		if (error) {
 			return fail(500, {
@@ -418,7 +426,7 @@ export const actions = {
 		}
 
 		const { error: updateErr } = await supabase
-			.from('trs_prod')
+			.from('trs_prod_status_view')
 			.update({ dispatch_date: dispatchDate })
 			.in('id', Array.from(ids));
 

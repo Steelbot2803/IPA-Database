@@ -41,6 +41,7 @@
 		model_no: string | null;
 		job_date: string | null;
 		dispatch_date: string | null;
+		derived_status: string | null;
 	};
 	type DuplicateGroup = {
 		key: string;
@@ -815,12 +816,14 @@
 		{#if duplicateModalOpen}
 			<div class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-800/95 p-4">
 				<div
-					class="max-h-[85vh] w-full max-w-4xl overflow-auto rounded-md border border-neutral-700 bg-neutral-900 p-4"
+					class="max-h-[85vh] w-full max-w-5xl overflow-auto rounded-md border-2 border-cyan-500 bg-neutral-900 p-4"
 				>
-					<h2 class="font-5xl mb-3 text-2xl text-cyan-300">Select duplicate rows to update</h2>
+					<h2 class="font-5xl mb-3 text-center text-2xl text-neutral-200">
+						Select duplicate rows to update
+					</h2>
 					{#each duplicateGroups as group}
-						<div class="mb-4 rounded-md border border-neutral-700 p-3">
-							<h3 class="font-5xl mb-2 text-xl text-neutral-200">{group.label}</h3>
+						<div class="mb-4 rounded-md border-2 border-neutral-600 p-2">
+							<h3 class="font-5xl mb-2 text-center text-xl text-neutral-200">{group.label}</h3>
 							<div class="space-y-2">
 								{#each group.options as option}
 									<label
@@ -840,7 +843,8 @@
 												)}
 										/>
 										<span class="text-neutral-200">
-											Job Date: {option.job_date ?? '—'} · Job No: {option.job_no ?? '—'} · Model No:
+											Status: {option.derived_status} · Job Date: {option.job_date ?? '—'} · Job No: {option.job_no ??
+												'—'} · Model No:
 											{option.model_no ?? '—'} · Blank No:
 											{option.blank_no ?? '—'} · Serial No: {option.serial_no ?? '—'}
 										</span>

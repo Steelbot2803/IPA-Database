@@ -25,6 +25,14 @@
 		isOpen = false;
 	}
 
+	function handleDocumentKeydown(event: KeyboardEvent) {
+		const key = event.key;
+		if (!key) return;
+		if (!isOpen) return;
+
+		isOpen = false;
+	}
+
 	function isActivePath(path: string) {
 		return page.url.pathname === path;
 	}
@@ -32,7 +40,7 @@
 
 <Toasts />
 
-<svelte:document onclick={handleClickOutside} />
+<svelte:document onclick={handleClickOutside} onkeydown={handleDocumentKeydown} />
 
 <svelte:head>
 	<title>TRS</title>
