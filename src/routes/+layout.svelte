@@ -97,7 +97,7 @@
 <button
 	type="button"
 	onclick={toggleTheme}
-	class="fixed top-2 right-2 z-50 rounded-md transition hover:bg-neutral-700 p-1"
+	class="fixed top-2 right-2 z-50 rounded-md p-1 text-neutral-200 transition hover:bg-neutral-700"
 	aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
 >
 	{#if theme === 'dark'}
