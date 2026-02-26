@@ -3,7 +3,7 @@
 	import { toast } from '$lib/utils/toast';
 	import { Plus, Trash2 } from 'lucide-svelte';
 	import { isElectromech } from '$lib/utils/customerFilters';
-	import { fade , slide} from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 	import { cubicInOut } from 'svelte/easing';
 
 	type JobRow = {
@@ -126,10 +126,7 @@
 		<section>
 			{#key electromech}
 				<div in:slide={{ duration: 180, easing: cubicInOut }} out:slide={{ duration: 120 }}>
-					<div
-						in:fade={{ duration: 180, easing: cubicInOut }}
-						out:fade={{ duration: 120 }}
-					>
+					<div in:fade={{ duration: 180, easing: cubicInOut }} out:fade={{ duration: 120 }}>
 						{#each rows as row, index}
 							{#if !electromech || isElectromech(row.customer)}
 								<div class={uiStyles.c0054}>

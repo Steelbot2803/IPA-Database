@@ -6,7 +6,7 @@ const toastStyles: StyleMap = {
 	c0002: 'flex items-start justify-between gap-3',
 	c0003: 'leading-snug',
 	c0004: 'text-neutral-200 hover:text-white',
-	c0005: 'absolute bottom-0 left-0 h-1 bg-neutral-422',
+	c0005: 'absolute bottom-0 left-0 h-1 bg-neutral-422'
 };
 
 // App shell and navigation
@@ -28,7 +28,7 @@ const layoutStyles: StyleMap = {
 	c0018: 'rounded-md bg-neutral-950 px-3 py-2 text-2xl',
 	c0019:
 		'flex block rounded-md px-3 py-2 text-xl hover:bg-neutral-600 justify-between items-center',
-	c0020: 'p-6',
+	c0020: 'p-6'
 };
 
 // Dashboard and KPI widgets
@@ -57,7 +57,7 @@ const dashboardStyles: StyleMap = {
 		'w-full rounded-md bg-purple-950 p-4 text-center text-2xl font-2xl text-neutral-200 items-center flex justify-center',
 	c0039: 'w-full rounded-md bg-purple-950 p-4 text-center text-xl text-neutral-200',
 	c0040: 'w-full border-separate border-spacing-y-2',
-	c0041: 'w-full border-separate border-spacing-y-2 overflow-x-auto',
+	c0041: 'w-full border-separate border-spacing-y-2 overflow-x-auto'
 };
 
 // Shared forms and input controls
@@ -121,7 +121,7 @@ const formStyles: StyleMap = {
 	c0084: 'overflow-x-auto text-center text-xl text-neutral-200',
 	c0085: 'mb-12 min-w-full border-none',
 	c0086: 'text-neutral-200',
-	c0087: 'rounded-md border-none hover:border-neutral-700 hover:bg-neutral-800 spacing-y-4',
+	c0087: 'rounded-md border-none hover:border-neutral-700 hover:bg-neutral-800 spacing-y-4'
 	// c0088: '',
 };
 
@@ -178,7 +178,7 @@ const tableStyles: StyleMap = {
 	c0127: 'flex-nonwrap flex justify-center space-x-4 text-center',
 	c0128:
 		'flex cursor-pointer rounded-md bg-neutral-800 px-4 py-2 hover:bg-neutral-600 disabled:pointer-events-none disabled:opacity-0',
-	c0129: 'px-4 text-xl',
+	c0129: 'px-4 text-xl'
 };
 
 // Modal and dialog layouts
@@ -192,7 +192,7 @@ const modalStyles: StyleMap = {
 	c0134: 'rounded-md bg-neutral-800 px-4 py-2 text-2xl text-neutral-200 hover:bg-neutral-600',
 	c0135: 'grid grid-cols-12 gap-8 text-center text-xl',
 	c0136: 'col-span-4 rounded-md bg-neutral-800/80 p-4',
-	c0137: 'rounded-md bg-neutral-700/80 p-4 text-xl text-neutral-200',
+	c0137: 'rounded-md bg-neutral-700/80 p-4 text-xl text-neutral-200'
 };
 
 // Additional utilities and newer screens

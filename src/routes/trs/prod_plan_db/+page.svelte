@@ -348,10 +348,7 @@
 	<div class={uiStyles.c0116}>
 		{#key electromech}
 			<div in:slide={{ duration: 180, easing: cubicInOut }} out:slide={{ duration: 120 }}>
-				<div
-					in:fade={{ duration: 180, easing: cubicInOut }}
-					out:fade={{ duration: 120 }}
-				>
+				<div in:fade={{ duration: 180, easing: cubicInOut }} out:fade={{ duration: 120 }}>
 					{#if visibleRows.length === 0}
 						<p class={uiStyles.c0067}>
 							{electromech
