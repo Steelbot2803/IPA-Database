@@ -83,9 +83,11 @@
 	}
 
 	async function saveUpdates() {
+		if (filteredRows.length === 0) return;
+
 		saving = true;
 
-		const payload = rows.map(
+		const payload = filteredRows.map(
 			({
 				id,
 				job_card_no,
@@ -315,17 +317,13 @@
 							</div>
 						</div>
 					{/each}
-
-					<div class={uiStyles.c0060}>
-						<button
-							type="button"
-							onclick={saveUpdates}
-							disabled={saving || rows.length === 0}
-							class={uiStyles.c0062}
-						>
-							{saving ? 'Saving...' : 'Save Updates'}
-						</button>
-					</div>
+					{#if filteredRows.length > 0}
+						<div class={uiStyles.c0060}>
+							<button type="button" onclick={saveUpdates} disabled={saving} class={uiStyles.c0062}>
+								{saving ? 'Saving...' : 'Save Updates'}
+							</button>
+						</div>
+					{/if}
 				</div>
 			</div>
 		{/key}
