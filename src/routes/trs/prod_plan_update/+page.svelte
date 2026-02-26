@@ -4,6 +4,8 @@
 	import { toast } from '$lib/utils/toast';
 	import { isElectromech } from '$lib/utils/customerFilters';
 	import { RefreshCw } from 'lucide-svelte';
+	import { fade, slide } from 'svelte/transition';
+	import { cubicInOut } from 'svelte/easing';
 
 	type JobRow = {
 		id: number;
@@ -177,144 +179,155 @@
 				</label>
 			</div>
 		</div>
+		{#key electromech}
+			<div in:slide={{ duration: 180, easing: cubicInOut }} out:slide={{ duration: 120 }}>
+				<div in:fade={{ duration: 180, easing: cubicInOut }} out:fade={{ duration: 120 }}>
+					{#if visibleRows.length === 0 && !loading && searchTerm.trim() === ''}
+						<p class={uiStyles.c0067}>
+							{electromech
+								? 'No Electromech production planned for this month.'
+								: 'No Main production planned for this month.'}
+						</p>
+					{:else if visibleRows.length === 0 && !loading && searchTerm.trim() !== ''}
+						<p class={uiStyles.c0067}>No results found!</p>
+					{/if}
 
-		{#if visibleRows.length === 0 && !loading && searchTerm.trim() === ''}
-			<p class={uiStyles.c0067}>
-				{electromech
-					? 'No Electromech production planned for this month.'
-					: 'No Main production planned for this month.'}
-			</p>
-		{:else if visibleRows.length === 0 && !loading && searchTerm.trim() !== ''}
-			<p class={uiStyles.c0067}>No results found!</p>
-		{/if}
+					{#each visibleRows as row, index}
+						<div class={uiStyles.c0054}>
+							<div class={uiStyles.c0045}>
+								<label for={`job_no-${index}`} class={uiStyles.c0046}>Job No</label>
+								<input
+									id={`job_no-${index}`}
+									name={`job_no-${index}`}
+									class={uiStyles.c0068}
+									placeholder="Job No *"
+									readonly
+									aria-readonly="true"
+									bind:value={row.job_no}
+								/>
+							</div>
+							<div class={uiStyles.c0045}>
+								<label for={`model_no-${index}`} class={uiStyles.c0046}>Model No *</label>
+								<input
+									id={`model_no-${index}`}
+									name={`model_no-${index}`}
+									class={uiStyles.c0047}
+									placeholder="Model No *"
+									bind:value={row.model_no}
+								/>
+							</div>
+							<div class={uiStyles.c0045}>
+								<label for={`quantity-${index}`} class={uiStyles.c0046}>Total Quantity *</label>
+								<input
+									id={`quantity-${index}`}
+									name={`quantity-${index}`}
+									class={uiStyles.c0047}
+									type="number"
+									placeholder="Quantity *"
+									bind:value={row.quantity}
+								/>
+							</div>
+							<div class={uiStyles.c0045}>
+								<label for={`planned_dispatch-${index}`} class={uiStyles.c0046}
+									>Planned Dispatch</label
+								>
+								<input
+									id={`planned_dispatch-${index}`}
+									name={`planned_dispatch-${index}`}
+									class={uiStyles.c0068}
+									type="date"
+									readonly
+									aria-readonly="true"
+									bind:value={row.planned_dispatch}
+								/>
+							</div>
+							<div class={uiStyles.c0045}>
+								<label for={`job_card_no-${index}`} class={uiStyles.c0046}>Job Card No</label>
+								<input
+									id={`job_card_no-${index}`}
+									name={`job_card_no-${index}`}
+									class={uiStyles.c0047}
+									placeholder="Job Card No"
+									type="number"
+									bind:value={row.job_card_no}
+								/>
+							</div>
+							<div class={uiStyles.c0045}>
+								<label for={`customer-${index}`} class={uiStyles.c0046}>Customer</label>
+								<input
+									id={`customer-${index}`}
+									name={`customer-${index}`}
+									class={uiStyles.c0047}
+									placeholder="Customer"
+									bind:value={row.customer}
+								/>
+							</div>
+							<div class={uiStyles.c0045}>
+								<label for={`dispatched_qty-${index}`} class={uiStyles.c0046}>
+									Dispatched Quantity
+								</label>
+								<input
+									id={`dispatched_qty-${index}`}
+									name={`dispatched_qty-${index}`}
+									class={uiStyles.c0047}
+									type="number"
+									placeholder="Dispatched Quantity"
+									bind:value={row.dispatched_qty}
+								/>
+							</div>
+							<div class={uiStyles.c0045}>
+								<label for={`actual_dispatch-${index}`} class={uiStyles.c0046}
+									>Actual Dispatch</label
+								>
+								<input
+									id={`actual_dispatch-${index}`}
+									name={`actual_dispatch-${index}`}
+									class={uiStyles.c0047}
+									type="date"
+									bind:value={row.actual_dispatch}
+								/>
+							</div>
+							<div class={uiStyles.c0048}>
+								<label for={`remarks-${index}`} class={uiStyles.c0046}>Remarks</label>
+								<textarea
+									id={`remarks-${index}`}
+									name={`remarks-${index}`}
+									bind:value={row.remarks}
+									class={uiStyles.c0047}
+									rows="2"
+									placeholder="Remarks"
+								></textarea>
+							</div>
+							<div class={uiStyles.c0045}>
+								<label for={`pending_qty-${index}`} class={uiStyles.c0046}>
+									Pending Quantity
+								</label>
+								<input
+									id={`pending_qty-${index}`}
+									name={`pending_qty-${index}`}
+									class={uiStyles.c0068}
+									type="number"
+									placeholder="Pending Quantity"
+									readonly
+									aria-readonly="true"
+									bind:value={row.pending_qty}
+								/>
+							</div>
+						</div>
+					{/each}
 
-		{#each visibleRows as row, index}
-			<div class={uiStyles.c0054}>
-				<div class={uiStyles.c0045}>
-					<label for={`job_no-${index}`} class={uiStyles.c0046}>Job No</label>
-					<input
-						id={`job_no-${index}`}
-						name={`job_no-${index}`}
-						class={uiStyles.c0068}
-						placeholder="Job No *"
-						readonly
-						aria-readonly="true"
-						bind:value={row.job_no}
-					/>
-				</div>
-				<div class={uiStyles.c0045}>
-					<label for={`model_no-${index}`} class={uiStyles.c0046}>Model No *</label>
-					<input
-						id={`model_no-${index}`}
-						name={`model_no-${index}`}
-						class={uiStyles.c0047}
-						placeholder="Model No *"
-						bind:value={row.model_no}
-					/>
-				</div>
-				<div class={uiStyles.c0045}>
-					<label for={`quantity-${index}`} class={uiStyles.c0046}>Total Quantity *</label>
-					<input
-						id={`quantity-${index}`}
-						name={`quantity-${index}`}
-						class={uiStyles.c0047}
-						type="number"
-						placeholder="Quantity *"
-						bind:value={row.quantity}
-					/>
-				</div>
-				<div class={uiStyles.c0045}>
-					<label for={`planned_dispatch-${index}`} class={uiStyles.c0046}>Planned Dispatch</label>
-					<input
-						id={`planned_dispatch-${index}`}
-						name={`planned_dispatch-${index}`}
-						class={uiStyles.c0068}
-						type="date"
-						readonly
-						aria-readonly="true"
-						bind:value={row.planned_dispatch}
-					/>
-				</div>
-				<div class={uiStyles.c0045}>
-					<label for={`job_card_no-${index}`} class={uiStyles.c0046}>Job Card No</label>
-					<input
-						id={`job_card_no-${index}`}
-						name={`job_card_no-${index}`}
-						class={uiStyles.c0047}
-						placeholder="Job Card No"
-						type="number"
-						bind:value={row.job_card_no}
-					/>
-				</div>
-				<div class={uiStyles.c0045}>
-					<label for={`customer-${index}`} class={uiStyles.c0046}>Customer</label>
-					<input
-						id={`customer-${index}`}
-						name={`customer-${index}`}
-						class={uiStyles.c0047}
-						placeholder="Customer"
-						bind:value={row.customer}
-					/>
-				</div>
-				<div class={uiStyles.c0045}>
-					<label for={`dispatched_qty-${index}`} class={uiStyles.c0046}>
-						Dispatched Quantity
-					</label>
-					<input
-						id={`dispatched_qty-${index}`}
-						name={`dispatched_qty-${index}`}
-						class={uiStyles.c0047}
-						type="number"
-						placeholder="Dispatched Quantity"
-						bind:value={row.dispatched_qty}
-					/>
-				</div>
-				<div class={uiStyles.c0045}>
-					<label for={`actual_dispatch-${index}`} class={uiStyles.c0046}>Actual Dispatch</label>
-					<input
-						id={`actual_dispatch-${index}`}
-						name={`actual_dispatch-${index}`}
-						class={uiStyles.c0047}
-						type="date"
-						bind:value={row.actual_dispatch}
-					/>
-				</div>
-				<div class={uiStyles.c0048}>
-					<label for={`remarks-${index}`} class={uiStyles.c0046}>Remarks</label>
-					<textarea
-						id={`remarks-${index}`}
-						name={`remarks-${index}`}
-						bind:value={row.remarks}
-						class={uiStyles.c0047}
-						rows="2"
-						placeholder="Remarks"
-					></textarea>
-				</div>
-				<div class={uiStyles.c0045}>
-					<label for={`pending_qty-${index}`} class={uiStyles.c0046}> Pending Quantity </label>
-					<input
-						id={`pending_qty-${index}`}
-						name={`pending_qty-${index}`}
-						class={uiStyles.c0068}
-						type="number"
-						placeholder="Pending Quantity"
-						readonly
-						aria-readonly="true"
-						bind:value={row.pending_qty}
-					/>
+					<div class={uiStyles.c0060}>
+						<button
+							type="button"
+							onclick={saveUpdates}
+							disabled={saving || rows.length === 0}
+							class={uiStyles.c0062}
+						>
+							{saving ? 'Saving...' : 'Save Updates'}
+						</button>
+					</div>
 				</div>
 			</div>
-		{/each}
-
-		<div class={uiStyles.c0060}>
-			<button
-				type="button"
-				onclick={saveUpdates}
-				disabled={saving || rows.length === 0}
-				class={uiStyles.c0062}
-			>
-				{saving ? 'Saving...' : 'Save Updates'}
-			</button>
-		</div>
+		{/key}
 	</div>
 </div>

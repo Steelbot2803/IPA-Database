@@ -7,6 +7,8 @@
 	import { page } from '$app/state';
 	import { navigating } from '$app/state';
 	import { Loader, Sun, Moon, Menu, X } from 'lucide-svelte';
+	import { fade, slide } from 'svelte/transition';
+	import { cubicInOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 
@@ -210,7 +212,17 @@
 		</div>
 	</aside>
 
-	<main class={uiStyles.c0020}>
-		{@render children()}
+	<main class={`${uiStyles.c0020} page-transition-container`}>
+		{#key page.url.pathname}
+			<div in:slide={{ duration: 180, easing: cubicInOut }} out:slide={{ duration: 120 }}>
+				<div
+					class="page-transition-content"
+					in:fade={{ duration: 180, easing: cubicInOut }}
+					out:fade={{ duration: 120 }}
+				>
+					{@render children()}
+				</div>
+			</div>
+		{/key}
 	</main>
 </div>
