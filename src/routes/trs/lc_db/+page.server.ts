@@ -14,10 +14,11 @@ const COLUMN_META = {
 	serial_no: { type: 'number', label: 'Serial No' }
 } as const;
 
-export async function load({ url }) {
+export async function load({ url, locals }) {
 	return loadTablePage({
 		url,
 		table: 'trs_prod_status_view',
-		columnMeta: COLUMN_META
+		columnMeta: COLUMN_META,
+		supabase: locals.supabase
 	});
 }

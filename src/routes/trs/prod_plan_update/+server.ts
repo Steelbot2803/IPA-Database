@@ -1,10 +1,12 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getSupabase } from '$lib/supabaseServer';
 import { toUserError } from '$lib/utils/userError';
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
-	const supabase = getSupabase(cookies);
+export const GET: RequestHandler = async ({ url, locals }) => {
+	const supabase = locals.supabase;
+	const user = locals.user;
+
+	if (!user) throw error(401, 'Authentication required');
 	const scheduledMonth = url.searchParams.get('scheduled_month');
 
 	if (!scheduledMonth) {
@@ -22,8 +24,11 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 	return json({ rows: data ?? [] });
 };
 
-export const PATCH: RequestHandler = async ({ request, cookies }) => {
-	const supabase = getSupabase(cookies);
+export const PATCH: RequestHandler = async ({ request, locals }) => {
+	const supabase = locals.supabase;
+	const user = locals.user;
+
+	if (!user) throw error(401, 'Authentication required');
 	const rows = await request.json();
 
 	if (!Array.isArray(rows) || rows.length === 0) {

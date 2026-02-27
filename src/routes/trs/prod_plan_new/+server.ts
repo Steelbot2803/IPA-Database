@@ -1,10 +1,12 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getSupabase } from '$lib/supabaseServer';
 import { toUserError } from '$lib/utils/userError';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
-	const supabase = getSupabase(cookies);
+export const POST: RequestHandler = async ({ request, locals }) => {
+	const supabase = locals.supabase;
+	const user = locals.user;
+
+	if (!user) throw error(401, 'Authentication required');
 	const rows = await request.json();
 
 	if (!Array.isArray(rows) || rows.length === 0) {

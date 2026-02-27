@@ -9,7 +9,7 @@ const COLUMN_META = {
 	actual_dispatch: { type: 'date', label: 'Actual Dispatch' }
 } as const;
 
-export async function load({ url }) {
+export async function load({ url, locals }) {
 	const scheduledMonth =
 		url.searchParams.get('scheduled_month') ??
 		`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
@@ -20,7 +20,8 @@ export async function load({ url }) {
 		url,
 		table,
 		columnMeta: COLUMN_META,
-		baseQuery: (query) => query.eq('scheduled_month', scheduledMonth)
+		baseQuery: (query) => query.eq('scheduled_month', scheduledMonth),
+		supabase: locals.supabase
 	});
 
 	return {
