@@ -1,3 +1,5 @@
+import { createClient } from '@supabase/supabase-js';
+import { env } from '$env/dynamic/private';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -7,6 +9,22 @@ type UsernameLookupRow = {
 
 function looksLikeEmail(value: string) {
 	return value.includes('@');
+}
+
+function getServiceRoleClient() {
+	const supabaseUrl = env.VITE_SUPABASE_URL ?? env.SUPABASE_URL;
+	const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
+
+	if (!supabaseUrl || !serviceRoleKey) {
+		return null;
+	}
+
+	return createClient(supabaseUrl, serviceRoleKey, {
+		auth: {
+			autoRefreshToken: false,
+			persistSession: false
+		}
+	});
 }
 
 export const load: PageServerLoad = async () => {
@@ -26,7 +44,13 @@ export const actions: Actions = {
 		let resolvedEmail = identifier;
 
 		if (!looksLikeEmail(identifier)) {
-			const { data, error } = await locals.supabase
+			const serviceRoleClient = getServiceRoleClient();
+
+			if (!serviceRoleClient) {
+				return fail(500, { error: 'Login is temporarily unavailable.' });
+			}
+
+			const { data, error } = await serviceRoleClient
 				.rpc('resolve_login_email', { p_username: identifier })
 				.single<UsernameLookupRow>();
 
