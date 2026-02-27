@@ -145,20 +145,6 @@
 					</button>
 				</form>
 			{/if}
-			<button
-				type="button"
-				onclick={toggleTheme}
-				class="mb-4 flex w-full items-center justify-center gap-2 rounded-md border border-neutral-700 bg-neutral-900/80 px-3 py-2 text-lg text-neutral-200 transition hover:bg-neutral-700"
-				aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-			>
-				{#if theme === 'dark'}
-					<Sun size={18} />
-					<span>Light Mode</span>
-				{:else}
-					<Moon size={18} />
-					<span>Dark Mode</span>
-				{/if}
-			</button>
 
 			<nav class={uiStyles.c0015} aria-label="Main Navigation">
 				<a
