@@ -5,7 +5,7 @@ alter table if exists public.user_profiles
 
 -- Ensure any null/invalid legacy values are normalized
 update public.user_profiles
-set role = 'user'
+set role = 'guest'
 where role is null or role not in ('admin', 'user', 'guest');
 
 -- Helper to resolve current authenticated user's application role

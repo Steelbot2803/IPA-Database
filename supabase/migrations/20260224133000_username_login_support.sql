@@ -61,16 +61,38 @@ after insert on auth.users
 for each row
 execute procedure public.handle_auth_user_created();
 
--- Backfill profiles for existing auth users
-insert into public.user_profiles (user_id, username)
-select
-	u.id,
-	coalesce(
-		nullif(lower(regexp_replace(split_part(u.email, '@', 1), '[^a-zA-Z0-9_.-]', '', 'g')), ''),
-		'user_' || replace(u.id::text, '-', '')
-	)
-from auth.users u
-where not exists (select 1 from public.user_profiles p where p.user_id = u.id);
+-- Backfill profiles for existing auth users, resolving username collisions as needed
+do $$
+declare
+	u record;
+	base_username text;
+	candidate text;
+	suffix int;
+begin
+	for u in
+		select au.id, au.email
+		from auth.users au
+		where not exists (select 1 from public.user_profiles p where p.user_id = au.id)
+	loop
+		base_username := coalesce(
+			nullif(lower(regexp_replace(split_part(u.email, '@', 1), '[^a-zA-Z0-9_.-]', '', 'g')), ''),
+			'user_' || replace(u.id::text, '-', '')
+		);
+
+		candidate := base_username;
+		suffix := 0;
+
+		while exists (select 1 from public.user_profiles where username = candidate) loop
+			suffix := suffix + 1;
+			candidate := base_username || suffix::text;
+		end loop;
+
+		insert into public.user_profiles (user_id, username)
+		values (u.id, candidate)
+		on conflict (user_id) do nothing;
+	end loop;
+end;
+$$;
 
 -- User can read/update own profile only
 alter table public.user_profiles enable row level security;
@@ -102,4 +124,5 @@ as $$
 	limit 1;
 $$;
 
-grant execute on function public.resolve_login_email(text) to anon, authenticated;
+revoke all on function public.resolve_login_email(text) from public, anon, authenticated;
+grant execute on function public.resolve_login_email(text) to service_role;
