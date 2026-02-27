@@ -328,6 +328,8 @@ export const actions = {
 		const form = await request.formData();
 		const rawValues = String(form.get('dispatch_values') ?? '').trim();
 		const dispatchDate = String(form.get('dispatch_date') ?? '').trim();
+		const dispatchJobNo = String(form.get('dispatch_job_no') ?? '').trim();
+		const dispatchCustomer = String(form.get('dispatch_customer') ?? '').trim();
 		const duplicateSelectionRaw = String(form.get('duplicate_selection') ?? '').trim();
 
 		if (!dispatchDate) {
@@ -425,9 +427,27 @@ export const actions = {
 			}
 		}
 
+		const updatePayload: {
+			dispatch_date: string;
+			job_no?: string | null;
+			customer?: string | null;
+		} = {
+			dispatch_date: dispatchDate,
+			job_no: dispatchJobNo || null,
+			customer: dispatchCustomer || null
+		};
+
+		if (dispatchCustomer) {
+			updatePayload.customer = dispatchCustomer;
+		}
+
+		if (dispatchJobNo) {
+			updatePayload.job_no = dispatchJobNo;
+		}
+
 		const { error: updateErr } = await supabase
 			.from('trs_prod_status_view')
-			.update({ dispatch_date: dispatchDate })
+			.update(updatePayload)
 			.in('id', Array.from(ids));
 
 		if (updateErr) {
@@ -436,10 +456,14 @@ export const actions = {
 			});
 		}
 
+		const updatedColumns = ['Dispatch Date'];
+		if (dispatchJobNo) updatedColumns.push('Job No');
+		if (dispatchCustomer) updatedColumns.push('Customer');
+
 		return {
 			success: true,
 			updatedCount: ids.size,
-			message: `Dispatch date updated for ${ids.size} entr${ids.size === 1 ? 'y' : 'ies'}.`
+			message: `${updatedColumns.join(', ')} updated for ${ids.size} entr${ids.size === 1 ? 'y' : 'ies'}.`
 		};
 	}
 };

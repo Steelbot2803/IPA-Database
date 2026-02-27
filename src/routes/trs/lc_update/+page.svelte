@@ -33,6 +33,8 @@
 	let lastNotFoundQuery = '';
 	let updateViewMode: 'main' | 'dispatch' = 'main';
 	let dispatchValues = '';
+	let dispatchCustomer = '';
+	let dispatchJobNo = '';
 	let dispatchDate = '';
 	let duplicateModalOpen = false;
 	type DispatchCandidate = {
@@ -445,6 +447,8 @@
 									} else if (result.type === 'success' && result.data?.message) {
 										toast.show(String(result.data.message), 'success', 5000);
 										dispatchValues = '';
+										dispatchCustomer = '';
+										dispatchJobNo = '';
 										duplicateGroups = [];
 										duplicateSelections = {};
 										duplicateModalOpen = false;
@@ -461,12 +465,43 @@
 						<div>
 							<h1 class={uiStyles.c0091}>Dispatch Date Bulk Entry</h1>
 							<div class="w-full gap-3">
-								<div class="grid grid-cols-2 items-center">
+								<div class="grid grid-cols-2 items-center gap-3">
 									<label for="dispatch_values" class={uiStyles.c0046}
 										>Serial or Blank No List / Range</label
 									>
-									<div>
-										<label for="dispatch_values" class={uiStyles.c0046}>Dispatch Date</label>
+									<div class="space-y-2 w-1/2 flex justify-end items-center">
+										<label for="dispatch_job_no" class={uiStyles.c0046}>Job No</label>
+										<input
+											id="dispatch_job_no"
+											name="dispatch_job_no"
+											type="text"
+											class="rounded-md border border-neutral-700 bg-neutral-800 px-3 text-xl text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+											bind:value={dispatchJobNo}
+											placeholder="Job No"
+										/>
+									</div>
+									<textarea
+										name="dispatch_values"
+										id="dispatch_values"
+										rows="4"
+										placeholder="Mixed values example: 000126, 000426-001026, 2600001, 2600004-2600010"
+										class="col-span-1 mt-2 w-3/4 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+										bind:value={dispatchValues}
+									></textarea>
+									<div class="space-y-2 w-1/2 flex justify-end items-center">
+										<label for="dispatch_customer" class={uiStyles.c0046}>Customer</label>
+										<input
+											id="dispatch_customer"
+											name="dispatch_customer"
+											type="text"
+											class="rounded-md border border-neutral-700 bg-neutral-800 px-3 text-xl text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+											bind:value={dispatchCustomer}
+											placeholder="Customer"
+										/>
+									</div>
+									<div></div>
+									<div class="space-y-2 w-1/2 flex justify-end items-center">
+										<label for="dispatch_date" class={uiStyles.c0046}>Dispatch Date</label>
 										<input
 											id="dispatch_date"
 											name="dispatch_date"
@@ -476,14 +511,6 @@
 											placeholder="Dispatch Date"
 										/>
 									</div>
-									<textarea
-										name="dispatch_values"
-										id="dispatch_values"
-										rows="4"
-										placeholder="Mixed values example: 000126, 000426-001026, 2600001, 2600004-2600010"
-										class="col-span-2 mt-2 w-3/4 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-										bind:value={dispatchValues}
-									></textarea>
 								</div>
 							</div>
 						</div>
