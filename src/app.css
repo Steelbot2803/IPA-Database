@@ -12,7 +12,7 @@
 
 :root.light body {
 	background: #f5f7fb;
-	color: #111827;
+	color: #262626;
 	filter: invert(1) hue-rotate(180deg);
 }
 
@@ -21,4 +21,71 @@
 :root.light canvas,
 :root.light [data-no-theme-invert='true'] {
 	filter: invert(1) hue-rotate(180deg);
+}
+
+body {
+	transition:
+		background-color 220ms ease,
+		color 220ms ease,
+		filter 220ms ease;
+}
+
+:root body,
+:root main,
+:root aside,
+:root nav,
+:root section,
+:root article,
+:root form,
+:root button,
+:root input,
+:root select,
+:root textarea,
+:root a,
+:root svg {
+	transition:
+		background-color 180ms ease,
+		border-color 180ms ease,
+		color 180ms ease,
+		box-shadow 180ms ease,
+		filter 180ms ease,
+		opacity 180ms ease,
+		transform 180ms ease;
+}
+
+.page-transition-container {
+	position: relative;
+}
+
+.page-transition-content {
+	will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body,
+	:root body,
+	:root main,
+	:root aside,
+	:root nav,
+	:root section,
+	:root article,
+	:root form,
+	:root button,
+	:root input,
+	:root select,
+	:root textarea,
+	:root a,
+	:root svg {
+		transition: none !important;
+	}
+
+	.page-transition-content {
+		will-change: auto;
+	}
+}
+
+@layer base {
+	html {
+		@apply overflow-y-scroll;
+	}
 }

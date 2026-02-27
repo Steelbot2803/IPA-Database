@@ -3,6 +3,8 @@
 	import { goto, afterNavigate, invalidateAll } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
+	import { fade, slide } from 'svelte/transition';
+	import { cubicInOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
 	import { isElectromech } from '$lib/utils/customerFilters.js';
 	import {
@@ -344,145 +346,157 @@
 	</div>
 
 	<div class={uiStyles.c0116}>
-		{#if visibleRows.length === 0}
-			<p class={uiStyles.c0067}>
-				{electromech
-					? 'No Electromech production planned for this month'
-					: 'No Main production planned for this month.'}
-			</p>
-		{:else}
-			<table class={uiStyles.c0117}>
-				<thead>
-					<tr>
-						{#each Object.keys(columnMeta) as column}
-							<th
-								class={uiStyles.c0118}
-								class:bg-teal-950={sortColumn === column && !filters[column]}
-								class:bg-lime-950={filters[column] && sortColumn !== column}
-								class:bg-orange-950={sortColumn === column && filters[column]}
-							>
-								<span class={uiStyles.c0119}>{columnMeta[column].label}</span>
-								<button aria-label="Sort" class={uiStyles.c0120} onclick={() => toggleSort(column)}>
-									{#if sortColumn !== column}
-										<ChevronsUpDown size="16" />
-									{:else if sortAscending}
-										<ChevronUp size="16" />
-									{:else}
-										<ChevronDown size="16" />
-									{/if}
-								</button>
-								<button
-									class={uiStyles.c0120}
-									aria-label="Filter"
-									onclick={() => {
-										ensureFilter(column);
-										activeFilter = column;
-									}}
-								>
-									<Funnel size="16" />
-								</button>
-								{#if activeFilter === column}
-									<div bind:this={popoverEl} class={uiStyles.c0121}>
-										<select
-											id={`filter-op-${column}`}
-											name={`filter-op-${column}`}
-											class={uiStyles.c0122}
-											bind:value={filters[column].op}
-											onchange={() => normalizeFilterValue(column)}
+		{#key electromech}
+			<div in:slide={{ duration: 180, easing: cubicInOut }} out:slide={{ duration: 120 }}>
+				<div in:fade={{ duration: 180, easing: cubicInOut }} out:fade={{ duration: 120 }}>
+					{#if visibleRows.length === 0}
+						<p class={uiStyles.c0067}>
+							{electromech
+								? 'No Electromech production planned for this month'
+								: 'No Main production planned for this month.'}
+						</p>
+					{:else}
+						<table class={uiStyles.c0117}>
+							<thead>
+								<tr>
+									{#each Object.keys(columnMeta) as column}
+										<th
+											class={uiStyles.c0118}
+											class:bg-teal-950={sortColumn === column && !filters[column]}
+											class:bg-lime-950={filters[column] && sortColumn !== column}
+											class:bg-orange-950={sortColumn === column && filters[column]}
 										>
-											{#each OPERATORS[columnMeta[column].type] as op}
-												<option value={op.value}>{op.label}</option>
-											{/each}
-										</select>
-
-										{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
-											<input
-												id={`filter-start-${column}`}
-												name={`filter-start-${column}`}
-												class={uiStyles.c0123}
-												type="date"
-												bind:value={filters[column].value[0]}
-											/>
-											<input
-												id={`filter-end-${column}`}
-												name={`filter-end-${column}`}
-												class={uiStyles.c0123}
-												type="date"
-												bind:value={filters[column].value[1]}
-											/>
-										{:else if columnMeta[column].type === 'date'}
-											<input
-												id={`filter-value-${column}`}
-												name={`filter-value-${column}`}
-												class={uiStyles.c0123}
-												type="date"
-												bind:value={filters[column].value}
-											/>
-										{:else}
-											<input
-												id={`filter-value-${column}`}
-												name={`filter-value-${column}`}
-												class={uiStyles.c0123}
-												type={columnMeta[column].type === 'number' ? 'number' : 'text'}
-												bind:value={filters[column].value}
-												onkeydown={(e) => e.key === 'Enter' && applyFilters()}
-											/>
-										{/if}
-										<div class={uiStyles.c0124}>
-											<button class={uiStyles.c0100} onclick={applyFilters}>Apply</button>
-											<button class={uiStyles.c0100} onclick={() => clearFilter(column)}
-												>Clear</button
+											<span class={uiStyles.c0119}>{columnMeta[column].label}</span>
+											<button
+												aria-label="Sort"
+												class={uiStyles.c0120}
+												onclick={() => toggleSort(column)}
 											>
-										</div>
-									</div>
-								{/if}
-							</th>
-						{/each}
-						<th class={uiStyles.c0118}></th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each data.rows as row}
-						<tr class={uiStyles.c0125}>
-							{#each Object.keys(columnMeta) as column}
-								<td class={uiStyles.c0126}>{row[column] ?? '—'}</td>
-							{/each}
-							<td>
-								<button class={uiStyles.c0089} onclick={() => (selectedPlan = row)}> Open </button>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+												{#if sortColumn !== column}
+													<ChevronsUpDown size="16" />
+												{:else if sortAscending}
+													<ChevronUp size="16" />
+												{:else}
+													<ChevronDown size="16" />
+												{/if}
+											</button>
+											<button
+												class={uiStyles.c0120}
+												aria-label="Filter"
+												onclick={() => {
+													ensureFilter(column);
+													activeFilter = column;
+												}}
+											>
+												<Funnel size="16" />
+											</button>
+											{#if activeFilter === column}
+												<div bind:this={popoverEl} class={uiStyles.c0121}>
+													<select
+														id={`filter-op-${column}`}
+														name={`filter-op-${column}`}
+														class={uiStyles.c0122}
+														bind:value={filters[column].op}
+														onchange={() => normalizeFilterValue(column)}
+													>
+														{#each OPERATORS[columnMeta[column].type] as op}
+															<option value={op.value}>{op.label}</option>
+														{/each}
+													</select>
 
-			<div class={uiStyles.c0127}>
-				<button
-					class={uiStyles.c0128}
-					aria-label="First page"
-					disabled={data.page === 1}
-					onclick={() => gotoPage(1)}><ChevronFirst size="24" /></button
-				>
-				<button
-					class={uiStyles.c0128}
-					aria-label="Previous page"
-					disabled={data.page === 1}
-					onclick={() => gotoPage(data.page - 1)}><ChevronLeft size="24" /></button
-				>
-				<span class={uiStyles.c0129}> {data.page} / {totalPages} </span>
-				<button
-					class={uiStyles.c0128}
-					aria-label="Next page"
-					disabled={data.page === totalPages}
-					onclick={() => gotoPage(data.page + 1)}><ChevronRight size="24" /></button
-				>
-				<button
-					class={uiStyles.c0128}
-					aria-label="Last page"
-					disabled={data.page === totalPages}
-					onclick={() => gotoPage(totalPages)}><ChevronLast size="24" /></button
-				>
+													{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
+														<input
+															id={`filter-start-${column}`}
+															name={`filter-start-${column}`}
+															class={uiStyles.c0123}
+															type="date"
+															bind:value={filters[column].value[0]}
+														/>
+														<input
+															id={`filter-end-${column}`}
+															name={`filter-end-${column}`}
+															class={uiStyles.c0123}
+															type="date"
+															bind:value={filters[column].value[1]}
+														/>
+													{:else if columnMeta[column].type === 'date'}
+														<input
+															id={`filter-value-${column}`}
+															name={`filter-value-${column}`}
+															class={uiStyles.c0123}
+															type="date"
+															bind:value={filters[column].value}
+														/>
+													{:else}
+														<input
+															id={`filter-value-${column}`}
+															name={`filter-value-${column}`}
+															class={uiStyles.c0123}
+															type={columnMeta[column].type === 'number' ? 'number' : 'text'}
+															bind:value={filters[column].value}
+															onkeydown={(e) => e.key === 'Enter' && applyFilters()}
+														/>
+													{/if}
+													<div class={uiStyles.c0124}>
+														<button class={uiStyles.c0100} onclick={applyFilters}>Apply</button>
+														<button class={uiStyles.c0100} onclick={() => clearFilter(column)}
+															>Clear</button
+														>
+													</div>
+												</div>
+											{/if}
+										</th>
+									{/each}
+									<th class={uiStyles.c0118}></th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each data.rows as row}
+									<tr class={uiStyles.c0125}>
+										{#each Object.keys(columnMeta) as column}
+											<td class={uiStyles.c0126}>{row[column] ?? '—'}</td>
+										{/each}
+										<td>
+											<button class={uiStyles.c0089} onclick={() => (selectedPlan = row)}>
+												Open
+											</button>
+										</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+
+						<div class={uiStyles.c0127}>
+							<button
+								class={uiStyles.c0128}
+								aria-label="First page"
+								disabled={data.page === 1}
+								onclick={() => gotoPage(1)}><ChevronFirst size="24" /></button
+							>
+							<button
+								class={uiStyles.c0128}
+								aria-label="Previous page"
+								disabled={data.page === 1}
+								onclick={() => gotoPage(data.page - 1)}><ChevronLeft size="24" /></button
+							>
+							<span class={uiStyles.c0129}> {data.page} / {totalPages} </span>
+							<button
+								class={uiStyles.c0128}
+								aria-label="Next page"
+								disabled={data.page === totalPages}
+								onclick={() => gotoPage(data.page + 1)}><ChevronRight size="24" /></button
+							>
+							<button
+								class={uiStyles.c0128}
+								aria-label="Last page"
+								disabled={data.page === totalPages}
+								onclick={() => gotoPage(totalPages)}><ChevronLast size="24" /></button
+							>
+						</div>
+					{/if}
+				</div>
 			</div>
-		{/if}
+		{/key}
 	</div>
 </div>
 
