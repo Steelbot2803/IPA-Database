@@ -1,8 +1,8 @@
-import { supabase } from '$lib/supabaseClient';
 import { styles as uiStyles } from '$lib/utils/styles';
 import { toUserError } from '$lib/utils/userError';
 
-export async function load() {
+export async function load({ locals }) {
+	const supabase = locals.supabase;
 	const errors: string[] = [];
 
 	/* ---------- STATUS COUNTS ---------- */

@@ -10,7 +10,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 
-	let { children } = $props();
+	let { data, children } = $props();
 	let isOpen = $state(false);
 	let sidebarElement: HTMLElement | undefined;
 	let toggleButtonElement: HTMLButtonElement | undefined;
@@ -116,6 +116,21 @@
 			<img src={logo} alt="IPA LOGO" class={uiStyles.c0013} />
 			<h1 class={uiStyles.c0014}>Transducer</h1>
 
+			{#if data.user}
+				<div
+					class="mb-3 rounded-md border border-neutral-700 bg-neutral-900/80 p-2 text-sm text-neutral-300"
+				>
+					Signed in as <span class="font-semibold">{data.user.user_metadata?.username ?? data.user.email}</span>
+				</div>
+				<form method="POST" action="/auth/logout" class="mb-4">
+					<button
+						type="submit"
+						class="w-full rounded-md border border-neutral-700 bg-neutral-900/80 px-3 py-2 text-sm text-neutral-200 transition hover:bg-neutral-700"
+					>
+						Sign out
+					</button>
+				</form>
+			{/if}
 			<button
 				type="button"
 				onclick={toggleTheme}

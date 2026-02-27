@@ -1,5 +1,5 @@
 import { fail } from '@sveltejs/kit';
-import { supabase } from '$lib/supabaseClient';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { toUserError } from '$lib/utils/userError';
 
 function parseDispatchIdentifiers(raw: string) {
@@ -78,7 +78,7 @@ function toUUID(value: unknown): string | null {
 	return trimmed.length > 0 ? trimmed : null;
 }
 
-async function buildDispatchTargets(values: number[]) {
+async function buildDispatchTargets(values: number[], supabase: SupabaseClient) {
 	const ids = new Set<string>();
 	const duplicateGroups = new Map<string, DuplicateGroup>();
 
@@ -158,7 +158,12 @@ async function buildDispatchTargets(values: number[]) {
 }
 
 /* ---------- LOAD JOB ---------- */
-export async function load({ url }) {
+export async function load({ url, locals }) {
+	const supabase = locals.supabase;
+
+	if (!locals.user) {
+		return { jobs: [], job: undefined, notFound: true };
+	}
 	const blank_no = url.searchParams.get('blank_no');
 	const serial_no = url.searchParams.get('serial_no');
 	const id = url.searchParams.get('id');
@@ -250,7 +255,10 @@ export async function load({ url }) {
 
 /* ---------- UPDATE JOB ---------- */
 export const actions = {
-	main: async ({ request }) => {
+	main: async ({ request, locals }) => {
+		const supabase = locals.supabase;
+
+		if (!locals.user) return fail(401, { error: 'Authentication required.' });
 		const f = Object.fromEntries(await request.formData());
 
 		if (!f.id) {
@@ -324,7 +332,10 @@ export const actions = {
 
 		return { success: true };
 	},
-	dispatch: async ({ request }) => {
+	dispatch: async ({ request, locals }) => {
+		const supabase = locals.supabase;
+
+		if (!locals.user) return fail(401, { error: 'Authentication required.' });
 		const form = await request.formData();
 		const rawValues = String(form.get('dispatch_values') ?? '').trim();
 		const dispatchDate = String(form.get('dispatch_date') ?? '').trim();
@@ -340,7 +351,7 @@ export const actions = {
 			return fail(422, { error: parsed.error });
 		}
 
-		const targetResult = await buildDispatchTargets(parsed.values);
+		const targetResult = await buildDispatchTargets(parsed.values, supabase);
 
 		if ('error' in targetResult) return fail(500, { error: targetResult.error });
 

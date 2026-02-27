@@ -1,5 +1,4 @@
 import type { RequestHandler } from './$types';
-import { getSupabase } from '$lib/supabaseServer';
 import { toUserError } from '$lib/utils/userError';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
@@ -167,8 +166,8 @@ async function buildPdf(rows: string[][], titleYear: string): Promise<Uint8Array
 	return await pdf.save();
 }
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
-	const supabase = getSupabase(cookies);
+export const GET: RequestHandler = async ({ url, locals }) => {
+	const supabase = locals.supabase;
 	const scheduledMonth =
 		url.searchParams.get('scheduled_month') ??
 		`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
