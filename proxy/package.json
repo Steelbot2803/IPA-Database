@@ -1,0 +1,8 @@
+{
+  "name": "supabase-proxy",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6"
+  }
+}
