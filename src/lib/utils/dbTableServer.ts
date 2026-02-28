@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { supabase } from '$lib/supabaseClient';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 type ColumnType = 'text' | 'number' | 'date' | 'enum';
 
@@ -80,12 +80,14 @@ export async function loadTablePage<ColumnKey extends string>({
 	url,
 	table,
 	columnMeta,
-	baseQuery
+	baseQuery,
+	supabase
 }: {
 	url: URL;
 	table: string;
 	columnMeta: ColumnMetaRecord<ColumnKey>;
 	baseQuery?: (query: any) => any;
+	supabase: SupabaseClient;
 }) {
 	const rawPage = Number(url.searchParams.get('page') ?? 1);
 	const page = Number.isFinite(rawPage) && rawPage > 0 ? Math.floor(rawPage) : 1;

@@ -1,14 +1,16 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getSupabase } from '$lib/supabaseServer';
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
 	const mode = url.searchParams.get('mode') === 'serial' ? 'serial' : 'blank';
 	const rawQuery = (url.searchParams.get('q') ?? '').trim();
 	const numericQuery = /^\d+$/.test(rawQuery) ? String(Number(rawQuery)) : rawQuery;
 	const limit = Math.min(Number(url.searchParams.get('limit') ?? 10) || 10, 20);
 
-	const supabase = getSupabase(cookies);
+	const supabase = locals.supabase;
+	const user = locals.user;
+
+	if (!user) return json({ suggestions: [] }, { status: 401 });
 	const column = mode === 'serial' ? 'serial_no' : 'blank_no';
 
 	const query = supabase

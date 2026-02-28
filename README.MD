@@ -36,3 +36,37 @@ Internal SvelteKit application for managing IPA-related database workflows.
 
 - Keep sensitive credentials in environment variables and never commit secrets.
 - If this project becomes public, review code, commit history, and configuration files for private/internal details before publishing.
+
+
+## Role Setup (Supabase RLS)
+
+After deploying migrations, bootstrap the first admin once from an authenticated session:
+
+```sql
+select public.bootstrap_first_admin();
+```
+
+Then admins can grant roles to others:
+
+```sql
+select public.set_user_role('some_username', 'admin');
+select public.set_user_role('some_username', 'user');
+select public.set_user_role('some_username', 'guest');
+```
+
+Role behavior:
+- `guest`: read-only
+- `user`: read + create + update
+- `admin`: full CRUD + role management
+
+
+## Username Setup Notes
+
+Usernames are independent from email addresses (e.g. `email=abc@outlook.com`, `username=XYZ`).
+
+- For new users, if `user_metadata.username` is supplied at signup, it is used.
+- Existing users can explicitly set/change their username with:
+
+```sql
+select public.set_my_username('XYZ');
+```

@@ -10,7 +10,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 
-	let { children } = $props();
+	let { data, children } = $props();
 	let isOpen = $state(false);
 	let sidebarElement: HTMLElement | undefined;
 	let toggleButtonElement: HTMLButtonElement | undefined;
@@ -116,6 +116,21 @@
 			<img src={logo} alt="IPA LOGO" class={uiStyles.c0013} />
 			<h1 class={uiStyles.c0014}>Transducer</h1>
 
+			{#if data.user}
+				<div
+					class="mb-3 rounded-md border border-neutral-700 bg-neutral-900/80 p-2 text-sm text-neutral-300"
+				>
+					Signed in as <span class="font-semibold">{data.user.user_metadata?.username ?? data.user.email} ({data.role})</span>
+				</div>
+				<form method="POST" action="/auth/logout" class="mb-4">
+					<button
+						type="submit"
+						class="w-full rounded-md border border-neutral-700 bg-neutral-900/80 px-3 py-2 text-sm text-neutral-200 transition hover:bg-neutral-700"
+					>
+						Sign out
+					</button>
+				</form>
+			{/if}
 			<button
 				type="button"
 				onclick={toggleTheme}
@@ -145,26 +160,28 @@
 				</a>
 				<nav class={uiStyles.c0017} aria-label="Production Plan Navigation">
 					<h2 class={uiStyles.c0018}>Production Plan</h2>
-					<a
-						href="/trs/prod_plan_new"
-						class={uiStyles.c0019}
-						class:bg-neutral-600={isActivePath('/trs/prod_plan_new')}
-					>
-						<span>Entry</span>
-						{#if navigating?.to?.url.pathname === '/trs/prod_plan_new'}
-							<Loader class="animate-spin" stroke-width="5" size={20} />
-						{/if}
-					</a>
-					<a
-						href="/trs/prod_plan_update"
-						class={uiStyles.c0019}
-						class:bg-neutral-600={isActivePath('/trs/prod_plan_update')}
-					>
-						<span>Update</span>
-						{#if navigating?.to?.url.pathname === '/trs/prod_plan_update'}
-							<Loader class="animate-spin" stroke-width="5" size={20} />
-						{/if}
-					</a>
+					{#if data.role === 'admin' || data.role === 'user'}
+						<a
+							href="/trs/prod_plan_new"
+							class={uiStyles.c0019}
+							class:bg-neutral-600={isActivePath('/trs/prod_plan_new')}
+						>
+							<span>Entry</span>
+							{#if navigating?.to?.url.pathname === '/trs/prod_plan_new'}
+								<Loader class="animate-spin" stroke-width="5" size={20} />
+							{/if}
+						</a>
+						<a
+							href="/trs/prod_plan_update"
+							class={uiStyles.c0019}
+							class:bg-neutral-600={isActivePath('/trs/prod_plan_update')}
+						>
+							<span>Update</span>
+							{#if navigating?.to?.url.pathname === '/trs/prod_plan_update'}
+								<Loader class="animate-spin" stroke-width="5" size={20} />
+							{/if}
+						</a>
+					{/if}
 					<a
 						href="/trs/prod_plan_db"
 						class={uiStyles.c0019}
@@ -178,26 +195,28 @@
 				</nav>
 				<nav class={uiStyles.c0017} aria-label="Jobs Navigation">
 					<h2 class={uiStyles.c0018}>Loadcells</h2>
-					<a
-						href="/trs/lc_new"
-						class={uiStyles.c0019}
-						class:bg-neutral-600={isActivePath('/trs/lc_new')}
-					>
-						<span>Entry</span>
-						{#if navigating?.to?.url.pathname === '/trs/lc_new'}
-							<Loader class="animate-spin" stroke-width="5" size={20} />
-						{/if}
-					</a>
-					<a
-						href="/trs/lc_update"
-						class={uiStyles.c0019}
-						class:bg-neutral-600={isActivePath('/trs/lc_update')}
-					>
-						<span>Update</span>
-						{#if navigating?.to?.url.pathname === '/trs/lc_update'}
-							<Loader class="animate-spin" stroke-width="5" size={20} />
-						{/if}
-					</a>
+					{#if data.role === 'admin' || data.role === 'user'}
+						<a
+							href="/trs/lc_new"
+							class={uiStyles.c0019}
+							class:bg-neutral-600={isActivePath('/trs/lc_new')}
+						>
+							<span>Entry</span>
+							{#if navigating?.to?.url.pathname === '/trs/lc_new'}
+								<Loader class="animate-spin" stroke-width="5" size={20} />
+							{/if}
+						</a>
+						<a
+							href="/trs/lc_update"
+							class={uiStyles.c0019}
+							class:bg-neutral-600={isActivePath('/trs/lc_update')}
+						>
+							<span>Update</span>
+							{#if navigating?.to?.url.pathname === '/trs/lc_update'}
+								<Loader class="animate-spin" stroke-width="5" size={20} />
+							{/if}
+						</a>
+					{/if}
 					<a
 						href="/trs/lc_db"
 						class={uiStyles.c0019}

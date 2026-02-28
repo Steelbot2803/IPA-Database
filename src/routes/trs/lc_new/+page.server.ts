@@ -1,10 +1,13 @@
 import { fail } from '@sveltejs/kit';
-import { supabase } from '$lib/supabaseClient';
 import { toUserError } from '$lib/utils/userError';
 import { isNDigits } from '$lib/utils/validators';
 
 export const actions = {
-	create: async ({ request }) => {
+	create: async ({ request, locals }) => {
+		const supabase = locals.supabase;
+		const user = locals.user;
+
+		if (!user) return fail(401, { error: 'Authentication required.' });
 		const f = Object.fromEntries(await request.formData());
 
 		/* ---------- REQUIRED FIELDS ---------- */
