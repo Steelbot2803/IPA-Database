@@ -134,7 +134,7 @@
 				<div
 					class="mb-3 rounded-md border border-neutral-700 bg-neutral-900/80 p-2 text-sm text-neutral-300"
 				>
-					Signed in as <span class="font-semibold">{data.user.user_metadata?.username ?? data.user.email}</span>
+					Signed in as <span class="font-semibold">{data.user.user_metadata?.username ?? data.user.email} ({data.role})</span>
 				</div>
 				<form method="POST" action="/auth/logout" class="mb-4">
 					<button
@@ -160,6 +160,7 @@
 				</a>
 				<nav class={uiStyles.c0017} aria-label="Production Plan Navigation">
 					<h2 class={uiStyles.c0018}>Production Plan</h2>
+					{#if data.role === 'ADMIN' || data.role === 'USER'}
 					<a
 						href="/trs/prod_plan_new"
 						class={uiStyles.c0019}
@@ -180,6 +181,7 @@
 							<Loader class="animate-spin" stroke-width="5" size={20} />
 						{/if}
 					</a>
+					{/if}
 					<a
 						href="/trs/prod_plan_db"
 						class={uiStyles.c0019}
@@ -193,6 +195,7 @@
 				</nav>
 				<nav class={uiStyles.c0017} aria-label="Jobs Navigation">
 					<h2 class={uiStyles.c0018}>Loadcells</h2>
+					{#if data.role === 'ADMIN' || data.role === 'USER'}
 					<a
 						href="/trs/lc_new"
 						class={uiStyles.c0019}
@@ -213,6 +216,7 @@
 							<Loader class="animate-spin" stroke-width="5" size={20} />
 						{/if}
 					</a>
+					{/if}
 					<a
 						href="/trs/lc_db"
 						class={uiStyles.c0019}
