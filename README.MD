@@ -36,3 +36,11 @@ Internal SvelteKit application for managing IPA-related database workflows.
 
 - Keep sensitive credentials in environment variables and never commit secrets.
 - If this project becomes public, review code, commit history, and configuration files for private/internal details before publishing.
+
+## Role Setup (Supabase RLS)
+
+Role behavior:
+
+- `GUEST`: read-only
+- `USER`: read + create + update
+- `ADMIN`: full CRUD + role management

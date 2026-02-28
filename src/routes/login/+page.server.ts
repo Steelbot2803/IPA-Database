@@ -47,7 +47,7 @@ export const actions: Actions = {
 			const serviceRoleClient = getServiceRoleClient();
 
 			if (!serviceRoleClient) {
-				return fail(500, { error: 'Login is temporarily unavailable.' });
+				return fail(500, { error: 'Login is temporarily unavailable with username. Please use email instead.' });
 			}
 
 			const { data, error } = await serviceRoleClient

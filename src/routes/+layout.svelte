@@ -14,8 +14,8 @@
 
 	let { data, children } = $props();
 	let isOpen = $state(false);
-	let sidebarElement: HTMLElement | undefined;
-	let toggleButtonElement: HTMLButtonElement | undefined;
+	let sidebarElement = $state<HTMLElement | undefined>(undefined);
+	let toggleButtonElement = $state<HTMLButtonElement | undefined>(undefined);
 
 	type Theme = 'dark' | 'light';
 	const THEME_STORAGE_KEY = 'theme-preference';
@@ -83,6 +83,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/png" href={logo} />
 </svelte:head>
+{#if data.user}
 <button
 	bind:this={toggleButtonElement}
 	onclick={() => (isOpen = !isOpen)}
@@ -95,7 +96,7 @@
 		<div class={uiStyles.c0008} class:-translate-y-2={isOpen} class:-rotate-45={isOpen}></div>
 	</div>
 </button>
-
+{/if}
 <button
 	type="button"
 	onclick={toggleTheme}

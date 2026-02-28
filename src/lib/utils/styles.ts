@@ -2,11 +2,11 @@ type StyleMap = Record<string, string>;
 
 // Toast notifications
 const toastStyles: StyleMap = {
-	c0001: 'max-w-base fixed top-8 right-4 z-50 flex flex-col gap-3 text-xl',
+	c0001: 'max-w-base fixed top-12 right-4 z-50 flex flex-col gap-3 text-xl items-center',
 	c0002: 'flex items-start justify-between gap-3',
 	c0003: 'leading-snug',
-	c0004: 'text-neutral-200 hover:text-white',
-	c0005: 'absolute bottom-0 left-0 h-1 bg-neutral-422'
+	c0004: 'text-neutral-200 rounded-md hover:bg-neutral-700 transition',
+	c0005: 'absolute bottom-0 left-0 h-1 bg-neutral-700'
 };
 
 // App shell and navigation

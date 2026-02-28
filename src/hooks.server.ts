@@ -34,9 +34,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	event.locals.supabase = createServerClient(supabaseURL, supabaseAnonKey, {
 		cookies: {
-			get: (name) => event.cookies.get(name),
-			set: (name, value, options) => event.cookies.set(name, value, { ...options, path: '/' }),
-			remove: (name, options) => event.cookies.delete(name, { ...options, path: '/' })
+			getAll: () => event.cookies.getAll(),
+			setAll: (cookies) => {
+				for (const cookie of cookies) {
+					event.cookies.set(cookie.name, cookie.value, { ...cookie.options, path: '/' });
+				}
+			}
 		}
 	});
 

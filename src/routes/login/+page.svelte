@@ -1,46 +1,69 @@
 <script lang="ts">
-	let { form } = $props();
+	import { styles as uiStyles } from '$lib/utils/styles';
+	import { toast } from '$lib/utils/toast';
+	import { enhance } from '$app/forms';
+	import { LoaderIcon } from 'lucide-svelte';
+	export let form;
+	let loggingIn = false;
+	$: if (form?.error) {
+		toast.show(form.error, 'error', 5000);
+	}
 </script>
 
 <svelte:head>
 	<title>Login | TRS</title>
 </svelte:head>
 
+<h1 class={uiStyles.c0021}>TRS</h1>
+
 <div
-	class="mx-auto mt-20 max-w-md rounded-lg border border-neutral-700 bg-neutral-900 p-6 text-white"
+	class="mx-auto mt-20 max-w-md rounded-md border-2 border-neutral-700 bg-neutral-900 p-6 text-neutral-200"
 >
-	<h1 class="mb-4 text-2xl font-semibold">Sign in</h1>
-	<form method="POST" class="space-y-4">
+	<form
+		method="POST"
+		class="space-y-4"
+		use:enhance={() => {
+			loggingIn = true;
+
+			return async ({ update }) => {
+				await update();
+				loggingIn = false;
+			};
+		}}
+	>
 		<div>
-			<label class="mb-1 block text-sm" for="identifier">Username</label>
 			<input
 				id="identifier"
 				name="identifier"
 				type="text"
 				required
+				placeholder="Username/Email"
 				autocomplete="username"
-				class="w-full rounded border border-neutral-600 bg-neutral-800 px-3 py-2"
+				class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 			/>
 		</div>
 		<div>
-			<label class="mb-1 block text-sm" for="password">Password</label>
 			<input
 				id="password"
 				name="password"
 				type="password"
 				required
+				placeholder="Password"
 				autocomplete="current-password"
-				class="w-full rounded border border-neutral-600 bg-neutral-800 px-3 py-2"
+				class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 			/>
 		</div>
-		{#if form?.error}
-			<p class="text-sm text-red-400">{form.error}</p>
+		{#if loggingIn}
+			<div class="flex items-center justify-center">
+				<LoaderIcon class="animate-spin" size={32} />
+			</div>
+		{:else}
+			<button
+				type="submit"
+				class="font-5xl w-full cursor-pointer rounded-md border-2 border-neutral-700 bg-neutral-800 px-4 py-2 transition hover:border-blue-700 hover:bg-blue-800"
+			>
+				Sign in
+			</button>
 		{/if}
-		<button
-			type="submit"
-			class="w-full rounded bg-blue-600 px-4 py-2 font-medium hover:bg-blue-500"
-		>
-			Sign in
-		</button>
 	</form>
 </div>
