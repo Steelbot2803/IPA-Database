@@ -13,7 +13,7 @@
 		} else if (form.success) {
 			toast.show('Loadcell entry created successfully', 'success', 5000);
 		} else if (form.warn) {
-			toast.show(form.warn, 'info', 3000);
+			toast.show(form.warn, 'warning', 3000);
 		}
 	}
 
@@ -67,12 +67,12 @@
 				</div>
 
 				<div class={uiStyles.c0045}>
-					<label for="recieved_date" class={uiStyles.c0046}>Recieved Date *</label>
-					<input id="recieved_date" type="date" name="recieved_date" class={uiStyles.c0055} />
+					<label for="received_date" class={uiStyles.c0046}>Recieved Date</label>
+					<input id="received_date" type="date" name="received_date" class={uiStyles.c0055} />
 				</div>
 
 				<div class={uiStyles.c0045}>
-					<label for="job_date" class={uiStyles.c0046}>Job Date</label>
+					<label for="job_date" class={uiStyles.c0046}>Job Date *</label>
 					<input id="job_date" type="date" name="job_date" class={uiStyles.c0055} />
 				</div>
 

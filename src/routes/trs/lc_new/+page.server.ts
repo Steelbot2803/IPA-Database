@@ -12,12 +12,16 @@ export const actions = {
 
 		/* ---------- REQUIRED FIELDS ---------- */
 
-		if (!f.recieved_date) {
-			return fail(422, { error: 'Missing Recieved Date' });
-		}
-
 		if (!f.blank_no) {
 			return fail(422, { error: 'Missing Blank No' });
+		}
+
+		if(!f.job_date) {
+			return fail(422, { error: 'Missing Job Date' });
+		}
+
+		if (!f.model_no) {
+			return fail(422, { error: 'Missing Model No' });
 		}
 
 		if (!isNDigits(f.blank_no.toString(), 7)) {
@@ -26,6 +30,10 @@ export const actions = {
 
 		if (f.serial_no && !isNDigits(f.serial_no.toString(), 6)) {
 			return fail(422, { warn: 'Serial No must be exactly 6 digits' });
+		}
+
+		if (!f.received_date) {
+			return fail(422, { warn: 'Received Date assumed to be a day before job date' });
 		}
 
 		/* ---------- DUPLICATE CHECK ---------- */
@@ -45,8 +53,8 @@ export const actions = {
 
 		/* ---------- INSERT ---------- */
 		const { error: insertErr } = await supabase.from('trs_prod').insert({
-			recieved_date: f.recieved_date,
-			job_date: f.job_date || null,
+			received_date: f.received_date || null,
+			job_date: f.job_date,
 			job_no: f.job_no || null,
 			model_no: f.model_no,
 			blank_no: f.blank_no,
