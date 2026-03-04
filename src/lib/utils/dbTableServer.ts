@@ -27,11 +27,39 @@ type ColumnMetaRecord<ColumnKey extends string> = Record<
 >;
 
 const PAGE_SIZE = 25;
+const FILTER_OPS = new Set<FilterOp>([
+	'contains',
+	'not_contains',
+	'eq',
+	'gte',
+	'lte',
+	'gt',
+	'lt',
+	'neq',
+	'between'
+]);
+
+function isFilter(value: unknown): value is Filter {
+	if (!value || typeof value !== 'object') return false;
+	const candidate = value as { op?: unknown; value?: unknown };
+	if (typeof candidate.op !== 'string' || !FILTER_OPS.has(candidate.op as FilterOp)) return false;
+	return 'value' in candidate;
+}
 
 function parseFilters<ColumnKey extends string>(rawFilters: string | null): Filters<ColumnKey> {
 	if (!rawFilters) return {};
 	try {
-		return JSON.parse(rawFilters) as Filters<ColumnKey>;
+		const parsed = JSON.parse(rawFilters) as unknown;
+		if (!parsed || typeof parsed !== 'object') return {};
+
+		const sanitized: Filters<ColumnKey> = {};
+		for (const [column, filter] of Object.entries(parsed)) {
+			if (isFilter(filter)) {
+				sanitized[column as ColumnKey] = filter;
+			}
+		}
+
+		return sanitized;
 	} catch {
 		return {};
 	}
@@ -43,8 +71,7 @@ function applyFilter(query: any, column: string, type: ColumnType, filter: Filte
 	switch (type) {
 		case 'text':
 			if (op === 'contains') return query.ilike(column, `%${value}%`);
-			if (op === 'not_contains')
-				return query.or(`${column}.not.ilike.%${value}%,${column}.is.null`);
+			if (op === 'not_contains') return query.not(column, 'ilike', `%${value}%`);
 			if (op === 'eq') return query.eq(column, value);
 			return query;
 		case 'number':
@@ -101,7 +128,7 @@ export async function loadTablePage<ColumnKey extends string>({
 		'id'
 	]);
 
-	let query = supabase.from(table).select('*', { count: 'exact' }).range(from, to);
+	let query = supabase.from(table).select('*', { count: 'exact' });
 
 	if (baseQuery) {
 		query = baseQuery(query);

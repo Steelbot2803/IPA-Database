@@ -6,7 +6,7 @@ const COLUMN_META = {
 		label: 'Status',
 		values: ['BLANK-STOCK', 'IN-PROCESS', 'READY', 'DISPATCHED']
 	},
-	recieved_date: { type: 'date', label: 'Recieved Date' },
+	recieved_date: { type: 'date', label: 'Received Date' },
 	job_date: { type: 'date', label: 'Job Date' },
 	job_no: { type: 'text', label: 'Job No' },
 	model_no: { type: 'text', label: 'Model No' },

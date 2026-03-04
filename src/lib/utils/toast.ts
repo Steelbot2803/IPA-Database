@@ -1,4 +1,3 @@
-import { FunctionSquare } from 'lucide-svelte';
 import { writable } from 'svelte/store';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';

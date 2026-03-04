@@ -47,14 +47,14 @@ export async function load({ locals }) {
 
 	/* ---------- RECENT 10 ENTRIES ---------- */
 
-	const recetJobsRes = await supabase
+	const recentJobsRes = await supabase
 		.from('trs_prod_status_view')
 		.select('job_no, model_no, blank_no, serial_no, derived_status, updated_at')
 		.order('updated_at', { ascending: false })
 		.limit(10);
 
-	if (recetJobsRes.error) {
-		errors.push(toUserError('Could not load recent jobs', recetJobsRes.error.message));
+	if (recentJobsRes.error) {
+		errors.push(toUserError('Could not load recent jobs', recentJobsRes.error.message));
 	}
 
 	const monthlyKPIsRes = await supabase
@@ -139,7 +139,7 @@ export async function load({ locals }) {
 		kpi: kpi,
 		monthlyKPIs,
 		KPIsYears,
-		recentJobs: recetJobsRes.data ?? [],
+		recentJobs: recentJobsRes.data ?? [],
 		blankDuplicates: blankDuplicatesRes.data ?? [],
 		serialDuplicates: serialDuplicatesRes.data ?? [],
 		blankStock: blankStockRes.data ?? [],

@@ -469,7 +469,7 @@
 									<label for="dispatch_values" class={uiStyles.c0046}
 										>Serial or Blank No List / Range</label
 									>
-									<div class="space-y-2 w-1/2 flex justify-end items-center">
+									<div class="flex w-1/2 items-center justify-end space-y-2">
 										<label for="dispatch_job_no" class={uiStyles.c0046}>Job No</label>
 										<input
 											id="dispatch_job_no"
@@ -488,7 +488,7 @@
 										class="col-span-1 mt-2 w-3/4 rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 										bind:value={dispatchValues}
 									></textarea>
-									<div class="space-y-2 w-1/2 flex justify-end items-center">
+									<div class="flex w-1/2 items-center justify-end space-y-2">
 										<label for="dispatch_customer" class={uiStyles.c0046}>Customer</label>
 										<input
 											id="dispatch_customer"
@@ -500,7 +500,7 @@
 										/>
 									</div>
 									<div></div>
-									<div class="space-y-2 w-1/2 flex justify-end items-center">
+									<div class="flex w-1/2 items-center justify-end space-y-2">
 										<label for="dispatch_date" class={uiStyles.c0046}>Dispatch Date</label>
 										<input
 											id="dispatch_date"

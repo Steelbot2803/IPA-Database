@@ -8,6 +8,7 @@ export type ColumnMeta = {
 
 export type Filter = {
 	op: string;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	value: any;
 };
 
@@ -27,6 +28,11 @@ export const OPERATORS: Record<ColumnType, { value: string; label: string }[]> =
 	],
 	date: [
 		{ value: 'eq', label: 'On' },
+		{ value: 'neq', label: 'Not On' },
+		{ value: 'gt', label: 'After' },
+		{ value: 'lt', label: 'Before' },
+		{ value: 'gte', label: 'On or After' },
+		{ value: 'lte', label: 'On or Before' },
 		{ value: 'between', label: 'Between' }
 	],
 	enum: [

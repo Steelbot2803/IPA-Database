@@ -6,7 +6,7 @@
 	import Toasts from '$lib/components/Toasts.svelte';
 	import { page } from '$app/state';
 	import { navigating } from '$app/state';
-	import { Loader, Sun, Moon, Menu, X } from 'lucide-svelte';
+	import { Loader, Sun, Moon } from 'lucide-svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { cubicInOut } from 'svelte/easing';
 	import { onMount } from 'svelte';

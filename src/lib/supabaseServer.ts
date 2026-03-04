@@ -1,11 +1,11 @@
 import { createServerClient } from '@supabase/ssr';
 import type { Cookies } from '@sveltejs/kit';
-import { VITE_SUPABASE_PUBLISHABLE_SVELTE_KEY, VITE_SUPABASE_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export function getSupabase(cookies: Cookies) {
 	return createServerClient(
-		VITE_SUPABASE_URL,
-		VITE_SUPABASE_PUBLISHABLE_SVELTE_KEY,
+		env.VITE_SUPABASE_URL,
+		env.VITE_SUPABASE_PUBLISHABLE_SVELTE_KEY,
 
 		{
 			cookies: {
