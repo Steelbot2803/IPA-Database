@@ -344,7 +344,7 @@ export const actions = {
 		const duplicateSelectionRaw = String(form.get('duplicate_selection') ?? '').trim();
 
 		if (!dispatchDate) {
-			return fail(422, { info: "Todays's date has been used as the Dispatch Date." });
+			return fail(422, { error: 'Enter Dispatch Date.' });
 		}
 
 		const parsed = parseDispatchIdentifiers(rawValues);
