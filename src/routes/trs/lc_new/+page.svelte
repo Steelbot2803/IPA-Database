@@ -7,13 +7,18 @@
 	export let form;
 	let saving = false;
 
-	$: if (form?.error || form?.success || form?.warn) {
+	$: if (form?.error || form?.success || form?.warn || form?.info) {
 		if (form.error) {
 			toast.show(form.error, 'error', 5000);
-		} else if (form.success) {
-			toast.show('Loadcell entry created successfully', 'success', 5000);
-		} else if (form.warn) {
+		}
+		if (form.warn) {
 			toast.show(form.warn, 'warning', 3000);
+		}
+		if (form.info) {
+			toast.show(form.info, 'info', 3000);
+		}
+		if (form.success) {
+			toast.show('Loadcell entry created successfully', 'success', 5000);
 		}
 	}
 

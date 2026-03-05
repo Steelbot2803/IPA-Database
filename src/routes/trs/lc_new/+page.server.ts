@@ -16,7 +16,7 @@ export const actions = {
 			return fail(422, { error: 'Missing Blank No' });
 		}
 
-		if(!f.job_date) {
+		if (!f.job_date) {
 			return fail(422, { error: 'Missing Job Date' });
 		}
 
@@ -32,9 +32,7 @@ export const actions = {
 			return fail(422, { warn: 'Serial No must be exactly 6 digits' });
 		}
 
-		if (!f.received_date) {
-			return fail(422, { warn: 'Received Date assumed to be a day before job date' });
-		}
+		const isReceivedDateMissing = !f.received_date;
 
 		/* ---------- DUPLICATE CHECK ---------- */
 		const { data: existing } = await supabase
@@ -87,6 +85,11 @@ export const actions = {
 			});
 		}
 
-		return { success: true };
+		return {
+			success: true,
+			info: isReceivedDateMissing
+				? 'Received Date assumed to be a day before job date. Loadcell entry created successfully.'
+				: null
+		};
 	}
 };
