@@ -17,8 +17,10 @@ const MAX_TOASTS = 4;
 function createToastStore() {
 	const { subscribe, update } = writable<Toast[]>([]);
 
+	let toastIdCounter = 0;
+
 	function show(message: string, type: ToastType = 'info', duration = 3000) {
-		const id = Date.now();
+		const id = toastIdCounter++;
 
 		const toast: Toast = {
 			id,

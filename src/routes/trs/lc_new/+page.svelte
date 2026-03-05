@@ -4,23 +4,7 @@
 	import { toast } from '$lib/utils/toast.js';
 	import { LOADCELL_PROCESS_DATE_FIELDS } from '$lib/utils/loadcellDates.js';
 
-	export let form;
 	let saving = false;
-
-	$: if (form?.error || form?.success || form?.warn || form?.info) {
-		if (form.error) {
-			toast.show(form.error, 'error', 5000);
-		}
-		if (form.warn) {
-			toast.show(form.warn, 'warning', 3000);
-		}
-		if (form.info) {
-			toast.show(form.info, 'info', 3000);
-		}
-		if (form.success) {
-			toast.show('Loadcell entry created successfully', 'success', 5000);
-		}
-	}
 
 	const dateFields = LOADCELL_PROCESS_DATE_FIELDS;
 </script>
@@ -32,9 +16,24 @@
 		method="POST"
 		use:enhance={() => {
 			saving = true;
-			return async ({ update }) => {
+			return async ({ result, update }) => {
 				saving = false;
 				await update();
+
+				if (result.type !== 'success' && result.type !== 'failure') return;
+				const data = (result.data ?? {}) as {
+					error?: string;
+					info?: string;
+					warn?: string;
+					success?: boolean;
+				};
+
+				if (data.error) toast.show(data.error, 'error', 5000);
+				if (data.warn) toast.show(data.warn, 'warning', 3000);
+				if (data.info) toast.show(data.info, 'info', 3000);
+				if (result.type === 'success' && data.success) {
+					toast.show('Loadcell entry created successfully.', 'success', 5000);
+				}
 			};
 		}}
 		class={uiStyles.c0090}

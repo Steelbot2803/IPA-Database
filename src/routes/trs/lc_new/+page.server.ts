@@ -88,7 +88,7 @@ export const actions = {
 		return {
 			success: true,
 			info: isReceivedDateMissing
-				? 'Received Date assumed to be a day before job date. Loadcell entry created successfully.'
+				? 'Received Date assumed to be a day before job date.'
 				: null
 		};
 	}
