@@ -11,6 +11,14 @@ function looksLikeEmail(value: string) {
 	return value.includes('@');
 }
 
+function normalizeEmail(value: string) {
+	return value.trim().toLowerCase();
+}
+
+function normalizeUsername(value: string) {
+	return value.trim();
+}
+
 function getServiceRoleClient() {
 	const supabaseUrl = env.VITE_SUPABASE_URL ?? env.SUPABASE_URL;
 	const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
@@ -34,8 +42,11 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 	default: async ({ request, locals }) => {
 		const form = await request.formData();
-		const identifier = String(form.get('identifier') ?? '').trim();
-		const password = String(form.get('password') ?? '').trim();
+		const rawIdentifier = String(form.get('identifier') ?? '');
+		const password = String(form.get('password') ?? '');
+		const identifier = looksLikeEmail(rawIdentifier)
+			? normalizeEmail(rawIdentifier)
+			: normalizeUsername(rawIdentifier);
 
 		if (!identifier || !password) {
 			return fail(422, { error: 'Username and password are required.' });
@@ -60,7 +71,11 @@ export const actions: Actions = {
 				return fail(401, { error: 'Invalid username or password.' });
 			}
 
-			resolvedEmail = data.email;
+			resolvedEmail = normalizeEmail(data.email);
+		}
+
+		if (!resolvedEmail) {
+			return fail(401, { error: 'Invalid username or password.' });
 		}
 
 		const { error } = await locals.supabase.auth.signInWithPassword({

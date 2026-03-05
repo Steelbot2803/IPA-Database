@@ -2,9 +2,10 @@
 	import { styles as uiStyles } from '$lib/utils/styles';
 	import { toast } from '$lib/utils/toast';
 	import { enhance } from '$app/forms';
-	import { LoaderIcon } from 'lucide-svelte';
+	import { Loader, Eye, EyeOff } from 'lucide-svelte';
 	export let form;
 	let loggingIn = false;
+	let showPassword = false;
 	$: if (form?.error) {
 		toast.show(form.error, 'error', 5000);
 	}
@@ -37,25 +38,41 @@
 				name="identifier"
 				type="text"
 				required
-				placeholder="Username/Email"
+				autocapitalize="none"
+				spellcheck="false"
+				placeholder="Email"
 				autocomplete="username"
 				class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 			/>
 		</div>
-		<div>
+		<div class="relative">
 			<input
 				id="password"
 				name="password"
-				type="password"
+				type={showPassword ? 'text' : 'password'}
 				required
 				placeholder="Password"
 				autocomplete="current-password"
-				class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+				class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 pr-12 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 			/>
+			<button
+				type="button"
+				aria-label={showPassword ? 'Hide password' : 'Show password'}
+				onclick={() => {
+					showPassword = !showPassword;
+				}}
+				class="absolute inset-y-0 right-0 flex items-center justify-center px-3 text-neutral-400 transition hover:text-neutral-200"
+			>
+				{#if showPassword}
+					<EyeOff size={18} />
+				{:else}
+					<Eye size={18} />
+				{/if}
+			</button>
 		</div>
 		{#if loggingIn}
 			<div class="flex items-center justify-center">
-				<LoaderIcon class="animate-spin" size={32} />
+				<Loader class="animate-spin" size={32} />
 			</div>
 		{:else}
 			<button

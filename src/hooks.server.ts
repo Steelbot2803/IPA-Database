@@ -25,8 +25,11 @@ function isGuestAllowedPath(pathname: string) {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const supabaseURL = env.VITE_SUPABASE_URL;
-	const supabaseAnonKey = env.VITE_SUPABASE_PUBLISHABLE_SVELTE_KEY;
+	const supabaseURL = env.VITE_SUPABASE_URL ?? env.SUPABASE_URL;
+	const supabaseAnonKey =
+		env.VITE_SUPABASE_PUBLISHABLE_SVELTE_KEY ??
+		env.SUPABASE_ANON_KEY ??
+		env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 	if (!supabaseURL || !supabaseAnonKey) {
 		throw new Error('Missing Supabase environment variables.');
@@ -37,7 +40,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 			getAll: () => event.cookies.getAll(),
 			setAll: (cookies) => {
 				for (const cookie of cookies) {
-					event.cookies.set(cookie.name, cookie.value, { ...cookie.options, path: '/' });
+					event.cookies.set(cookie.name, cookie.value, {
+						...cookie.options,
+						path: '/',
+						httpOnly: true,
+						secure: event.url.protocol === 'https:',
+						sameSite: cookie.options?.sameSite ?? 'lax'
+					});
 				}
 			}
 		}
