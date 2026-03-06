@@ -2,7 +2,8 @@
 	import { styles as uiStyles } from '$lib/utils/styles';
 	import { toast } from '$lib/utils/toast';
 	import { enhance } from '$app/forms';
-	import { Loader, Eye, EyeOff } from 'lucide-svelte';
+	import { Eye, EyeOff } from 'lucide-svelte';
+	import LoaderDots from '$lib/components/Loading.svelte';
 	export let form;
 	let loggingIn = false;
 	let showPassword = false;
@@ -71,8 +72,8 @@
 			</button>
 		</div>
 		{#if loggingIn}
-			<div class="flex items-center justify-center">
-				<Loader class="animate-spin" size={32} />
+			<div class="flex items-center justify-center text-cyan-500">
+				<LoaderDots />
 			</div>
 		{:else}
 			<button

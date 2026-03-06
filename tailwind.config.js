@@ -8,10 +8,15 @@ export default {
 				toastIn: {
 					'0%': { opacity: '0', transform: 'translateX(16px)' },
 					'100%': { opacity: '1', transform: 'translateX(0)' }
+				},
+				dotPulse: {
+					'0%, 80%, 100%': { transform: 'scale(0.6)', opacity: '0.4' },
+					'40%': { transform: 'scale(1)', opacity: '1' }
 				}
 			},
 			animation: {
-				'toast-in': 'toastIn 0.25s ease-out'
+				'toast-in': 'toastIn 0.25s ease-out',
+				dot: 'dotPulse 1.2s infinite ease-in-out'
 			},
 			borderRadius: {
 				md: '8px'

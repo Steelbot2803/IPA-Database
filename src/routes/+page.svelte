@@ -236,9 +236,9 @@
 								{#each monthlyKPIsByYear as kpimy}
 									<tr>
 										<td>{monthLabels[kpimy.month]}</td>
-										<td>{kpimy.plnvdsp}</td>
-										<td>{kpimy.plnvpro}</td>
-										<td>{kpimy.provdsp}</td>
+										<td>{kpimy.plnvdsp ?? 0}</td>
+										<td>{kpimy.plnvpro ?? 0}</td>
+										<td>{kpimy.provdsp ?? 0}</td>
 									</tr>
 								{/each}
 							</tbody>
