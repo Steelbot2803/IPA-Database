@@ -6,6 +6,7 @@
 	import { RefreshCw } from 'lucide-svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { cubicInOut } from 'svelte/easing';
+	import Updating from '$lib/components/Updating.svelte';
 
 	type JobRow = {
 		id: number;
@@ -319,9 +320,20 @@
 					{/each}
 					{#if filteredRows.length > 0}
 						<div class={uiStyles.c0060}>
-							<button type="button" onclick={saveUpdates} disabled={saving} class={uiStyles.c0062}>
-								{saving ? 'Saving...' : 'Save Updates'}
-							</button>
+							{#if saving}
+								<div class={`${uiStyles.c0061} opacity-50`}>
+									<Updating size={24}/>
+								</div>
+							{:else}
+								<button
+									type="button"
+									onclick={saveUpdates}
+									disabled={saving}
+									class={uiStyles.c0062}
+								>
+									Update Plan
+								</button>
+							{/if}
 						</div>
 					{/if}
 				</div>

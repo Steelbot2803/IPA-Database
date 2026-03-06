@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { toast } from '$lib/utils/toast.js';
 	import { LOADCELL_PROCESS_DATE_FIELDS } from '$lib/utils/loadcellDates.js';
+	import Saving from '$lib/components/Saving.svelte';
 
 	let saving = false;
 
@@ -162,9 +163,15 @@
 		<!-- ACTIONS -->
 		<div class={uiStyles.c0111}>
 			<a href="/trs/new" class={uiStyles.c0100}>Cancel</a>
-			<button type="submit" formaction="?/create" class={uiStyles.c0062} disabled={saving}>
-				{saving ? 'Saving...' : 'Create Entry'}
-			</button>
+			{#if saving}
+				<div class={`${uiStyles.c0061} opacity-50`}>
+					<Saving size={24} />
+				</div>
+			{:else}
+				<button type="submit" formaction="?/create" class={uiStyles.c0062} disabled={saving}>
+					Save Entry
+				</button>
+			{/if}
 		</div>
 	</form>
 </div>

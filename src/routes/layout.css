@@ -1,3 +1,27 @@
+@config '../../tailwind.config.js';
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+@layer utilities {
+	@keyframes dotPulse {
+		0%,
+		80%,
+		100% {
+			transform: scale(0.6);
+			opacity: 0.4;
+		}
+
+		40% {
+			transform: scale(1);
+			opacity: 1;
+		}
+	}
+
+	.animate-dot {
+		animation-name: dotPulse;
+		animation-duration: 1.2s;
+		animation-iteration-count: infinite;
+		animation-timing-function: ease-in-out;
+	}
+}

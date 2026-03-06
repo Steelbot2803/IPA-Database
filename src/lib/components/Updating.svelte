@@ -1,12 +1,12 @@
 <script>
 	import { Dot } from 'lucide-svelte';
 
-	export let size = 36;
+	export let size = 24;
 </script>
 
-<div class="flex items gap-1">
-    Updating
-	<Dot class="animate-bounce" {size} />
-	<Dot class="[animation-delay-0.15s] animate-bounce" {size} />
-	<Dot class="[animation-delay-0.3s] animate-bounce" {size} />
+<div class="flex cursor-not-allowed items-center">
+	Updating
+	<Dot class="animate-dot" {size} />
+	<Dot class="animate-dot" style="animation-delay: 150ms;" {size} />
+	<Dot class="animate-dot" style="animation-delay: 300ms;" {size} />
 </div>

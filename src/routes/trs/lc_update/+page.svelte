@@ -9,6 +9,7 @@
 	import { History, Database, RefreshCw } from 'lucide-svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { cubicInOut } from 'svelte/easing';
+	import Updating from '$lib/components/Updating.svelte';
 
 	export let data;
 
@@ -460,7 +461,7 @@
 								}
 							};
 						}}
-						class="bg-surface shadow-card gap-3 space-y-8 rounded-md px-6"
+						class="bg-surface gap-3 space-y-8 rounded-md px-6 shadow-card"
 					>
 						<div>
 							<h1 class={uiStyles.c0091}>Dispatch Date Bulk Entry</h1>
@@ -516,11 +517,15 @@
 						</div>
 						<div class={uiStyles.c0060}>
 							<a href="/trs/lc_update" class={uiStyles.c0100}>Cancel</a>
-							<button formaction="?/dispatch" class={uiStyles.c0062} disabled={dispatchSaving}>
-								{dispatchSaving
-									? 'Updating...'
-									: `Update Entr${countDispatchNumbers(dispatchValues) > 1 ? 'ies' : 'y'}`}
-							</button>
+							{#if dispatchSaving}
+								<div class={`${uiStyles.c0061} opacity-50`}>
+									<Updating size={24} />
+								</div>
+							{:else}
+								<button formaction="?/dispatch" class={uiStyles.c0062} disabled={dispatchSaving}>
+									{`Update Entr${countDispatchNumbers(dispatchValues) > 1 ? 'ies' : 'y'}`}
+								</button>
+							{/if}
 						</div>
 					</form>
 					{#if duplicateModalOpen}
@@ -897,9 +902,15 @@
 							<!-- ACTION -->
 							<div class={uiStyles.c0060}>
 								<a href="/trs/lc_update" class={uiStyles.c0100}>Cancel</a>
-								<button formaction="?/main" class={uiStyles.c0062} disabled={saving}>
-									{saving ? 'Saving...' : 'Update Entry'}
-								</button>
+								{#if saving}
+									<div class={`${uiStyles.c0061} opacity-50`}>
+										<Updating size={24} />
+									</div>
+								{:else}
+									<button formaction="?/main" class={uiStyles.c0062} disabled={saving}>
+										Update Entry
+									</button>
+								{/if}
 							</div>
 						</form>
 					{/if}

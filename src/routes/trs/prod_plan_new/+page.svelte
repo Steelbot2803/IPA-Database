@@ -5,6 +5,7 @@
 	import { isElectromech } from '$lib/utils/customerFilters';
 	import { fade, slide } from 'svelte/transition';
 	import { cubicInOut } from 'svelte/easing';
+	import Saving from '$lib/components/Saving.svelte';
 
 	type JobRow = {
 		job_no: string;
@@ -68,7 +69,7 @@
 			scheduled_month: scheduledMonth
 		}));
 
-		const res = await fetch('/trs/prod_plan', {
+		const res = await fetch('/trs/prod_plan_new', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(payload)
@@ -253,9 +254,15 @@
 			<button type="button" onclick={addRow} class={uiStyles.c0061} aria-label="Add row">
 				<Plus size={24} />
 			</button>
-			<button type="button" onclick={submit} disabled={submitting} class={uiStyles.c0062}>
-				{submitting ? 'Saving...' : 'Submit'}
-			</button>
+			{#if submitting}
+				<div class={`${uiStyles.c0061} opacity-50`}>
+					<Saving size={24} />
+				</div>
+			{:else}
+				<button type="button" onclick={submit} disabled={submitting} class={uiStyles.c0062}>
+					Save Plan
+				</button>
+			{/if}
 		</div>
 	</div>
 </div>
