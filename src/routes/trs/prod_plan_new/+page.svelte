@@ -64,28 +64,34 @@
 	async function submit() {
 		submitting = true;
 
-		const payload = rows.map((row) => ({
-			...row,
-			scheduled_month: scheduledMonth
-		}));
+		try {
+			const payload = rows.map((row) => ({
+				...row,
+				scheduled_month: scheduledMonth
+			}));
 
-		const res = await fetch('/trs/prod_plan_new', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(payload)
-		});
+			const res = await fetch('/trs/prod_plan_new', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			});
 
-		submitting = false;
+			submitting = false;
 
-		if (!res.ok) {
-			const { message } = await res.json();
-			toast.show(message, 'error');
-			return;
+			if (!res.ok) {
+				const { message } = await res.json();
+				toast.show(message, 'error');
+				return;
+			}
+
+			const { inserted } = await res.json();
+			toast.show(`Created ${inserted} entries successfully`, 'success');
+			rows = [emptyRow()];
+		} catch {
+			toast.show('An unexpected error occurred. Please try again.', 'error');
+		} finally {
+			submitting = false;
 		}
-
-		const { inserted } = await res.json();
-		toast.show(`Created ${inserted} entries successfully`, 'success');
-		rows = [emptyRow()];
 	}
 </script>
 
@@ -259,7 +265,15 @@
 					<Saving size={24} />
 				</div>
 			{:else}
-				<button type="button" onclick={submit} disabled={submitting} class={uiStyles.c0062}>
+				<button
+					type="button"
+					onclick={(event) => {
+						event.preventDefault();
+						void submit();
+					}}
+					disabled={submitting}
+					class={uiStyles.c0062}
+				>
 					Save Plan
 				</button>
 			{/if}

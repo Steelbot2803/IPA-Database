@@ -723,7 +723,11 @@
 							name="loadcell_entry_update"
 							method="POST"
 							action="?/main"
-							use:enhance={({ formData, cancel }) => {
+							use:enhance={({ formData, cancel, submitter }) => {
+								if ((submitter as HTMLButtonElement | null)?.formAction?.includes('?/main')) {
+									saving = true;
+								}
+								
 								const modelNo = String(formData.get('model_no') ?? '').trim();
 								const jobDate = String(formData.get('job_date') ?? '').trim();
 

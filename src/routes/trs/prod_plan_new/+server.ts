@@ -14,11 +14,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	const cleaned = rows.map((r, i) => {
-		if (!r.job_no) throw error(422, `Row ${i + 1}: job_no missing`);
-		if (!r.model_no) throw error(422, `Row ${i + 1}: model_no missing`);
-		if (!r.quantity || r.quantity <= 0) throw error(422, `Row ${i + 1}: qty invalid`);
-		if (!r.planned_dispatch) throw error(422, `Row ${i + 1}: committed date missing`);
-		if (!r.scheduled_month) throw error(422, `Row ${i + 1}: scheduled month missing`);
+		if (!r.scheduled_month) throw error(422, `Row ${i + 1}: Scheduled Month missing`);
+		if (!r.job_no) throw error(422, `Row ${i + 1}: Job No missing`);
+		if (!r.model_no) throw error(422, `Row ${i + 1}: Model No missing`);
+		if (!r.quantity || r.quantity <= 0) throw error(422, `Row ${i + 1}: Total Quantity missing/invalid`);
+		if (!r.planned_dispatch) throw error(422, `Row ${i + 1}: Planned Dispatch date missing`);
 
 		const jobCardNo = r.job_card_no ? String(r.job_card_no).trim() : '';
 		const dispatchedQtyValue =
