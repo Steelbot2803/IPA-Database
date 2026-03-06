@@ -19,9 +19,13 @@
 	}
 
 	.animate-dot {
+		opacity: 0.4;
+		transform: scale(0.6);
+		transform-origin: center;
 		animation-name: dotPulse;
 		animation-duration: 1.2s;
 		animation-iteration-count: infinite;
 		animation-timing-function: ease-in-out;
+		animation-fill-mode: both;
 	}
 }
