@@ -322,7 +322,7 @@
 						<div class={uiStyles.c0060}>
 							{#if saving}
 								<div class={`${uiStyles.c0061} opacity-50`}>
-									<Updating size={24}/>
+									<Updating size={24} />
 								</div>
 							{:else}
 								<button

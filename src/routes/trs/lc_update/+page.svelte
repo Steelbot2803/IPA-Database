@@ -331,11 +331,24 @@
 			part = part.trim();
 
 			if (part.includes('-')) {
-				const [start, end] = part.split('-').map(Number);
-				if (!isNaN(start) && !isNaN(end) && end >= start) {
-					return total + (end - start + 1);
+				const rawParts = part.split('-');
+				const startStr = rawParts[0].trim();
+				const endStr = rawParts[1]?.trim() ?? '';
+				const start = Number(startStr);
+				const end = Number(endStr);
+
+				if (isNaN(start) || isNaN(end) || end < start) return total;
+
+				const isYearSuffixRange = startStr.length === 6 && endStr.length === 6;
+
+				if (isYearSuffixRange) {
+					if (start % 100 !== end % 100) return total;
+					const startBase = Math.floor(start / 100);
+					const endBase = Math.floor(end / 100);
+					return total + (endBase - startBase + 1);
 				}
-				return total;
+
+				return total + (end - start + 1);
 			}
 
 			return !isNaN(Number(part)) ? total + 1 : total;
@@ -727,7 +740,7 @@
 								if ((submitter as HTMLButtonElement | null)?.formAction?.includes('?/main')) {
 									saving = true;
 								}
-								
+
 								const modelNo = String(formData.get('model_no') ?? '').trim();
 								const jobDate = String(formData.get('job_date') ?? '').trim();
 

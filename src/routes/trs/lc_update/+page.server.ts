@@ -23,8 +23,10 @@ function parseDispatchIdentifiers(raw: string) {
 			};
 		}
 
-		const start = Number(rangeMatch[1]);
-		const end = Number(rangeMatch[2]);
+		const startStr = rangeMatch[1];
+		const endStr = rangeMatch[2];
+		const start = Number(startStr);
+		const end = Number(endStr);
 
 		if (end < start) {
 			return {
@@ -32,14 +34,46 @@ function parseDispatchIdentifiers(raw: string) {
 			};
 		}
 
-		if (end - start > 1000) {
-			return {
-				error: `Range too large: "${token}". Split into sub-ranges of 1000 values each.`
-			};
-		}
+		const isYearSuffixFormat = startStr.length === 6 && endStr.length === 6;
 
-		for (let value = start; value <= end; value += 1) {
-			values.add(value);
+		if (isYearSuffixFormat) {
+			const startYear = start % 100;
+			const endYear = end % 100;
+
+			if (startYear !== endYear) {
+				return {
+					error: `Cross-year range "${token}" is not supported. Enter each year's range separately, e.g. "139425-XXXX25, 140026-140726".`
+				};
+			}
+
+			const startBase = Math.floor(start / 100);
+			const endBase = Math.floor(end / 100);
+
+			if (endBase < startBase) {
+				return {
+					error: `Invalid range: "${token}". End serial must be >= Start serial.`
+				};
+			}
+
+			if (endBase - startBase > 1000) {
+				return {
+					error: `Range too large: "${token}". Split into sub-ranges of 1000 values each.`
+				};
+			}
+
+			for (let base = startBase; base <= endBase; base++) {
+				values.add(base * 100 + startYear);
+			}
+		} else {
+			if (end - start > 1000) {
+				return {
+					error: `Range too large: "${token}". Split into sub-ranges of 1000 values each.`
+				};
+			}
+
+			for (let value = start; value <= end; value += 1) {
+				values.add(value);
+			}
 		}
 	}
 
