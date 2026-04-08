@@ -4,14 +4,14 @@ type AppRole = 'ADMIN' | 'USER' | 'GUEST';
 
 declare global {
 	namespace App {
-		interface Locals {
-			supabase: SupabaseClient;
-			user: User | null;
-			role: AppRole;
-		}
-		interface PageData {
-			user: User | null;
-			role: AppRole;
+		interface Locals { supabase: SupabaseClient; user: User | null; role: AppRole }
+		interface PageData { user: User | null; role: AppRole }
+
+		interface Platform {
+			env: Env;
+			ctx: ExecutionContext;
+			caches: CacheStorage;
+			cf?: IncomingRequestCfProperties
 		}
 	}
 }
