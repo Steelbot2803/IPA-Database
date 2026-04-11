@@ -354,7 +354,7 @@ export const actions = {
 		}
 
 		const { error } = await supabase
-			.from('trs_prod_status_view')
+			.from('trs_prod')
 			.update(updatePayload)
 			.eq('id', f.id);
 
@@ -491,7 +491,7 @@ export const actions = {
 		}
 
 		const { error: updateErr } = await supabase
-			.from('trs_prod_status_view')
+			.from('trs_prod')
 			.update(updatePayload)
 			.in('id', Array.from(ids));
 
