@@ -1,6 +1,12 @@
+// PATH: src/routes/trs/lc_import/+page.server.ts
 import { fail } from '@sveltejs/kit';
 import { parseImportCsv, type ParsedRow } from '$lib/utils/csvImport';
 import { toUserError } from '$lib/utils/userError';
+import { requireUser, requireRole } from '$lib/utils/auth';
+
+// Maximum CSV upload size: 5 MB.
+// A CSV row is roughly 200-400 bytes, so this comfortably allows 12 000–25 000 rows.
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export type DuplicateCandidate = {
 	id: string;
@@ -25,10 +31,12 @@ export type ClassifiedRow =
 			payload: Partial<ParsedRow>;
 	  };
 
+// Fields that the import is allowed to fill in when they are currently empty.
+// blank_no is excluded because it's the identifier, not an updatable field.
 const UPDATABLE_FIELDS = [
 	'serial_no',
 	'job_date',
-	'received_date',
+	'received_date', // ← correct spelling; must match the actual DB column name
 	'job_no',
 	'job_card_no',
 	'model_no',
@@ -56,6 +64,7 @@ function buildUpdatePayload(csvRow: ParsedRow, dbRow: Record<string, unknown>): 
 	for (const field of UPDATABLE_FIELDS) {
 		const csvValue = csvRow[field as keyof ParsedRow];
 		const dbValue = dbRow[field];
+		// Only fill in fields that are currently empty in the DB
 		if ((dbValue === null || dbValue === undefined || dbValue === '') && csvValue !== null) {
 			(payload as Record<string, unknown>)[field] = csvValue;
 		}
@@ -77,16 +86,30 @@ function toCandidate(row: Record<string, unknown>): DuplicateCandidate {
 }
 
 export const actions = {
+	// ── preview: parse CSV and classify each row without writing to the DB ───
 	preview: async ({ request, locals }) => {
 		const supabase = locals.supabase;
-		if (!locals.user) return fail(401, { error: 'Authentication required.' });
+
+		requireUser(locals.user);
+		requireRole(locals.role, 'USER');
 
 		const formData = await request.formData();
 		const file = formData.get('csv_file');
 
-		if (!(file instanceof File) || file.size === 0)
+		if (!(file instanceof File) || file.size === 0) {
 			return fail(422, { error: 'No file uploaded.' });
-		if (!file.name.endsWith('.csv')) return fail(422, { error: 'Only .csv files are accepted.' });
+		}
+
+		if (!file.name.endsWith('.csv')) {
+			return fail(422, { error: 'Only .csv files are accepted.' });
+		}
+
+		// 🔒 Reject oversized files before reading them into memory
+		if (file.size > MAX_FILE_SIZE) {
+			return fail(422, {
+				error: `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum allowed size is 5 MB.`
+			});
+		}
 
 		const rawText = await file.text();
 		const parseResult = parseImportCsv(rawText);
@@ -102,20 +125,22 @@ export const actions = {
 			.select('*')
 			.in('blank_no', allBlankNos.length > 0 ? allBlankNos : [-1]);
 
-		if (blankErr)
+		if (blankErr) {
 			return fail(500, {
 				error: toUserError('Could not look up blank numbers', blankErr.message)
 			});
+		}
 
 		const { data: serialMatches, error: serialErr } = await supabase
 			.from('trs_prod_status_view')
 			.select('*')
 			.in('serial_no', allSerialNos.length > 0 ? allSerialNos : [-1]);
 
-		if (serialErr)
+		if (serialErr) {
 			return fail(500, {
 				error: toUserError('Could not look up serial numbers', serialErr.message)
 			});
+		}
 
 		const existingByBlank = new Map<number, Record<string, unknown>[]>();
 		for (const row of blankMatches ?? []) {
@@ -201,21 +226,22 @@ export const actions = {
 			}
 		}
 
-		return {
-			success: true,
-			preview: JSON.stringify(classified)
-		};
+		return { success: true, preview: JSON.stringify(classified) };
 	},
 
+	// ── import: apply the classified rows to the DB ──────────────────────────
 	import: async ({ request, locals }) => {
 		const supabase = locals.supabase;
-		if (!locals.user) return fail(401, { error: 'Authentication required.' });
+
+		requireUser(locals.user);
+		requireRole(locals.role, 'USER');
 
 		const formData = await request.formData();
 		const rawPayload = formData.get('classified_rows');
 
-		if (typeof rawPayload !== 'string' || !rawPayload)
+		if (typeof rawPayload !== 'string' || !rawPayload) {
 			return fail(422, { error: 'Missing import payload.' });
+		}
 
 		let classified: ClassifiedRow[];
 		try {
@@ -242,10 +268,12 @@ export const actions = {
 
 		const skipped = classified.filter((c) => c.action === 'skip').length;
 
+		// ✅ Write directly to trs_prod (the underlying table), not the view
 		if (toInsert.length > 0) {
 			const { error: insertErr } = await supabase.from('trs_prod').insert(toInsert);
-			if (insertErr)
+			if (insertErr) {
 				return fail(500, { error: toUserError('Bulk insert failed', insertErr.message) });
+			}
 		}
 
 		if (toUpdate.length > 0) {
@@ -254,10 +282,11 @@ export const actions = {
 			);
 
 			const firstError = updateResults.find((r) => r.error)?.error;
-			if (firstError)
+			if (firstError) {
 				return fail(500, {
 					error: toUserError('One or more updates failed', firstError.message)
 				});
+			}
 		}
 
 		return {

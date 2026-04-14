@@ -1,7 +1,27 @@
+// PATH: src/routes/trs/lc_update/+page.server.ts
 import { fail } from '@sveltejs/kit';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { toUserError } from '$lib/utils/userError';
+import { requireUser, requireRole } from '$lib/utils/auth';
 
+// ─── UUID validation ──────────────────────────────────────────────────────────
+// Supabase parameterises queries so SQL injection isn't possible, but we still
+// validate that submitted IDs are real UUIDs so we never pass junk to the DB.
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function toUUID(value: unknown): string | null {
+	if (typeof value !== 'string') return null;
+	const trimmed = value.trim();
+	return UUID_REGEX.test(trimmed) ? trimmed : null;
+}
+
+// ─── Range parser ─────────────────────────────────────────────────────────────
+// Accepts a comma-separated mix of:
+//   • individual numbers:    000126, 2600001
+//   • plain ranges:          100000-100050
+//   • year-suffix ranges:    139425-150025  (last 2 digits = year, must match)
+//
+// Returns { values } on success or { error } with a user-readable message.
 function parseDispatchIdentifiers(raw: string) {
 	const tokens = raw
 		.split(',')
@@ -34,6 +54,9 @@ function parseDispatchIdentifiers(raw: string) {
 			};
 		}
 
+		// Year-suffix format: both sides are exactly 6 digits.
+		// The last 2 digits encode the year and MUST match across start/end —
+		// cross-year ranges must be entered as separate sub-ranges.
 		const isYearSuffixFormat = startStr.length === 6 && endStr.length === 6;
 
 		if (isYearSuffixFormat) {
@@ -50,9 +73,7 @@ function parseDispatchIdentifiers(raw: string) {
 			const endBase = Math.floor(end / 100);
 
 			if (endBase < startBase) {
-				return {
-					error: `Invalid range: "${token}". End serial must be >= Start serial.`
-				};
+				return { error: `Invalid range: "${token}". End serial must be >= Start serial.` };
 			}
 
 			if (endBase - startBase > 1000) {
@@ -70,23 +91,24 @@ function parseDispatchIdentifiers(raw: string) {
 					error: `Range too large: "${token}". Split into sub-ranges of 1000 values each.`
 				};
 			}
-
-			for (let value = start; value <= end; value += 1) {
+			for (let value = start; value <= end; value++) {
 				values.add(value);
 			}
 		}
 	}
 
 	if (values.size === 0) {
-		return { error: 'Provide atleast one value.' };
+		return { error: 'Provide at least one value.' };
 	}
 
 	if (values.size > 2500) {
-		return { error: 'Too many values. Only 2500 values allowed per request' };
+		return { error: 'Too many values. Only 2500 values allowed per request.' };
 	}
 
 	return { values: Array.from(values) };
 }
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type DispatchCandidate = {
 	id: string;
@@ -105,13 +127,11 @@ type DuplicateGroup = {
 	options: DispatchCandidate[];
 };
 
-function toUUID(value: unknown): string | null {
-	if (typeof value !== 'string') return null;
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-	const trimmed = value.trim();
-	return trimmed.length > 0 ? trimmed : null;
-}
-
+// Query both serial_no and blank_no columns in trs_prod_status_view (read-only
+// view used for lookups) to find which trs_prod row IDs to update, then return
+// the set of IDs and any groups that have duplicate matches needing resolution.
 async function buildDispatchTargets(values: number[], supabase: SupabaseClient) {
 	const ids = new Set<string>();
 	const duplicateGroups = new Map<string, DuplicateGroup>();
@@ -131,9 +151,9 @@ async function buildDispatchTargets(values: number[], supabase: SupabaseClient) 
 
 	for (const row of serialRows ?? []) {
 		const normalizedID = toUUID(row.id);
-		if (normalizedID !== null) ids.add(normalizedID);
-		if (typeof row.serial_no !== 'number') continue;
 		if (normalizedID === null) continue;
+		ids.add(normalizedID);
+		if (typeof row.serial_no !== 'number') continue;
 
 		const existing = serialGroups.get(row.serial_no) ?? [];
 		existing.push({ ...row, id: normalizedID });
@@ -142,13 +162,8 @@ async function buildDispatchTargets(values: number[], supabase: SupabaseClient) 
 
 	for (const [serialNo, options] of serialGroups.entries()) {
 		if (options.length <= 1) continue;
-
-		const key = `serial: ${serialNo}`;
-		duplicateGroups.set(key, {
-			key,
-			label: `Serial No ${serialNo}`,
-			options
-		});
+		const key = `serial:${serialNo}`;
+		duplicateGroups.set(key, { key, label: `Serial No ${serialNo}`, options });
 	}
 
 	const { data: blankRows, error: blankFetchErr } = await supabase
@@ -163,11 +178,12 @@ async function buildDispatchTargets(values: number[], supabase: SupabaseClient) 
 	}
 
 	const blankGroups = new Map<number, DispatchCandidate[]>();
+
 	for (const row of blankRows ?? []) {
 		const normalizedID = toUUID(row.id);
-		if (normalizedID !== null) ids.add(normalizedID);
-		if (typeof row.blank_no !== 'number') continue;
 		if (normalizedID === null) continue;
+		ids.add(normalizedID);
+		if (typeof row.blank_no !== 'number') continue;
 
 		const existing = blankGroups.get(row.blank_no) ?? [];
 		existing.push({ ...row, id: normalizedID });
@@ -176,32 +192,27 @@ async function buildDispatchTargets(values: number[], supabase: SupabaseClient) 
 
 	for (const [blankNo, options] of blankGroups.entries()) {
 		if (options.length <= 1) continue;
-
 		const key = `blank:${blankNo}`;
-		duplicateGroups.set(key, {
-			key,
-			label: `Blank No ${blankNo}`,
-			options
-		});
+		duplicateGroups.set(key, { key, label: `Blank No ${blankNo}`, options });
 	}
 
-	return {
-		ids,
-		duplicateGroups: Array.from(duplicateGroups.values())
-	};
+	return { ids, duplicateGroups: Array.from(duplicateGroups.values()) };
 }
 
-/* ---------- LOAD JOB ---------- */
+// ─── Load ─────────────────────────────────────────────────────────────────────
+
 export async function load({ url, locals }) {
 	const supabase = locals.supabase;
 
 	if (!locals.user) {
 		return { jobs: [], job: undefined, notFound: true };
 	}
+
 	const blank_no = url.searchParams.get('blank_no');
 	const serial_no = url.searchParams.get('serial_no');
 	const id = url.searchParams.get('id');
 	const success = url.searchParams.get('success');
+
 	const isDigits = (value: string | null) => (value ? /^\d+$/.test(value) : false);
 	const toNumericValue = (value: string | null) => {
 		if (!isDigits(value)) return null;
@@ -209,26 +220,22 @@ export async function load({ url, locals }) {
 		return Number.isFinite(parsed) ? parsed : null;
 	};
 
+	// Direct ID lookup (used after selecting from the duplicate list)
 	if (id) {
+		// Validate the id is a UUID before sending to DB
+		if (!toUUID(id)) {
+			return { jobs: [], job: undefined, notFound: true };
+		}
+
 		const { data: job, error } = await supabase
 			.from('trs_prod_status_view')
 			.select('*')
 			.eq('id', id)
 			.single();
 
-		if (error || !job) {
-			return {
-				jobs: [],
-				job: undefined,
-				notFound: true
-			};
-		}
+		if (error || !job) return { jobs: [], job: undefined, notFound: true };
 
-		return {
-			jobs: [],
-			job,
-			success: success === 'true'
-		};
+		return { jobs: [], job, success: success === 'true' };
 	}
 
 	const hasBlankNo = isDigits(blank_no);
@@ -237,18 +244,14 @@ export async function load({ url, locals }) {
 	const normalizedSerialNo = toNumericValue(serial_no);
 
 	if (!hasBlankNo && !hasSerialNo) {
-		return {
-			jobs: [],
-			job: undefined,
-			success: success === 'true'
-		};
+		return { jobs: [], job: undefined, success: success === 'true' };
 	}
 
 	let jobs;
-	let error;
+	let loadError;
 
 	if (hasBlankNo && normalizedBlankNo !== null) {
-		({ data: jobs, error } = await supabase
+		({ data: jobs, error: loadError } = await supabase
 			.from('trs_prod_status_view')
 			.select('*')
 			.eq('blank_no', normalizedBlankNo)
@@ -256,53 +259,46 @@ export async function load({ url, locals }) {
 	}
 
 	if (hasSerialNo && normalizedSerialNo !== null && (jobs == null || jobs.length === 0)) {
-		({ data: jobs, error } = await supabase
+		({ data: jobs, error: loadError } = await supabase
 			.from('trs_prod_status_view')
 			.select('*')
 			.eq('serial_no', normalizedSerialNo)
 			.order('id', { ascending: false }));
 	}
 
-	if (error || !jobs || jobs.length === 0) {
-		return {
-			jobs: [],
-			job: undefined,
-			notFound: true
-		};
+	if (loadError || !jobs || jobs.length === 0) {
+		return { jobs: [], job: undefined, notFound: true };
 	}
 
 	if (jobs.length === 1) {
-		return {
-			jobs: [],
-			job: jobs[0],
-			success: success === 'true'
-		};
+		return { jobs: [], job: jobs[0], success: success === 'true' };
 	}
 
-	return {
-		blank_no,
-		jobs,
-		job: undefined,
-		success: success === 'true'
-	};
+	return { blank_no, jobs, job: undefined, success: success === 'true' };
 }
 
-/* ---------- UPDATE JOB ---------- */
+// ─── Actions ──────────────────────────────────────────────────────────────────
+
 export const actions = {
+	// ── main: update a single loadcell entry ────────────────────────────────
 	main: async ({ request, locals }) => {
 		const supabase = locals.supabase;
 
-		if (!locals.user) return fail(401, { error: 'Authentication required.' });
+		requireUser(locals.user);
+		requireRole(locals.role, 'USER');
+
 		const f = Object.fromEntries(await request.formData());
 
-		if (!f.id) {
-			return fail(422, { error: 'Row ID missing. Cannot update.' });
-		}
+		if (!f.id) return fail(422, { error: 'Row ID missing. Cannot update.' });
+
+		// Validate the submitted ID is a real UUID before using it
+		const rowId = toUUID(f.id);
+		if (!rowId) return fail(422, { error: 'Invalid row ID.' });
 
 		const { data: currentJob, error: currentJobErr } = await supabase
 			.from('trs_prod_status_view')
 			.select('*')
-			.eq('id', f.id)
+			.eq('id', rowId)
 			.single();
 
 		if (currentJobErr || !currentJob) {
@@ -319,7 +315,6 @@ export const actions = {
 			serial_no: f.serial_no ? Number(f.serial_no) : null,
 			customer: f.customer || null,
 			remarks: f.remarks || null,
-
 			wiring: f.wiring || null,
 			tc0: f.tc0 || null,
 			cycling: f.cycling || null,
@@ -343,33 +338,32 @@ export const actions = {
 			return value;
 		};
 
-		const hasChanges = Object.entries(updatePayload).some(([key, value]) => {
-			return normalize(currentJob[key as keyof typeof currentJob]) !== normalize(value);
-		});
+		const hasChanges = Object.entries(updatePayload).some(
+			([key, value]) => normalize(currentJob[key as keyof typeof currentJob]) !== normalize(value)
+		);
 
-		if (!hasChanges) {
-			return {
-				info: 'Nothing changed or added'
-			};
-		}
+		if (!hasChanges) return { info: 'Nothing changed or added' };
 
-		const { error } = await supabase
+		// ✅ Write directly to the underlying table, not the view
+		const { error: updateErr } = await supabase
 			.from('trs_prod')
 			.update(updatePayload)
-			.eq('id', f.id);
+			.eq('id', rowId);
 
-		if (error) {
-			return fail(500, {
-				error: toUserError('Could not update entry', error.message)
-			});
+		if (updateErr) {
+			return fail(500, { error: toUserError('Could not update entry', updateErr.message) });
 		}
 
 		return { success: true };
 	},
+
+	// ── dispatch: bulk-update dispatch_date (and optionally job_no/customer) ─
 	dispatch: async ({ request, locals }) => {
 		const supabase = locals.supabase;
 
-		if (!locals.user) return fail(401, { error: 'Authentication required.' });
+		requireUser(locals.user);
+		requireRole(locals.role, 'USER');
+
 		const form = await request.formData();
 		const rawValues = String(form.get('dispatch_values') ?? '').trim();
 		const dispatchDate = String(form.get('dispatch_date') ?? '').trim();
@@ -377,27 +371,19 @@ export const actions = {
 		const dispatchCustomer = String(form.get('dispatch_customer') ?? '').trim();
 		const duplicateSelectionRaw = String(form.get('duplicate_selection') ?? '').trim();
 
-		if (!dispatchDate) {
-			return fail(422, { error: 'Enter Dispatch Date.' });
-		}
+		if (!dispatchDate) return fail(422, { error: 'Enter Dispatch Date.' });
 
 		const parsed = parseDispatchIdentifiers(rawValues);
-
-		if ('error' in parsed) {
-			return fail(422, { error: parsed.error });
-		}
+		if ('error' in parsed) return fail(422, { error: parsed.error });
 
 		const targetResult = await buildDispatchTargets(parsed.values, supabase);
-
 		if ('error' in targetResult) return fail(500, { error: targetResult.error });
 
 		const ids = targetResult.ids;
 		const duplicateGroups = targetResult.duplicateGroups;
 
 		if (ids.size === 0) {
-			return fail(422, {
-				error: 'No entries found for the provided values.'
-			});
+			return fail(422, { error: 'No entries found for the provided values.' });
 		}
 
 		if (duplicateGroups.length > 0) {
@@ -408,15 +394,13 @@ export const actions = {
 				try {
 					const maybeParsed = JSON.parse(duplicateSelectionRaw);
 					if (maybeParsed && typeof maybeParsed === 'object' && !Array.isArray(maybeParsed)) {
-						Object.entries(maybeParsed).forEach(([key, value]) => {
-							const rawValues = Array.isArray(value) ? value : [value];
-							const normalizedValues = rawValues
+						for (const [key, value] of Object.entries(maybeParsed)) {
+							const rawVals = Array.isArray(value) ? value : [value];
+							const normalized = rawVals
 								.map((entry) => toUUID(entry))
 								.filter((entry): entry is string => entry !== null);
-							if (normalizedValues.length > 0) {
-								jsonSelection[key] = Array.from(new Set(normalizedValues));
-							}
-						});
+							if (normalized.length > 0) jsonSelection[key] = Array.from(new Set(normalized));
+						}
 					}
 				} catch {
 					return fail(422, {
@@ -434,7 +418,6 @@ export const actions = {
 				const merged = Array.from(
 					new Set([...(jsonSelection[group.key] ?? []), ...fromCheckboxes])
 				);
-
 				if (merged.length > 0) parsedSelection[group.key] = merged;
 			}
 
@@ -453,8 +436,8 @@ export const actions = {
 
 			for (const group of duplicateGroups) {
 				const selectedIDs = parsedSelection[group.key] ?? [];
-				const groupOptionIDs = new Set(group.options.map((option) => option.id));
-				const invalidSelection = selectedIDs.some((selectedID) => !groupOptionIDs.has(selectedID));
+				const groupOptionIDs = new Set(group.options.map((o) => o.id));
+				const invalidSelection = selectedIDs.some((sid) => !groupOptionIDs.has(sid));
 
 				if (invalidSelection) {
 					return fail(422, {
@@ -462,34 +445,22 @@ export const actions = {
 					});
 				}
 
-				for (const option of group.options) {
-					ids.delete(option.id);
-				}
-
-				for (const selectedID of selectedIDs) {
-					ids.add(selectedID);
-				}
+				// Remove all candidates for this group, then re-add only selected ones
+				for (const option of group.options) ids.delete(option.id);
+				for (const sid of selectedIDs) ids.add(sid);
 			}
 		}
 
-		const updatePayload: {
-			dispatch_date: string;
-			job_no?: string | null;
-			customer?: string | null;
-		} = {
-			dispatch_date: dispatchDate,
-			job_no: dispatchJobNo || null,
-			customer: dispatchCustomer || null
+		// ✅ FIX: Build payload with only the fields that were actually provided.
+		//    Previously, job_no and customer were always included — even as null —
+		//    which would CLEAR existing values when the fields were left empty.
+		const updatePayload: Record<string, string | null> = {
+			dispatch_date: dispatchDate
 		};
+		if (dispatchJobNo) updatePayload.job_no = dispatchJobNo;
+		if (dispatchCustomer) updatePayload.customer = dispatchCustomer;
 
-		if (dispatchCustomer) {
-			updatePayload.customer = dispatchCustomer;
-		}
-
-		if (dispatchJobNo) {
-			updatePayload.job_no = dispatchJobNo;
-		}
-
+		// ✅ Write directly to the underlying table, not the view
 		const { error: updateErr } = await supabase
 			.from('trs_prod')
 			.update(updatePayload)

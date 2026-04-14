@@ -1,3 +1,4 @@
+<!-- PATH: src/routes/trs/prod_plan_update/+page.svelte -->
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
 	import { onMount } from 'svelte';
@@ -23,26 +24,26 @@
 		pending_qty: number | '';
 	};
 
-	let rows: JobRow[] = [];
-	let loading = false;
-	let saving = false;
 	const today = new Date();
 	const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
-	let scheduledMonth = defaultMonth;
-	let electromech = false;
-	let searchTerm = '';
+
+	// Svelte 5: mutable vars → $state()
+	let rows = $state<JobRow[]>([]);
+	let loading = $state(false);
+	let saving = $state(false);
+	let electromech = $state(false);
+	let searchTerm = $state('');
+	let scheduledMonth = $state(defaultMonth);
 
 	const normalize = (value: unknown) =>
 		String(value ?? '')
 			.toLowerCase()
 			.replace(/\s+/g, ' ')
 			.trim();
-
 	const compact = (value: unknown) => normalize(value).replace(/[^a-z0-9]/g, '');
 
-	const constainsSearchTerm = (row: JobRow, term: string) => {
+	const containsSearchTerm = (row: JobRow, term: string) => {
 		if (!term) return true;
-
 		const rowText = [
 			row.job_no,
 			row.model_no,
@@ -55,78 +56,81 @@
 			row.dispatched_qty,
 			row.pending_qty
 		]
-			.map((value) => normalize(value))
+			.map((v) => normalize(v))
 			.join(' ');
-
 		return rowText.includes(term) || compact(rowText).includes(compact(term));
 	};
 
-	$: filteredRows = electromech
-		? rows.filter((row) => isElectromech(row.customer))
-		: rows.filter((row) => !isElectromech(row.customer));
-
-	$: normSearchTerm = searchTerm.trim().toLowerCase();
-	$: visibleRows = filteredRows.filter((row) => constainsSearchTerm(row, normSearchTerm));
+	// Svelte 5: $: reactive declarations → $derived()
+	let filteredRows = $derived(
+		electromech
+			? rows.filter((row) => isElectromech(row.customer))
+			: rows.filter((row) => !isElectromech(row.customer))
+	);
+	let normSearchTerm = $derived(searchTerm.trim().toLowerCase());
+	let visibleRows = $derived(filteredRows.filter((row) => containsSearchTerm(row, normSearchTerm)));
 
 	async function loadRows() {
 		loading = true;
-		const res = await fetch(`/trs/prod_plan_update?scheduled_month=${scheduledMonth}`);
-		loading = false;
-
-		if (!res.ok) {
-			const { message } = await res.json();
-			toast.show(message, 'error');
-			return;
+		try {
+			const res = await fetch(`/trs/prod_plan_update?scheduled_month=${scheduledMonth}`);
+			if (!res.ok) {
+				const body = await res.json().catch(() => ({ message: 'Unknown error' }));
+				toast.show(body.message ?? 'Failed to load production plan.', 'error');
+				return;
+			}
+			const { rows: fetchedRows } = await res.json();
+			rows = fetchedRows ?? [];
+		} catch {
+			toast.show('Could not reach the server. Check your connection.', 'error');
+		} finally {
+			loading = false;
 		}
-
-		const { rows: fetchedRows } = await res.json();
-		rows = fetchedRows ?? [];
 	}
 
 	async function saveUpdates() {
 		if (filteredRows.length === 0) return;
-
 		saving = true;
-
-		const payload = filteredRows.map(
-			({
-				id,
-				job_card_no,
-				model_no,
-				quantity,
-				actual_dispatch,
-				customer,
-				remarks,
-				dispatched_qty
-			}) => ({
-				id,
-				job_card_no,
-				model_no,
-				quantity,
-				actual_dispatch,
-				customer,
-				remarks,
-				dispatched_qty
-			})
-		);
-
-		const res = await fetch('/trs/prod_plan_update', {
-			method: 'PATCH',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(payload)
-		});
-
-		saving = false;
-
-		if (!res.ok) {
-			const { message } = await res.json();
-			toast.show(message, 'error');
-			return;
+		try {
+			const payload = filteredRows.map(
+				({
+					id,
+					job_card_no,
+					model_no,
+					quantity,
+					actual_dispatch,
+					customer,
+					remarks,
+					dispatched_qty
+				}) => ({
+					id,
+					job_card_no,
+					model_no,
+					quantity,
+					actual_dispatch,
+					customer,
+					remarks,
+					dispatched_qty
+				})
+			);
+			const res = await fetch('/trs/prod_plan_update', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			});
+			if (!res.ok) {
+				const body = await res.json().catch(() => ({ message: 'Unknown error' }));
+				toast.show(body.message ?? 'Failed to save updates.', 'error');
+				return;
+			}
+			const { updated } = await res.json();
+			toast.show(`Updated ${updated} entr${updated === 1 ? 'y' : 'ies'} successfully`, 'success');
+			await loadRows();
+		} catch {
+			toast.show('Could not reach the server. Check your connection.', 'error');
+		} finally {
+			saving = false;
 		}
-
-		const { updated } = await res.json();
-		toast.show(`Updated ${updated} entr${updated === 1 ? 'y' : 'ies'} successfully`, 'success');
-		await loadRows();
 	}
 
 	onMount(loadRows);
@@ -134,11 +138,10 @@
 
 <div class={uiStyles.c0042}>
 	<h1 class={uiStyles.c0021}>Update Monthly Production Plan</h1>
-
 	<div class={uiStyles.c0043}>
 		<div class={uiStyles.c0063}>
 			<div class={uiStyles.c0045}>
-				<label for="scheduled_month" class={uiStyles.c0046}> Scheduled Month </label>
+				<label for="scheduled_month" class={uiStyles.c0046}>Scheduled Month</label>
 				<input
 					id="scheduled_month"
 					name="scheduled_month"
@@ -149,11 +152,9 @@
 			</div>
 			<div class={uiStyles.c0064}>
 				<button type="button" onclick={loadRows} disabled={loading} class={uiStyles.c0065}>
-					{#if loading}
-						<RefreshCw class="animate-spin" size="24" />
-					{:else}
-						<RefreshCw size="24" />
-					{/if}
+					{#if loading}<RefreshCw class="animate-spin" size="24" />{:else}<RefreshCw
+							size="24"
+						/>{/if}
 				</button>
 			</div>
 			<div class={uiStyles.c0066}>
@@ -161,7 +162,6 @@
 				<input
 					id="search"
 					type="text"
-					name=""
 					class={uiStyles.c0047}
 					placeholder="Search"
 					bind:value={searchTerm}
@@ -182,6 +182,7 @@
 				</label>
 			</div>
 		</div>
+
 		{#key electromech}
 			<div in:slide={{ duration: 180, easing: cubicInOut }} out:slide={{ duration: 120 }}>
 				<div in:fade={{ duration: 180, easing: cubicInOut }} out:fade={{ duration: 120 }}>
@@ -203,7 +204,7 @@
 									id={`job_no-${index}`}
 									name={`job_no-${index}`}
 									class={uiStyles.c0068}
-									placeholder="Job No *"
+									placeholder="Job No"
 									readonly
 									aria-readonly="true"
 									bind:value={row.job_no}
@@ -266,9 +267,9 @@
 								/>
 							</div>
 							<div class={uiStyles.c0045}>
-								<label for={`dispatched_qty-${index}`} class={uiStyles.c0046}>
-									Dispatched Quantity
-								</label>
+								<label for={`dispatched_qty-${index}`} class={uiStyles.c0046}
+									>Dispatched Quantity</label
+								>
 								<input
 									id={`dispatched_qty-${index}`}
 									name={`dispatched_qty-${index}`}
@@ -302,9 +303,7 @@
 								></textarea>
 							</div>
 							<div class={uiStyles.c0045}>
-								<label for={`pending_qty-${index}`} class={uiStyles.c0046}>
-									Pending Quantity
-								</label>
+								<label for={`pending_qty-${index}`} class={uiStyles.c0046}>Pending Quantity</label>
 								<input
 									id={`pending_qty-${index}`}
 									name={`pending_qty-${index}`}
@@ -318,21 +317,15 @@
 							</div>
 						</div>
 					{/each}
+
 					{#if filteredRows.length > 0}
 						<div class={uiStyles.c0060}>
 							{#if saving}
-								<div class={`${uiStyles.c0061} opacity-50`}>
-									<Updating size={24} />
-								</div>
+								<div class={`${uiStyles.c0061} opacity-50`}><Updating size={24} /></div>
 							{:else}
-								<button
-									type="button"
-									onclick={saveUpdates}
-									disabled={saving}
-									class={uiStyles.c0062}
+								<button type="button" onclick={saveUpdates} disabled={saving} class={uiStyles.c0062}
+									>Update Plan</button
 								>
-									Update Plan
-								</button>
 							{/if}
 						</div>
 					{/if}

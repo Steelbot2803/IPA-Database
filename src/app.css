@@ -1,7 +1,7 @@
-@config '../tailwind.config.js';
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* PATH: src/app.css */
+/* Tailwind v4: single import replaces the old @tailwind base/components/utilities directives.
+   The @config directive is also gone in v4 — configuration lives in layout.css via @theme. */
+@import 'tailwindcss';
 
 :root {
 	color-scheme: dark;

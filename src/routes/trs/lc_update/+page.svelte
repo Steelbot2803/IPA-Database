@@ -11,33 +11,32 @@
 	import { cubicInOut } from 'svelte/easing';
 	import Updating from '$lib/components/Updating.svelte';
 
-	export let data;
+	let { data } = $props();
 
 	const initialBlankNo = page.url.searchParams.get('blank_no') ?? '';
 	const initialSerialNo = page.url.searchParams.get('serial_no') ?? '';
-	let saving = false;
-	let dispatchSaving = false;
-	let searching = false;
+	let saving = $state(false);
+	let dispatchSaving = $state(false);
+	let searching = $state(false);
 
-	let searchMode: 'blank' | 'serial' = initialSerialNo ? 'serial' : 'blank';
-	let searchValue = initialSerialNo || initialBlankNo;
+	let searchMode: 'blank' | 'serial' = $state(initialSerialNo ? 'serial' : 'blank');
+	let searchValue = $state(initialSerialNo || initialBlankNo);
 	let searchTimer: ReturnType<typeof setTimeout> | undefined;
 	let suggestionTimer: ReturnType<typeof setTimeout> | undefined;
 	let suggestionAbortController: AbortController | undefined;
 	let lastSearchQuery = '';
-	let isSearchFocused = false;
-	let showSuggestions = false;
+	let isSearchFocused = $state(false);
 	let dbSuggestion: string[] = [];
 	let blankSearchHistory: string[] = [];
 	let serialSearchHistory: string[] = [];
-	let searchInputEl: HTMLInputElement | null = null;
+	let searchInputEl: HTMLInputElement | null = $state(null);
 	let lastNotFoundQuery = '';
-	let updateViewMode: 'main' | 'dispatch' = 'main';
-	let dispatchValues = '';
-	let dispatchCustomer = '';
-	let dispatchJobNo = '';
-	let dispatchDate = '';
-	let duplicateModalOpen = false;
+	let updateViewMode: 'main' | 'dispatch' = $state('main');
+	let dispatchValues = $state('');
+	let dispatchCustomer = $state('');
+	let dispatchJobNo = $state('');
+	let dispatchDate = $state('');
+	let duplicateModalOpen = $state(false);
 	type DispatchCandidate = {
 		id: string;
 		blank_no: number;
@@ -53,8 +52,8 @@
 		label: string;
 		options: DispatchCandidate[];
 	};
-	let duplicateGroups: DuplicateGroup[] = [];
-	let duplicateSelections: Record<string, string[]> = {};
+	let duplicateGroups = $state<DuplicateGroup[]>([]);
+	let duplicateSelections = $state<Record<string, string[]>>({});
 
 	const BLANK_SEARCH_HISTORY_KEY = 'trs-update-blank-search-history';
 	const SERIAL_SEARCH_HISTORY_KEY = 'trs-update-serial-search-history';
@@ -67,27 +66,34 @@
 		source: 'history' | 'database';
 	};
 
-	$: normalizedSearch = searchValue.trim();
+	let normalizedSearch = $derived(searchValue.trim());
 
-	$: activeSearchHistory = searchMode === 'blank' ? blankSearchHistory : serialSearchHistory;
+	let activeSearchHistory = $derived(
+		searchMode === 'blank' ? blankSearchHistory : serialSearchHistory
+	);
 
-	$: suggestionOptions = [
-		...activeSearchHistory.map((value) => ({ value, source: 'history' as const })),
-		...dbSuggestion.map((value) => ({ value, source: 'database' as const }))
-	]
-		.filter(
-			(option, index, options) =>
-				option.value && index === options.findIndex((entry) => entry.value === option.value)
-		)
-		.filter((option) =>
-			normalizedSearch ? option.value.toLowerCase().includes(normalizedSearch.toLowerCase()) : true
-		)
-		.slice(0, 10);
+	let suggestionOptions = $derived(
+		[
+			...activeSearchHistory.map((value) => ({ value, source: 'history' as const })),
+			...dbSuggestion.map((value) => ({ value, source: 'database' as const }))
+		]
+			.filter(
+				(option, index, options) =>
+					option.value && index === options.findIndex((entry) => entry.value === option.value)
+			)
+			.filter((option) =>
+				normalizedSearch
+					? option.value.toLowerCase().includes(normalizedSearch.toLowerCase())
+					: true
+			)
+			.slice(0, 10)
+	);
 
-	$: showSuggestions = isSearchFocused && suggestionOptions.length > 0;
-	$: canConfirmDuplicates =
+	let showSuggestions = $derived(isSearchFocused && suggestionOptions.length > 0);
+	let canConfirmDuplicates = $derived(
 		duplicateGroups.length > 0 &&
-		duplicateGroups.every((group) => (duplicateSelections[group.key] ?? []).length > 0);
+			duplicateGroups.every((group) => (duplicateSelections[group.key] ?? []).length > 0)
+	);
 
 	async function clearURLParams() {
 		await goto(page.url.pathname, {
@@ -96,7 +102,6 @@
 			noScroll: true
 		});
 		await tick();
-		await invalidateAll();
 	}
 
 	function parseHistoryValue(stored: string | null): string[] {
@@ -174,14 +179,14 @@
 		}
 	}
 
-	$: {
+	$effect(() => {
 		if (suggestionTimer) clearTimeout(suggestionTimer);
 
 		const mode = searchMode;
 		suggestionTimer = setTimeout(() => {
 			void loadDbSuggestions(normalizedSearch, mode);
 		}, 180);
-	}
+	});
 
 	function setSearchMode(mode: 'blank' | 'serial') {
 		if (searchMode === mode) return;
@@ -252,7 +257,7 @@
 		}, 250);
 	}
 
-	$: {
+	$effect(() => {
 		const trimmedValue = normalizedSearch;
 		const minLen = searchMode === 'blank' ? MIN_BLANK_SEARCH_LEN : MIN_SERIAL_SEARCH_LEN;
 		if (trimmedValue && trimmedValue.length < minLen) {
@@ -268,7 +273,7 @@
 				runReactiveSearch(query, trimmedValue);
 			}
 		}
-	}
+	});
 
 	async function handleSearchSubmit(e: SubmitEvent) {
 		e.preventDefault();

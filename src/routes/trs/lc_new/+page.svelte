@@ -1,3 +1,4 @@
+<!-- PATH: src/routes/trs/lc_new/+page.svelte -->
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
 	import { enhance } from '$app/forms';
@@ -5,7 +6,8 @@
 	import { LOADCELL_PROCESS_DATE_FIELDS } from '$lib/utils/loadcellDates.js';
 	import Saving from '$lib/components/Saving.svelte';
 
-	let saving = false;
+	// Svelte 5: $state() for mutable variables
+	let saving = $state(false);
 
 	const dateFields = LOADCELL_PROCESS_DATE_FIELDS;
 </script>
@@ -39,7 +41,6 @@
 		}}
 		class={uiStyles.c0090}
 	>
-		<!-- CORE DETAILS -->
 		<section>
 			<h2 class={uiStyles.c0091}>Core Details</h2>
 			<div class={uiStyles.c0092}>
@@ -47,17 +48,15 @@
 					<div class="flex items-center justify-between px-2">
 						<label for="blank_no" class={uiStyles.c0046}>Blank No *</label>
 					</div>
-					<div class="relative">
-						<input
-							id="blank_no"
-							name="blank_no"
-							type="number"
-							placeholder="Blank No * (7 digits)"
-							inputmode="numeric"
-							pattern="\d{7}"
-							class={uiStyles.c0055}
-						/>
-					</div>
+					<input
+						id="blank_no"
+						name="blank_no"
+						type="number"
+						placeholder="Blank No * (7 digits)"
+						inputmode="numeric"
+						pattern="\d{7}"
+						class={uiStyles.c0055}
+					/>
 					<div class={uiStyles.c0103}>
 						<input
 							type="checkbox"
@@ -65,22 +64,19 @@
 							name="allow_duplicate_blank"
 							class={uiStyles.c0139}
 						/>
-						<label for="allow_duplicate_blank" class={uiStyles.c0140}>
-							Allow duplicate Blank No
-						</label>
+						<label for="allow_duplicate_blank" class={uiStyles.c0140}
+							>Allow duplicate Blank No</label
+						>
 					</div>
 				</div>
-
 				<div class={uiStyles.c0045}>
-					<label for="received_date" class={uiStyles.c0046}>Recieved Date</label>
+					<label for="received_date" class={uiStyles.c0046}>Received Date</label>
 					<input id="received_date" type="date" name="received_date" class={uiStyles.c0055} />
 				</div>
-
 				<div class={uiStyles.c0045}>
 					<label for="job_date" class={uiStyles.c0046}>Job Date *</label>
 					<input id="job_date" type="date" name="job_date" class={uiStyles.c0055} />
 				</div>
-
 				<div class={uiStyles.c0045}>
 					<label for="job_no" class={uiStyles.c0046}>Job No</label>
 					<input
@@ -91,7 +87,6 @@
 						class={uiStyles.c0055}
 					/>
 				</div>
-
 				<div class={uiStyles.c0045}>
 					<label for="serial_no" class={uiStyles.c0046}>Serial No</label>
 					<input
@@ -104,7 +99,6 @@
 						class={uiStyles.c0055}
 					/>
 				</div>
-
 				<div class={uiStyles.c0045}>
 					<label for="model_no" class={uiStyles.c0046}>Model No *</label>
 					<input
@@ -115,7 +109,6 @@
 						class={uiStyles.c0055}
 					/>
 				</div>
-
 				<div class={uiStyles.c0045}>
 					<label for="customer" class={uiStyles.c0046}>Customer</label>
 					<textarea
@@ -126,7 +119,6 @@
 						class={uiStyles.c0141}
 					></textarea>
 				</div>
-
 				<div class={uiStyles.c0045}>
 					<label for="job_card_no" class={uiStyles.c0046}>Job Card No</label>
 					<input
@@ -140,7 +132,6 @@
 			</div>
 		</section>
 
-		<!-- PROCESS DATES -->
 		<section>
 			<h2 class={uiStyles.c0091}>Process Dates</h2>
 			<div class={uiStyles.c0094}>
@@ -151,7 +142,6 @@
 			</div>
 		</section>
 
-		<!-- REMARKS -->
 		<section>
 			<h2 class={uiStyles.c0143}>Remarks</h2>
 			<div class={uiStyles.c0098}>
@@ -160,17 +150,14 @@
 			</div>
 		</section>
 
-		<!-- ACTIONS -->
 		<div class={uiStyles.c0111}>
 			<a href="/trs/new" class={uiStyles.c0100}>Cancel</a>
 			{#if saving}
-				<div class={`${uiStyles.c0061} opacity-50`}>
-					<Saving size={24} />
-				</div>
+				<div class={`${uiStyles.c0061} opacity-50`}><Saving size={24} /></div>
 			{:else}
-				<button type="submit" formaction="?/create" class={uiStyles.c0062} disabled={saving}>
-					Save Entry
-				</button>
+				<button type="submit" formaction="?/create" class={uiStyles.c0062} disabled={saving}
+					>Save Entry</button
+				>
 			{/if}
 		</div>
 	</form>

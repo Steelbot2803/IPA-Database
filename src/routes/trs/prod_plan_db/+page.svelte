@@ -33,17 +33,17 @@
 		FileText
 	} from 'lucide-svelte';
 
-	export let data;
+	let data = $props();
 
 	type ProdPlan = (typeof data.rows)[number] | null;
-	let selectedPlan: ProdPlan = null;
-	let scheduledMonth = data.scheduledMonth;
-	let loading = false;
+	let selectedPlan: ProdPlan = $state(null);
+	let scheduledMonth = $derived(data.scheduledMonth);
+	let loading = $state(false);
 	type DownloadState = 'idle' | 'loading' | 'done';
-	let downloadState: Record<'csv' | 'pdf', DownloadState> = {
+	let downloadState: Record<'csv' | 'pdf', DownloadState> = $state({
 		csv: 'idle',
 		pdf: 'idle'
-	};
+	});
 
 	function getExportUrl(format: 'csv' | 'pdf'): string {
 		return `/trs/prod_plan_db/export?scheduled_month=${encodeURIComponent(scheduledMonth)}${electromech ? '&electromech=1' : ''}&format=${format}`;
@@ -89,7 +89,7 @@
 		}
 	}
 
-	$: totalPages = Math.ceil(data.total / data.pageSize);
+	let totalPages = $derived(Math.ceil(data.total / data.pageSize));
 
 	function gotoPage(page: number) {
 		if (!browser) return;
@@ -115,7 +115,7 @@
 		}
 	}
 
-	let electromech = data.electromech ?? false;
+	let electromech = $derived(data.electromech ?? false);
 
 	function toggleElectromech() {
 		const params = new URLSearchParams(window.location.search);
@@ -130,8 +130,8 @@
 		goto(`?${params.toString()}`);
 	}
 
-	let sortColumn: string | null = null;
-	let sortAscending = true;
+	let sortColumn: string | null = $state(null);
+	let sortAscending = $state(true);
 
 	function toggleSort(column: string) {
 		if (!browser) return;
@@ -149,21 +149,21 @@
 		goto(query);
 	}
 
-	$: electromech = data.electromech ?? false;
-
 	function syncSortStateFromUrl() {
 		if (!browser) return;
 		({ sortColumn, sortAscending } = getSortState(new URLSearchParams(window.location.search)));
 	}
 
-	let filters: Record<string, Filter> = data.filters ?? {};
-	let columnMeta: Record<string, ColumnMeta> = data.columnMeta;
-	let activeFilter: string | null = null;
-	let popoverEl: HTMLDivElement | null = null;
+	let filters: Record<string, Filter> = $derived(data.filters ?? {});
+	let columnMeta: Record<string, ColumnMeta> = $derived(data.columnMeta);
+	let activeFilter: string | null = $state(null);
+	let popoverEl: HTMLDivElement | null = $state(null);
 
-	$: visibleRows = electromech
-		? data.rows.filter((row) => isElectromech(row.customer))
-		: data.rows.filter((row) => !isElectromech(row.customer));
+	let visibleRows = $derived(
+		electromech
+			? data.rows.filter((row: ProdPlan) => isElectromech(row?.customer))
+			: data.rows.filter((row: ProdPlan) => !isElectromech(row?.customer))
+	);
 
 	function applyFilters() {
 		goto(buildApplyFiltersQuery(window.location.search, filters));
@@ -190,7 +190,7 @@
 		closePopover();
 	}
 
-	$: isDefaultState = Object.keys(filters).length === 0 && !sortColumn;
+	let isDefaultState = $derived(Object.keys(filters).length === 0 && !sortColumn);
 
 	function ensureFilter(column: string) {
 		if (!filters[column]) {

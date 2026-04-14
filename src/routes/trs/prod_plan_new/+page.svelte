@@ -1,3 +1,4 @@
+<!-- PATH: src/routes/trs/prod_plan_new/+page.svelte -->
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
 	import { toast } from '$lib/utils/toast';
@@ -33,12 +34,14 @@
 		};
 	}
 
-	let rows: JobRow[] = [emptyRow()];
-	let submitting = false;
+	// Svelte 5: $state() replaces plain let for mutable vars
+	let rows = $state<JobRow[]>([emptyRow()]);
+	let submitting = $state(false);
+
 	const today = new Date();
 	const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
-	let scheduledMonth = defaultMonth;
-	let electromech = false;
+	let scheduledMonth = $state(defaultMonth);
+	let electromech = $state(false);
 
 	function addRow() {
 		const row = emptyRow();
@@ -48,7 +51,6 @@
 
 	function toggleElectromech() {
 		electromech = !electromech;
-
 		if (electromech) {
 			rows = rows.map((row) => ({ ...row, customer: 'ELECTROMECH' }));
 		} else {
@@ -58,32 +60,23 @@
 
 	function removeRow(index: number) {
 		if (rows.length === 1) return;
-		rows = rows.filter((_, rowIndex) => rowIndex !== index);
+		rows = rows.filter((_, i) => i !== index);
 	}
 
 	async function submit() {
 		submitting = true;
-
 		try {
-			const payload = rows.map((row) => ({
-				...row,
-				scheduled_month: scheduledMonth
-			}));
-
+			const payload = rows.map((row) => ({ ...row, scheduled_month: scheduledMonth }));
 			const res = await fetch('/trs/prod_plan_new', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(payload)
 			});
-
-			submitting = false;
-
 			if (!res.ok) {
 				const { message } = await res.json();
 				toast.show(message, 'error');
 				return;
 			}
-
 			const { inserted } = await res.json();
 			toast.show(`Created ${inserted} entries successfully`, 'success');
 			rows = [emptyRow()];
@@ -97,12 +90,11 @@
 
 <div class={uiStyles.c0042}>
 	<h1 class={uiStyles.c0021}>Monthly Production Plan</h1>
-
 	<div class={uiStyles.c0043}>
 		<section>
 			<div class={uiStyles.c0044}>
 				<div class={uiStyles.c0045}>
-					<label for="scheduled_month" class={uiStyles.c0046}> Scheduled Month * </label>
+					<label for="scheduled_month" class={uiStyles.c0046}>Scheduled Month *</label>
 					<input
 						id="scheduled_month"
 						name="scheduled_month"
@@ -256,21 +248,17 @@
 				</div>
 			{/key}
 		</section>
+
 		<div class={uiStyles.c0060}>
 			<button type="button" onclick={addRow} class={uiStyles.c0061} aria-label="Add row">
 				<Plus size={24} />
 			</button>
 			{#if submitting}
-				<div class={`${uiStyles.c0061} opacity-50`}>
-					<Saving size={24} />
-				</div>
+				<div class={`${uiStyles.c0061} opacity-50`}><Saving size={24} /></div>
 			{:else}
 				<button
 					type="button"
-					onclick={(event) => {
-						event.preventDefault();
-						void submit();
-					}}
+					onclick={() => void submit()}
 					disabled={submitting}
 					class={uiStyles.c0062}
 				>

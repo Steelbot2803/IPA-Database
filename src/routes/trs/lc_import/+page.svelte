@@ -7,40 +7,43 @@
 
 	// ---------- STATE ----------
 
-	let parsing = false; // true while ?/preview is in flight
-	let importing = false; // true while ?/import is in flight
+	let parsing = $state(false); // true while ?/preview is in flight
+	let importing = $state(false); // true while ?/import is in flight
 
 	// Holds the classified rows returned by ?/preview
-	let classifiedRows: ClassifiedRow[] = [];
+	let classifiedRows: ClassifiedRow[] = $state([]);
 
 	// JSON string re-submitted to ?/import as a hidden field
-	let classifiedPayload = '';
+	let classifiedPayload = $state('');
 
 	// Reference to the hidden submit button inside the preview form —
 	// we programmatically click it when the file input changes
 	let previewSubmitBtn: HTMLButtonElement;
 
 	// Duplicate resolution modal
-	let duplicateModalOpen = false;
-	let duplicateSelections: Record<string, string[]> = {};
+	let duplicateModalOpen = $state(false);
+	let duplicateSelections: Record<string, string[]> = $state({});
 
 	// ---------- DERIVED ----------
 
 	const PREVIEW_LIMIT = 20;
 
-	$: hasPreview = classifiedRows.length > 0;
-	$: insertCount = classifiedRows.filter((r) => r.action === 'insert').length;
-	$: updateCount = classifiedRows.filter((r) => r.action === 'update').length;
-	$: skipCount = classifiedRows.filter((r) => r.action === 'skip').length;
-	$: previewSlice = classifiedRows.slice(0, PREVIEW_LIMIT);
+	let hasPreview = $derived(classifiedRows.length > 0);
+	let insertCount = $derived(0);
+	let updateCount = $derived(0);
+	let skipCount = $derived(0);
+	let previewSlice = $derived(classifiedRows.slice(0, PREVIEW_LIMIT));
 
-	$: pendingGroups = classifiedRows.filter(
-		(r): r is Extract<ClassifiedRow, { action: 'pending' }> => r.action === 'pending'
+	let pendingGroups = $derived(
+		classifiedRows.filter(
+			(r): r is Extract<ClassifiedRow, { action: 'pending' }> => r.action === 'pending'
+		)
 	);
-	$: hasPending = pendingGroups.length > 0;
-	$: canConfirmDuplicates =
+	let hasPending = $derived(pendingGroups.length > 0);
+	let canConfirmDuplicates = $derived(
 		pendingGroups.length > 0 &&
-		pendingGroups.every((g) => (duplicateSelections[g.key] ?? []).length > 0);
+			pendingGroups.every((g) => (duplicateSelections[g.key] ?? []).length > 0)
+	);
 
 	// ---------- FILE INPUT HANDLER ----------
 

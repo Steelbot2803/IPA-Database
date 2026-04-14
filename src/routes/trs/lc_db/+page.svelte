@@ -1,3 +1,4 @@
+<!-- PATH: src/routes/trs/lc_db/+page.svelte -->
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
 	import { goto, afterNavigate } from '$app/navigation';
@@ -25,12 +26,22 @@
 		Funnel
 	} from 'lucide-svelte';
 
-	export let data;
+	// Svelte 5: $props() replaces "export let data"
+	let { data } = $props();
 
 	type Job = (typeof data.rows)[number] | null;
-	let selectedJob: Job = null;
 
-	$: totalPages = Math.ceil(data.total / data.pageSize);
+	// Svelte 5: $state() for all mutable variables
+	let selectedJob = $state<Job>(null);
+	let sortColumn = $state<string | null>(null);
+	let sortAscending = $state(true);
+	let filters = $derived<Record<string, Filter>>(data.filters ?? {});
+	let activeFilter = $state<string | null>(null);
+	let popoverEl = $state<HTMLDivElement | null>(null);
+
+	// Svelte 5: $derived() replaces $: reactive declarations
+	let columnMeta = $derived<Record<string, ColumnMeta>>(data.columnMeta);
+	let totalPages = $derived(Math.ceil(data.total / data.pageSize));
 
 	function gotoPage(page: number) {
 		if (!browser) return;
@@ -38,22 +49,16 @@
 		goto(buildPageQuery(window.location.search, page));
 	}
 
-	let sortColumn: string | null = null;
-	let sortAscending = true;
-
 	function toggleSort(column: string) {
 		if (!browser) return;
-
 		const { query, nextAscending } = buildSortQuery(
 			window.location.search,
 			column,
 			sortColumn,
 			sortAscending
 		);
-
 		sortColumn = column;
 		sortAscending = nextAscending;
-
 		goto(query);
 	}
 
@@ -62,18 +67,12 @@
 		({ sortColumn, sortAscending } = getSortState(new URLSearchParams(window.location.search)));
 	}
 
-	let filters: Record<string, Filter> = data.filters ?? {};
-	let columnMeta: Record<string, ColumnMeta> = data.columnMeta;
-	let activeFilter: string | null = null;
-	let popoverEl: HTMLDivElement | null = null;
-
 	function applyFilters() {
 		goto(buildApplyFiltersQuery(window.location.search, filters));
 	}
 
 	function clearFilter(column: string) {
 		delete filters[column];
-
 		goto(buildApplyFiltersQuery(window.location.search, filters));
 		closePopover();
 	}
@@ -82,18 +81,17 @@
 		filters = {};
 		sortColumn = null;
 		sortAscending = true;
-
 		const params = new URLSearchParams(window.location.search);
 		params.delete('filters');
 		params.delete('sort');
 		params.delete('order');
 		params.set('page', '1');
-
 		goto(`?${params.toString()}`, { replaceState: true, noScroll: true });
 		closePopover();
 	}
 
-	$: isDefaultState = Object.keys(filters).length === 0 && !sortColumn;
+	// Svelte 5: $derived() replaces $: isDefaultState = ...
+	let isDefaultState = $derived(Object.keys(filters).length === 0 && !sortColumn);
 
 	function ensureFilter(column: string) {
 		if (!filters[column]) {
@@ -106,13 +104,11 @@
 
 	function normalizeFilterValue(column: string) {
 		if (!filters[column]) return;
-
 		if (columnMeta[column].type === 'date' && filters[column].op === 'between') {
 			const existing = filters[column].value;
 			filters[column].value = [existing?.[0] ?? '', existing?.[1] ?? ''];
 			return;
 		}
-
 		if (Array.isArray(filters[column].value)) {
 			filters[column].value = filters[column].value[0] ?? '';
 		}
@@ -123,22 +119,16 @@
 	}
 
 	function onKeyDown(event: KeyboardEvent) {
-		if (event.key === 'Escape') {
-			closePopover();
-		}
+		if (event.key === 'Escape') closePopover();
 	}
 
 	function onClickOutside(event: MouseEvent) {
-		if (popoverEl && !popoverEl.contains(event.target as Node)) {
-			closePopover();
-		}
+		if (popoverEl && !popoverEl.contains(event.target as Node)) closePopover();
 	}
 
 	onMount(() => {
 		syncSortStateFromUrl();
-		afterNavigate(() => {
-			syncSortStateFromUrl();
-		});
+		afterNavigate(() => syncSortStateFromUrl());
 		window.addEventListener('keydown', onKeyDown);
 		window.addEventListener('mousedown', onClickOutside, true);
 		return () => {
@@ -147,9 +137,9 @@
 		};
 	});
 
-	const fields: [keyof Job, string][] = [
+	const fields: [keyof NonNullable<Job>, string][] = [
 		['derived_status', 'Status'],
-		['recieved_date', 'Recieved Date'],
+		['recieved_date', 'Received Date'],
 		['job_date', 'Job Date'],
 		['job_no', 'Job No'],
 		['job_card_no', 'Job Card No'],
@@ -186,7 +176,7 @@
 			>Filter Reset</button
 		>
 	</div>
-	<!-- ================= TABLE ================= -->
+
 	<div class={uiStyles.c0116}>
 		<table class={uiStyles.c0117}>
 			<thead>
@@ -200,12 +190,9 @@
 						>
 							<span class={uiStyles.c0119}>{columnMeta[column].label}</span>
 							<button aria-label="Sort" class={uiStyles.c0120} onclick={() => toggleSort(column)}>
-								{#if sortColumn !== column}
-									<ChevronsUpDown size="16" />
-								{:else if sortAscending}
-									<ChevronUp size="16" />
-								{:else}
-									<ChevronDown size="16" />
+								{#if sortColumn !== column}<ChevronsUpDown size="16" />
+								{:else if sortAscending}<ChevronUp size="16" />
+								{:else}<ChevronDown size="16" />
 								{/if}
 							</button>
 							<button
@@ -231,7 +218,6 @@
 											<option value={op.value}>{op.label}</option>
 										{/each}
 									</select>
-
 									{#if columnMeta[column].type === 'enum'}
 										<select
 											id={`filter-value-${column}`}
@@ -288,7 +274,6 @@
 					<th class={uiStyles.c0118}></th>
 				</tr>
 			</thead>
-
 			<tbody>
 				{#each data.rows as row}
 					<tr class={uiStyles.c0125}>
@@ -296,50 +281,40 @@
 							<td class={uiStyles.c0126}>{row[column] ?? '—'}</td>
 						{/each}
 						<td>
-							<button class={uiStyles.c0089} onclick={() => (selectedJob = row)}> Open </button>
+							<button class={uiStyles.c0089} onclick={() => (selectedJob = row)}>Open</button>
 						</td>
 					</tr>
 				{/each}
 			</tbody>
 		</table>
 	</div>
-	<!-- ================= PAGINATION ================= -->
+
 	<div class={uiStyles.c0127}>
 		<button
 			class={uiStyles.c0128}
 			aria-label="First page"
 			disabled={data.page === 1}
-			onclick={() => gotoPage(1)}
+			onclick={() => gotoPage(1)}><ChevronFirst size="24" /></button
 		>
-			<ChevronFirst size="24" />
-		</button>
 		<button
 			class={uiStyles.c0128}
 			aria-label="Previous page"
 			disabled={data.page === 1}
-			onclick={() => gotoPage(data.page - 1)}
+			onclick={() => gotoPage(data.page - 1)}><ChevronLeft size="24" /></button
 		>
-			<ChevronLeft size="24" />
-		</button>
-
-		<span class={uiStyles.c0129}> {data.page} / {totalPages} </span>
-
+		<span class={uiStyles.c0129}>{data.page} / {totalPages}</span>
 		<button
 			class={uiStyles.c0128}
 			aria-label="Next page"
 			disabled={data.page === totalPages}
-			onclick={() => gotoPage(data.page + 1)}
+			onclick={() => gotoPage(data.page + 1)}><ChevronRight size="24" /></button
 		>
-			<ChevronRight size="24" />
-		</button>
 		<button
 			class={uiStyles.c0128}
 			aria-label="Last page"
 			disabled={data.page === totalPages}
-			onclick={() => gotoPage(totalPages)}
+			onclick={() => gotoPage(totalPages)}><ChevronLast size="24" /></button
 		>
-			<ChevronLast size="24" />
-		</button>
 	</div>
 </div>
 
@@ -348,9 +323,8 @@
 		<div class={uiStyles.c0131}>
 			<div class={uiStyles.c0132}>
 				<h2 class={uiStyles.c0133}>Loadcell Details</h2>
-				<button onclick={() => (selectedJob = null)} class={uiStyles.c0134}> Close </button>
+				<button onclick={() => (selectedJob = null)} class={uiStyles.c0134}>Close</button>
 			</div>
-
 			<div class={uiStyles.c0135}>
 				{#each fields as [key, label]}
 					<div class={uiStyles.c0136}>

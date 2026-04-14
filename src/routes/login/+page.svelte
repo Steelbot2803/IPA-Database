@@ -1,15 +1,25 @@
+<!-- PATH: src/routes/login/+page.svelte -->
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
 	import { toast } from '$lib/utils/toast';
 	import { enhance } from '$app/forms';
 	import { Eye, EyeOff } from 'lucide-svelte';
 	import LoaderDots from '$lib/components/Loading.svelte';
-	export let form;
-	let loggingIn = false;
-	let showPassword = false;
-	$: if (form?.error) {
-		toast.show(form.error, 'error', 5000);
-	}
+
+	// Svelte 5: $props() replaces "export let form"
+	let { form } = $props<{ form: { error?: string } | null }>();
+
+	// Svelte 5: $state() replaces plain let for mutable vars
+	let loggingIn = $state(false);
+	let showPassword = $state(false);
+
+	// Svelte 5: $effect() replaces "$: if (form?.error) {...}"
+	// $effect runs after every render where its dependencies change.
+	$effect(() => {
+		if (form?.error) {
+			toast.show(form.error, 'error', 5000);
+		}
+	});
 </script>
 
 <svelte:head>
@@ -26,7 +36,6 @@
 		class="space-y-4"
 		use:enhance={() => {
 			loggingIn = true;
-
 			return async ({ update }) => {
 				await update();
 				loggingIn = false;
@@ -41,7 +50,7 @@
 				required
 				autocapitalize="none"
 				spellcheck="false"
-				placeholder="Email"
+				placeholder="Email or Username"
 				autocomplete="username"
 				class="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-neutral-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
 			/>
@@ -64,17 +73,11 @@
 				}}
 				class="absolute inset-y-0 right-0 flex items-center justify-center px-3 text-neutral-400 transition hover:text-neutral-200"
 			>
-				{#if showPassword}
-					<EyeOff size={18} />
-				{:else}
-					<Eye size={18} />
-				{/if}
+				{#if showPassword}<EyeOff size={18} />{:else}<Eye size={18} />{/if}
 			</button>
 		</div>
 		{#if loggingIn}
-			<div class="flex items-center justify-center text-cyan-500">
-				<LoaderDots />
-			</div>
+			<div class="flex items-center justify-center text-cyan-500"><LoaderDots /></div>
 		{:else}
 			<button
 				type="submit"

@@ -1,3 +1,14 @@
+// ─── CSV Import Utilities ─────────────────────────────────────────────────────
+//
+// The original code used `line.split(',')` which breaks whenever a field
+// contains a comma (e.g. customer name "Smith, John" or any remarks text).
+// This file implements a proper RFC 4180-compliant CSV parser that handles:
+//   - Quoted fields:  "Smith, John"
+//   - Escaped quotes: "He said ""hello"""
+//   - Unquoted fields with no commas: MODEL-X
+//
+// No external dependency needed — keeps the bundle small.
+
 export const IMPORT_HEADERS = [
 	'blank_no',
 	'serial_no',
@@ -76,12 +87,62 @@ export type ParsedRow = {
 
 export type ParseResult = { ok: true; rows: ParsedRow[] } | { ok: false; error: string };
 
+// ─── RFC 4180 CSV parser ──────────────────────────────────────────────────────
+// Parses a single CSV line into an array of cell strings, respecting:
+//   - Quoted fields that may contain commas
+//   - Doubled-quote escaping inside quoted fields ("" → ")
+//   - Unquoted fields (trimmed)
+function parseCsvLine(line: string): string[] {
+	const cells: string[] = [];
+	let i = 0;
+
+	while (i <= line.length) {
+		if (line[i] === '"') {
+			// Quoted field — read until the closing unescaped quote
+			let field = '';
+			i++; // skip opening quote
+			while (i < line.length) {
+				if (line[i] === '"') {
+					if (line[i + 1] === '"') {
+						// Escaped quote ("") — emit a single " and skip both characters
+						field += '"';
+						i += 2;
+					} else {
+						// Closing quote
+						i++;
+						break;
+					}
+				} else {
+					field += line[i];
+					i++;
+				}
+			}
+			cells.push(field);
+			// Skip the comma separator (or end of line)
+			if (line[i] === ',') i++;
+		} else {
+			// Unquoted field — read until the next comma
+			const start = i;
+			while (i < line.length && line[i] !== ',') i++;
+			cells.push(line.slice(start, i).trim());
+			if (line[i] === ',') i++;
+		}
+	}
+
+	return cells;
+}
+
 function isValidDate(value: string): boolean {
 	return /^\d{4}-\d{2}-\d{2}$/.test(value) && !isNaN(Date.parse(value));
 }
 
+// ─── Main entry point ─────────────────────────────────────────────────────────
+
 export function parseImportCsv(rawText: string): ParseResult {
+	// Normalise line endings (Windows CRLF → LF) then split
 	const lines = rawText
+		.replace(/\r\n/g, '\n')
+		.replace(/\r/g, '\n')
 		.split('\n')
 		.map((l) => l.trim())
 		.filter(Boolean);
@@ -90,7 +151,9 @@ export function parseImportCsv(rawText: string): ParseResult {
 		return { ok: false, error: 'File must contain a header row and at least one data row.' };
 	}
 
-	const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
+	// Parse the header row with the same quoted-field parser so headers with
+	// unusual characters still work, then normalise to lowercase.
+	const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase());
 
 	const validHeaderSet = new Set(IMPORT_HEADERS as readonly string[]);
 	for (const h of headers) {
@@ -112,7 +175,10 @@ export function parseImportCsv(rawText: string): ParseResult {
 	const rows: ParsedRow[] = [];
 
 	for (let i = 1; i < lines.length; i++) {
-		const cells = lines[i].split(',').map((c) => c.trim());
+		// Use the proper parser instead of split(',')
+		const cells = parseCsvLine(lines[i]);
+
+		// Map cells back to their header names
 		const raw: Record<string, string> = {};
 		for (let j = 0; j < headers.length; j++) {
 			raw[headers[j]] = cells[j] ?? '';
@@ -157,6 +223,7 @@ export function parseImportCsv(rawText: string): ParseResult {
 				}
 				(parsed as Record<string, unknown>)[field] = rawVal;
 			} else {
+				// Plain text field — value is already the parsed string from parseCsvLine
 				(parsed as Record<string, unknown>)[field] = rawVal;
 			}
 		}

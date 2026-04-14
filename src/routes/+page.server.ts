@@ -80,7 +80,10 @@ export async function load({ locals }) {
 	const monthlyKPIs = (monthlyKPIsRes.data ?? []).map((row) => ({
 		...row,
 		month: Number(row.month),
-		year: Number(row.year)
+		year: Number(row.year),
+		plnvdsp: Number(row.plnvdsp),
+		plnvpro: Number(row.plnvpro),
+		provdsp: Number(row.provdsp),
 	}));
 
 	const KPIsYears = (distinctYearsKPIsRes.data ?? [])

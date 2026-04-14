@@ -1,12 +1,15 @@
+// PATH: src/routes/trs/prod_plan_update/+server.ts
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { toUserError } from '$lib/utils/userError';
+import { requireUser, requireRole } from '$lib/utils/auth';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	const supabase = locals.supabase;
-	const user = locals.user;
 
-	if (!user) throw error(401, 'Authentication required');
+	// 🔒 Any authenticated user (including USER) can read production plans
+	requireUser(locals.user);
+
 	const scheduledMonth = url.searchParams.get('scheduled_month');
 
 	if (!scheduledMonth) {
@@ -26,9 +29,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
 export const PATCH: RequestHandler = async ({ request, locals }) => {
 	const supabase = locals.supabase;
-	const user = locals.user;
 
-	if (!user) throw error(401, 'Authentication required');
+	// 🔒 GUESTs cannot update production plans
+	requireUser(locals.user);
+	requireRole(locals.role, 'USER');
+
 	const rows = await request.json();
 
 	if (!Array.isArray(rows) || rows.length === 0) {

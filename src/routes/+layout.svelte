@@ -219,6 +219,16 @@
 								<Loader class="animate-spin" stroke-width="5" size={20} />
 							{/if}
 						</a>
+						<a
+							href="/trs/lc_import"
+							class={uiStyles.c0019}
+							class:bg-neutral-600={isActivePath('/trs/lc_import')}
+						>
+							<span>Import</span>
+							{#if navigating?.to?.url.pathname === '/trs/lc_import'}
+								<Loader class="animate-spin" stroke-width="5" size={20} />
+							{/if}
+						</a>
 					{/if}
 					<a
 						href="/trs/lc_db"
