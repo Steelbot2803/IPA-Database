@@ -83,7 +83,7 @@ export async function load({ locals }) {
 		year: Number(row.year),
 		plnvdsp: Number(row.plnvdsp),
 		plnvpro: Number(row.plnvpro),
-		provdsp: Number(row.provdsp),
+		provdsp: Number(row.provdsp)
 	}));
 
 	const KPIsYears = (distinctYearsKPIsRes.data ?? [])

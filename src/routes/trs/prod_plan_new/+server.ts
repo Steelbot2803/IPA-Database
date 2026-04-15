@@ -4,6 +4,31 @@ import type { RequestHandler } from './$types';
 import { toUserError } from '$lib/utils/userError';
 import { requireUser, requireRole } from '$lib/utils/auth';
 
+function parseRequiredPositiveNumber(
+	value: unknown,
+	rowNumber: number,
+	fieldLabel: string
+): number {
+	const parsed = Number(value);
+	if (!Number.isFinite(parsed) || parsed <= 0) {
+		throw error(422, `Row ${rowNumber}: ${fieldLabel} missing/invalid`);
+	}
+	return parsed;
+}
+
+function parseOptionalNonNegativeNumber(
+	value: unknown,
+	rowNumber: number,
+	fieldLabel: string
+): number | null {
+	if (value === '' || value === null || value === undefined) return null;
+	const parsed = Number(value);
+	if (!Number.isFinite(parsed) || parsed < 0) {
+		throw error(422, `Row ${rowNumber}: ${fieldLabel} invalid`);
+	}
+	return parsed;
+}
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	const supabase = locals.supabase;
 
@@ -18,24 +43,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	const cleaned = rows.map((r, i) => {
-		if (!r.scheduled_month) throw error(422, `Row ${i + 1}: Scheduled Month missing`);
-		if (!r.job_no) throw error(422, `Row ${i + 1}: Job No missing`);
-		if (!r.model_no) throw error(422, `Row ${i + 1}: Model No missing`);
-		if (!r.quantity || r.quantity <= 0)
-			throw error(422, `Row ${i + 1}: Total Quantity missing/invalid`);
-		if (!r.planned_dispatch) throw error(422, `Row ${i + 1}: Planned Dispatch date missing`);
+		const rowNumber = i + 1;
+		if (!r.scheduled_month) throw error(422, `Row ${rowNumber}: Scheduled Month missing`);
+		if (!r.job_no) throw error(422, `Row ${rowNumber}: Job No missing`);
+		if (!r.model_no) throw error(422, `Row ${rowNumber}: Model No missing`);
+		const quantity = parseRequiredPositiveNumber(r.quantity, rowNumber, 'Total Quantity');
+		if (!r.planned_dispatch) throw error(422, `Row ${rowNumber}: Planned Dispatch date missing`);
 
 		const jobCardNo = r.job_card_no ? String(r.job_card_no).trim() : '';
-		const dispatchedQtyValue =
-			r.dispatched_qty === '' || r.dispatched_qty === null || r.dispatched_qty === undefined
-				? null
-				: Number(r.dispatched_qty);
+		const dispatchedQtyValue = parseOptionalNonNegativeNumber(
+			r.dispatched_qty,
+			rowNumber,
+			'Dispatched Qty'
+		);
 
 		return {
 			job_no: r.job_no.trim(),
 			job_card_no: jobCardNo || null,
 			model_no: r.model_no.trim(),
-			quantity: Number(r.quantity),
+			quantity,
 			planned_dispatch: r.planned_dispatch,
 			scheduled_month: r.scheduled_month,
 			actual_dispatch: r.actual_dispatch || null,

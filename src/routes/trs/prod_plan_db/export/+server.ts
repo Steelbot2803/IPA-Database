@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { toUserError } from '$lib/utils/userError';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { requireUser, requireRole } from '$lib/utils/auth';
 
 const TITLE = 'PRODUCTION PLAN - TRANSDUCER';
 const FORM_NUMBER = 'FORM NO.: R-PP-05/01-TRS';
@@ -168,6 +169,8 @@ async function buildPdf(rows: string[][], titleYear: string): Promise<Uint8Array
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	const supabase = locals.supabase;
+	requireUser(locals.user);
+	requireRole(locals.role, 'USER');
 	const scheduledMonth =
 		url.searchParams.get('scheduled_month') ??
 		`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
