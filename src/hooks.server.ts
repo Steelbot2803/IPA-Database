@@ -7,7 +7,8 @@ type AppRole = 'ADMIN' | 'USER' | 'GUEST';
 const PROTECTED_PATH_PREFIXES = ['/trs'];
 const PROTECTED_EXACT_PATHS = ['/'];
 const PUBLIC_PATH_PREFIXES = ['/login', '/auth'];
-const GUEST_ALLOWED_PATH_PREFIXES = ['/', '/trs/lc_db', '/trs/prod_plan_db'];
+const GUEST_ALLOWED_EXACT_PATHS = new Set(['/', '/trs/lc_db', '/trs/prod_plan_db']);
+const GUEST_ALLOWED_PATH_PREFIXES = ['/trs/lc_db/', '/trs/prod_plan_db/'];
 
 function isPublicPath(pathname: string) {
 	return PUBLIC_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
@@ -19,9 +20,8 @@ function isProtectedPath(pathname: string) {
 }
 
 function isGuestAllowedPath(pathname: string) {
-	return GUEST_ALLOWED_PATH_PREFIXES.some(
-		(prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
-	);
+	if (GUEST_ALLOWED_EXACT_PATHS.has(pathname)) return true;
+	return GUEST_ALLOWED_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
 export const handle: Handle = async ({ event, resolve }) => {

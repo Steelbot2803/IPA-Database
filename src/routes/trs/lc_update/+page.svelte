@@ -21,8 +21,6 @@
 
 	let searchMode: 'blank' | 'serial' = $state(initialSerialNo ? 'serial' : 'blank');
 	let searchValue = $state(initialSerialNo || initialBlankNo);
-	let searchTimer: ReturnType<typeof setTimeout> | undefined;
-	let suggestionTimer: ReturnType<typeof setTimeout> | undefined;
 	let suggestionAbortController: AbortController | undefined;
 	let lastSearchQuery = '';
 	let isSearchFocused = $state(false);
@@ -180,12 +178,14 @@
 	}
 
 	$effect(() => {
-		if (suggestionTimer) clearTimeout(suggestionTimer);
-
 		const mode = searchMode;
-		suggestionTimer = setTimeout(() => {
-			void loadDbSuggestions(normalizedSearch, mode);
+		const search = normalizedSearch;
+
+		const timer = setTimeout(() => {
+			void loadDbSuggestions(search, mode);
 		}, 180);
+
+		return () => clearTimeout(timer);
 	});
 
 	function setSearchMode(mode: 'blank' | 'serial') {
@@ -199,7 +199,6 @@
 	function applySuggestion(option: SuggestionOption) {
 		searchValue = option.value;
 		isSearchFocused = false;
-		showSuggestions = false;
 		searchInputEl?.blur();
 	}
 
@@ -226,15 +225,17 @@
 		}
 	}
 
+	let cancelSearch: (() => void) | undefined;
+
 	function runReactiveSearch(query: string, historyValue = '', forceRefresh = false) {
 		if (!forceRefresh && query === page.url.searchParams.toString()) {
 			searching = false;
 			return;
 		}
 
-		if (searchTimer) clearTimeout(searchTimer);
+		if (cancelSearch) cancelSearch();
 
-		searchTimer = setTimeout(async () => {
+		const timer = setTimeout(async () => {
 			searching = true;
 			saveSearch(historyValue);
 
@@ -255,6 +256,8 @@
 			showNotFoundToastForCurrentQuery();
 			searching = false;
 		}, 250);
+
+		cancelSearch = () => clearTimeout(timer);
 	}
 
 	$effect(() => {

@@ -18,6 +18,13 @@
 	let isYearPickerOpen = $state(false);
 	let yearPickerContainer = $state<HTMLDivElement | null>(null);
 
+	const kpiClasses: Record<string, string> = {
+		dispatched: uiStyles.c0024,
+		ready: uiStyles.c0026,
+		in_process: uiStyles.c0027,
+		blank_stock: uiStyles.c0157
+	};
+
 	onMount(() => {
 		if (data.errors?.length && !show) {
 			data.errors.forEach((err: string) => {
@@ -138,7 +145,7 @@
 	<section class={uiStyles.c0022}>
 		<div class={uiStyles.c0023}>
 			{#each kpi as kpiItem}
-				<div class={kpiItem.class}>
+				<div class={kpiItem.type}>
 					<h3 class={uiStyles.c0025}>{kpiItem.label}</h3>
 					<p class="text-center">{kpiItem.value}</p>
 				</div>

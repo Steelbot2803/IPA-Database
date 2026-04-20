@@ -67,8 +67,8 @@ function createToastStore() {
 
 	function dismiss(id: number) {
 		update((toasts) => {
-			toasts.find((t) => t.id === id)?.timer &&
-				clearTimeout(toasts.find((t) => t.id === id)?.timer);
+			const target = toasts.find((t) => t.id === id);
+			if (target?.timer) clearTimeout(target.timer);
 			return toasts.filter((t) => t.id !== id);
 		});
 	}

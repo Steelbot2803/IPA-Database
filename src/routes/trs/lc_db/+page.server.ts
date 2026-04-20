@@ -10,14 +10,16 @@ const COLUMN_META = {
 		label: 'Status',
 		values: ['BLANK-STOCK', 'IN-PROCESS', 'READY', 'DISPATCHED']
 	},
-	recieved_date: { type: 'date', label: 'Received Date' }, // ← DB column is misspelled; label is correct
+	recieved_date: { type: 'date', label: 'Received Date' },
 	job_date: { type: 'date', label: 'Job Date' },
 	job_no: { type: 'text', label: 'Job No' },
-	job_card_no: { type: 'number', label: 'Job Card No' }, // ← added (was missing)
+	job_card_no: { type: 'number', label: 'Job Card No' },
 	model_no: { type: 'text', label: 'Model No' },
 	blank_no: { type: 'number', label: 'Blank No' },
 	serial_no: { type: 'number', label: 'Serial No' },
-	customer: { type: 'text', label: 'Customer' } // ← added (was missing)
+	customer: { type: 'text', label: 'Customer' },
+	curing: { type: 'date', label: 'Curing' },
+	post_curing: { type: 'date', label: 'Post Curing' }
 } as const;
 
 // Reads always go through the view — the view joins trs_prod with derived columns

@@ -1,4 +1,3 @@
-import { styles as uiStyles } from '$lib/utils/styles';
 import { toUserError } from '$lib/utils/userError';
 
 export async function load({ locals }) {
@@ -19,25 +18,25 @@ export async function load({ locals }) {
 			key: 'dispatched_qty',
 			label: 'Dispatched',
 			value: kpiData.dispatched_qty,
-			class: uiStyles.c0024
+			type: 'dispatched'
 		},
 		{
 			key: 'ready_qty',
 			label: 'Ready',
 			value: kpiData.ready_qty,
-			class: uiStyles.c0026
+			type: 'ready'
 		},
 		{
 			key: 'in_process_qty',
 			label: 'In-Process',
 			value: kpiData.in_process_qty,
-			class: uiStyles.c0027
+			type: 'in_process'
 		},
 		{
 			key: 'blank_stock_qty',
 			label: 'Blank-Stock',
 			value: kpiData.blank_stock_qty,
-			class: uiStyles.c0157
+			type: 'blank_stock'
 		}
 	];
 

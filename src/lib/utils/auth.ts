@@ -26,7 +26,8 @@ export function requireRole(role: AppRole, minRole: 'USER' | 'ADMIN'): void {
  * Throws a 401 error if there is no authenticated user.
  * Always call this before requireRole.
  */
-export function requireUser(user: unknown): asserts user is NonNullable<typeof user> {
+// AFTER
+export function requireUser(user: unknown): asserts user is object {
 	if (!user) {
 		throw error(401, 'Authentication required.');
 	}

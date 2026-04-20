@@ -29,9 +29,10 @@
 	const PREVIEW_LIMIT = 20;
 
 	let hasPreview = $derived(classifiedRows.length > 0);
-	let insertCount = $derived(0);
-	let updateCount = $derived(0);
-	let skipCount = $derived(0);
+	// AFTER — actually counts rows by action type
+	let insertCount = $derived(classifiedRows.filter((r) => r.action === 'insert').length);
+	let updateCount = $derived(classifiedRows.filter((r) => r.action === 'update').length);
+	let skipCount = $derived(classifiedRows.filter((r) => r.action === 'skip').length);
 	let previewSlice = $derived(classifiedRows.slice(0, PREVIEW_LIMIT));
 
 	let pendingGroups = $derived(
