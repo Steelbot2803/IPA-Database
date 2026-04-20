@@ -145,7 +145,7 @@
 	<section class={uiStyles.c0022}>
 		<div class={uiStyles.c0023}>
 			{#each kpi as kpiItem}
-				<div class={kpiItem.type}>
+				<div class={kpiClasses[kpiItem.type]}>
 					<h3 class={uiStyles.c0025}>{kpiItem.label}</h3>
 					<p class="text-center">{kpiItem.value}</p>
 				</div>
