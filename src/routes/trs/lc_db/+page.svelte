@@ -23,13 +23,17 @@
 		ChevronLast,
 		ChevronLeft,
 		ChevronRight,
-		Funnel
+		Funnel,
+		Check,
+		FileSpreadsheet,
+		FileText
 	} from 'lucide-svelte';
 
 	// Svelte 5: $props() replaces "export let data"
 	let { data } = $props();
 
 	type Job = (typeof data.rows)[number] | null;
+	type DownloadState = 'idle' | 'loading' | 'done';
 
 	// Svelte 5: $state() for all mutable variables
 	let selectedJob = $state<Job>(null);
@@ -38,10 +42,12 @@
 	let filters = $derived<Record<string, Filter>>(data.filters ?? {});
 	let activeFilter = $state<string | null>(null);
 	let popoverEl = $state<HTMLDivElement | null>(null);
-
-	// Svelte 5: $derived() replaces $: reactive declarations
 	let columnMeta = $derived<Record<string, ColumnMeta>>(data.columnMeta);
 	let totalPages = $derived(Math.ceil(data.total / data.pageSize));
+	let downloadState: Record<'csv' | 'pdf', DownloadState> = $state({
+		csv: 'idle',
+		pdf: 'idle'
+	});
 
 	function gotoPage(page: number) {
 		if (!browser) return;
@@ -126,6 +132,48 @@
 		if (popoverEl && !popoverEl.contains(event.target as Node)) closePopover();
 	}
 
+	function getExportUrl(format: 'csv' | 'pdf'): string {
+		return `/trs/lc_db/export?format=${format}`;
+	}
+
+	function filenameFromDisposition(contentDisposition: string | null, fallback: string): string {
+		if (!contentDisposition) return fallback;
+		const match = contentDisposition.match(/filename=\"?([^\";]+)\"?/i);
+		return match?.[1] ?? fallback;
+	}
+
+	async function handleDownload(format: 'csv' | 'pdf') {
+		if (downloadState[format] === 'loading') return;
+		downloadState = { ...downloadState, [format]: 'loading' };
+
+		try {
+			const res = await fetch(getExportUrl(format));
+			if (!res.ok) throw new Error(`Download failed`);
+
+			const blob = await res.blob();
+			const filename = filenameFromDisposition(
+				res.headers.get('Content-Disposition'),
+				`loadcell-export.${format}`
+			);
+			const objectUrl = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = objectUrl;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			URL.revokeObjectURL(objectUrl);
+
+			downloadState = { ...downloadState, [format]: 'done' };
+		} catch {
+			downloadState = { ...downloadState, [format]: 'idle' };
+		} finally {
+			setTimeout(() => {
+				downloadState = { ...downloadState, [format]: 'idle' };
+			}, 1200);
+		}
+	}
+
 	onMount(() => {
 		syncSortStateFromUrl();
 		afterNavigate(() => syncSortStateFromUrl());
@@ -170,11 +218,57 @@
 </script>
 
 <div class={uiStyles.c0113}>
-	<h1 class={uiStyles.c0021}>Loadcell Database</h1>
-	<div class={uiStyles.c0114}>
-		<button disabled={isDefaultState} class={uiStyles.c0115} onclick={() => resetAll()}
-			>Filter Reset</button
-		>
+	<div class={uiStyles.c0148}>
+		<h1 class={uiStyles.c0021}>Loadcell Database</h1>
+	</div>
+
+	<div class="inline-flex items-center justify-between gap-4">
+		<button disabled={isDefaultState} class={uiStyles.c0115} onclick={() => resetAll()}>
+			Filter Reset
+		</button>
+		<!-- NEW: download buttons -->
+		<div class="flex items-center gap-2">
+			<div class="group relative">
+				<button
+					class={uiStyles.c0156}
+					type="button"
+					onclick={() => handleDownload('csv')}
+					disabled={downloadState.csv === 'loading'}
+					aria-label="Download CSV Format"
+				>
+					{#if downloadState.csv === 'done'}
+						<Check size={24} class="text-green-500" />
+					{:else}
+						<FileSpreadsheet size={24} class="text-cyan-500" />
+					{/if}
+				</button>
+				<span
+					class="text-s pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+				>
+					Download CSV
+				</span>
+			</div>
+			<div class="group relative">
+				<button
+					class={uiStyles.c0156}
+					type="button"
+					onclick={() => handleDownload('pdf')}
+					disabled={downloadState.pdf === 'loading'}
+					aria-label="Download PDF"
+				>
+					{#if downloadState.pdf === 'done'}
+						<Check size={24} class="text-green-500" />
+					{:else}
+						<FileText size={24} class="text-cyan-500" />
+					{/if}
+				</button>
+				<span
+					class="text-s pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+				>
+					Download PDF
+				</span>
+			</div>
+		</div>
 	</div>
 
 	<div class={uiStyles.c0116}>
