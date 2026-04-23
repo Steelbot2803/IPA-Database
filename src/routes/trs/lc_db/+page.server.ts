@@ -1,7 +1,7 @@
 // PATH: src/routes/trs/lc_db/+page.server.ts
 import { loadTablePage } from '$lib/utils/dbTableServer';
 
-// NOTE on column naming: the database column is named `recieved_date` (misspelling
+// NOTE on column naming: the database column is named `received_date` (misspelling
 // is in the DB schema itself). The label shown to users is corrected to "Received Date".
 // Do NOT rename this key — it must match the actual DB column name exactly.
 const COLUMN_META = {
@@ -10,7 +10,7 @@ const COLUMN_META = {
 		label: 'Status',
 		values: ['BLANK-STOCK', 'IN-PROCESS', 'READY', 'DISPATCHED']
 	},
-	recieved_date: { type: 'date', label: 'Received Date' },
+	received_date: { type: 'date', label: 'Received Date' },
 	job_date: { type: 'date', label: 'Job Date' },
 	job_no: { type: 'text', label: 'Job No' },
 	job_card_no: { type: 'number', label: 'Job Card No' },

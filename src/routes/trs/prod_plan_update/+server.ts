@@ -3,6 +3,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { toUserError } from '$lib/utils/userError';
 import { requireUser, requireRole } from '$lib/utils/auth';
+import { requireSameOrigin } from '$lib/utils/csrf';
 
 function parseOptionalNonNegativeNumber(
 	value: unknown,
@@ -17,10 +18,10 @@ function parseOptionalNonNegativeNumber(
 	return parsed;
 }
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ request, locals, url }) => {
+	requireSameOrigin(request, url);
 	const supabase = locals.supabase;
 
-	// 🔒 Any authenticated user (including USER) can read production plans
 	requireUser(locals.user);
 
 	const scheduledMonth = url.searchParams.get('scheduled_month');
@@ -40,7 +41,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	return json({ rows: data ?? [] });
 };
 
-export const PATCH: RequestHandler = async ({ request, locals }) => {
+export const PATCH: RequestHandler = async ({ request, locals, url }) => {
+	requireSameOrigin(request, url);
 	const supabase = locals.supabase;
 
 	// 🔒 GUESTs cannot update production plans

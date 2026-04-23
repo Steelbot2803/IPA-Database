@@ -161,6 +161,17 @@
 						<Loader class="animate-spin" stroke-width="5" size={28} />
 					{/if}
 				</a>
+				{#if data.role === 'ADMIN'}
+					<nav class={uiStyles.c0017} aria-label="Admin Navigation">
+						<h2 class={uiStyles.c0018}>Admin</h2>
+						<a href="/admin" class={uiStyles.c0019} class:bg-neutral-600={isActivePath('/admin')}>
+							<span>User Management</span>
+							{#if navigating?.to?.url.pathname === '/admin'}
+								<Loader class="animate-spin" stroke-width="5" size={20} />
+							{/if}
+						</a>
+					</nav>
+				{/if}
 				<nav class={uiStyles.c0017} aria-label="Production Plan Navigation">
 					<h2 class={uiStyles.c0018}>Production Plan</h2>
 					{#if data.role === 'ADMIN' || data.role === 'USER'}

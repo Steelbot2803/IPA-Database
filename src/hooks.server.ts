@@ -4,6 +4,7 @@ import { env } from '$env/dynamic/private';
 
 type AppRole = 'ADMIN' | 'USER' | 'GUEST';
 
+const ADMIN_PATH_PREFIXES = ['/admin'];
 const PROTECTED_PATH_PREFIXES = ['/trs'];
 const PROTECTED_EXACT_PATHS = ['/'];
 const PUBLIC_PATH_PREFIXES = ['/login', '/auth'];
@@ -88,6 +89,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 
 		return new Response('Forbidden for guest role', { status: 403 });
+	}
+
+	// Block non-admins from /admin routes entirely
+	if (
+		event.locals.user &&
+		event.locals.role !== 'ADMIN' &&
+		ADMIN_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+	) {
+		throw redirect(303, '/');
+	}
+
+	// Block unauthenticated users from /admin routes
+	if (!event.locals.user && ADMIN_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+		throw redirect(303, '/login');
 	}
 
 	return resolve(event);

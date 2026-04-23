@@ -33,7 +33,7 @@
 		FileText
 	} from 'lucide-svelte';
 
-	let data = $props();
+	let { data } = $props();
 
 	type ProdPlan = (typeof data.rows)[number] | null;
 	let selectedPlan: ProdPlan = $state(null);

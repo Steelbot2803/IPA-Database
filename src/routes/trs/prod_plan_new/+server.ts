@@ -3,6 +3,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { toUserError } from '$lib/utils/userError';
 import { requireUser, requireRole } from '$lib/utils/auth';
+import { requireSameOrigin } from '$lib/utils/csrf';
 
 function parseRequiredPositiveNumber(
 	value: unknown,
@@ -29,10 +30,10 @@ function parseOptionalNonNegativeNumber(
 	return parsed;
 }
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request, locals, url }) => {
+	requireSameOrigin(request, url);
 	const supabase = locals.supabase;
 
-	// 🔒 Auth + role gate — GUESTs cannot create production plan entries
 	requireUser(locals.user);
 	requireRole(locals.role, 'USER');
 

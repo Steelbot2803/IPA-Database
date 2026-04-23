@@ -1,7 +1,7 @@
 <script>
 	import { Dot } from 'lucide-svelte';
 
-	export let size = 48;
+	let { size = 48 } = $props();
 </script>
 
 <div class="flex items-center">

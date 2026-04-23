@@ -365,7 +365,7 @@
 
 	type Job = {
 		id: string;
-		recieved_date: Date;
+		received_date: Date;
 		job_date: Date;
 		job_no: string;
 		job_card_no: number | null;
@@ -706,7 +706,7 @@
 								<table class={uiStyles.c0085}>
 									<thead class={uiStyles.c0086}>
 										<tr>
-											<th>Recieved Date</th>
+											<th>received Date</th>
 											<th>Job Date</th>
 											<th>Job No</th>
 											<th>Model No</th>
@@ -718,7 +718,7 @@
 									<tbody>
 										{#each data.jobs as job}
 											<tr class={uiStyles.c0087}>
-												<td class="p-2">{job.recieved_date}</td>
+												<td class="p-2">{job.received_date}</td>
 												<td>{job.job_date}</td>
 												<td>{job.job_no}</td>
 												<td>{job.model_no}</td>
@@ -812,12 +812,12 @@
 									</div>
 
 									<div class={uiStyles.c0045}>
-										<label for="recieved_date" class={uiStyles.c0046}>Recieved Date</label>
+										<label for="received_date" class={uiStyles.c0046}>received Date</label>
 										<input
-											id="recieved_date"
+											id="received_date"
 											type="date"
-											name="recieved_date"
-											bind:value={job.recieved_date}
+											name="received_date"
+											bind:value={job.received_date}
 											disabled
 											class={uiStyles.c0068}
 										/>
