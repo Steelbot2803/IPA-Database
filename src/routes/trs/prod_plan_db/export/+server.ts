@@ -2,6 +2,9 @@ import type { RequestHandler } from './$types';
 import { toUserError } from '$lib/utils/userError';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { requireUser, requireRole } from '$lib/utils/auth';
+import { parseFilters, applyFilter } from '$lib/utils/dbTableServer';
+import { _COLUMN_META } from '../+page.server';
+import type { Filter } from '$lib/utils/dbTableServer';
 
 const TITLE = 'PRODUCTION PLAN - TRANSDUCER';
 const FORM_NUMBER = 'FORM NO.: R-PP-05/01-TRS';
@@ -26,6 +29,15 @@ function escapeCsvCell(value: unknown): string {
 	return text;
 }
 
+function sanitizePdfText(text: string): string {
+	return text
+		.replace(/[\u2018\u2019]/g, "'")
+		.replace(/[\u201C\u201D]/g, '"')
+		.replace(/[\u2013\u2014]/g, '-')
+		.replace(/\u2026/g, '...')
+		.replace(/[^\x00-\xFF]/g, '?');
+}
+
 function formatDate(value: string | null): string {
 	if (!value) return '';
 	return value;
@@ -45,12 +57,11 @@ function normalizeRow(row: ExportRow): string[] {
 
 async function buildPdf(rows: string[][], titleYear: string): Promise<Uint8Array> {
 	const pdf = await PDFDocument.create();
-	const page = pdf.addPage([1200, 700]);
+	let page = pdf.addPage([1200, 700]);
 	const font = await pdf.embedFont(StandardFonts.Helvetica);
 	const fontBold = await pdf.embedFont(StandardFonts.HelveticaBold);
 
 	const pageWidth = page.getWidth();
-	const pageHeight = page.getHeight();
 	const marginX = 30;
 	const tableWidth = pageWidth - marginX * 2;
 	const titleFontSize = 28;
@@ -64,9 +75,9 @@ async function buildPdf(rows: string[][], titleYear: string): Promise<Uint8Array
 	const dataRows = rows.map((row) => row.map((cell) => (cell ?? '').toString()));
 
 	const widestByColumn = HEADERS.map((header, colIdx) => {
-		let widest = fontBold.widthOfTextAtSize(header, headerFontSize) + 20;
+		let widest = fontBold.widthOfTextAtSize(sanitizePdfText(header), headerFontSize) + 20;
 		for (const row of dataRows) {
-			const width = font.widthOfTextAtSize(row[colIdx] ?? '', bodyFontSize) + 20;
+			const width = font.widthOfTextAtSize(sanitizePdfText(row[colIdx] ?? ''), bodyFontSize) + 20;
 			if (width > widest) widest = width;
 		}
 		return widest;
@@ -77,11 +88,38 @@ async function buildPdf(rows: string[][], titleYear: string): Promise<Uint8Array
 	const totalWeight = widthWeights.reduce((sum, value) => sum + value, 0) || 1;
 	const colWidths = widthWeights.map((value) => (value / totalWeight) * tableWidth);
 
-	const startX = marginX;
-	let y = pageHeight - 26;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const drawHeaders = (pageObj: any, startY: number) => {
+		let x = marginX;
+		for (let col = 0; col < HEADERS.length; col += 1) {
+			const width = colWidths[col];
+			pageObj.drawRectangle({
+				x,
+				y: startY - headerRowHeight,
+				width,
+				height: headerRowHeight,
+				borderColor: rgb(0.2, 0.2, 0.2),
+				borderWidth: 1,
+				color: rgb(0.7, 0.86, 0.94)
+			});
+			const sanitizedHeader = sanitizePdfText(HEADERS[col]);
+			const textWidth = fontBold.widthOfTextAtSize(sanitizedHeader, headerFontSize);
+			pageObj.drawText(sanitizedHeader, {
+				x: x + (width - textWidth) / 2,
+				y: startY - 20,
+				size: headerFontSize,
+				font: fontBold,
+				color: rgb(0.06, 0.06, 0.06)
+			});
+			x += width;
+		}
+		return startY - headerRowHeight;
+	};
+
+	let y = page.getHeight() - 26;
 
 	page.drawRectangle({
-		x: startX,
+		x: marginX,
 		y: y - titleBlockHeight,
 		width: tableWidth,
 		height: titleBlockHeight,
@@ -93,7 +131,7 @@ async function buildPdf(rows: string[][], titleYear: string): Promise<Uint8Array
 	const titleText = `${TITLE} ${titleYear}`;
 	const titleWidth = fontBold.widthOfTextAtSize(titleText, titleFontSize);
 	page.drawText(titleText, {
-		x: startX + (tableWidth - titleWidth) / 2,
+		x: marginX + (tableWidth - titleWidth) / 2,
 		y: y - 36,
 		size: titleFontSize,
 		font: fontBold,
@@ -102,7 +140,7 @@ async function buildPdf(rows: string[][], titleYear: string): Promise<Uint8Array
 
 	const formWidth = fontBold.widthOfTextAtSize(FORM_NUMBER, formFontSize);
 	page.drawText(FORM_NUMBER, {
-		x: startX + (tableWidth - formWidth) / 2,
+		x: marginX + (tableWidth - formWidth) / 2,
 		y: y - 62,
 		size: formFontSize,
 		font: fontBold,
@@ -111,34 +149,15 @@ async function buildPdf(rows: string[][], titleYear: string): Promise<Uint8Array
 
 	y -= titleBlockHeight;
 
-	let x = startX;
-	for (let col = 0; col < HEADERS.length; col += 1) {
-		const width = colWidths[col];
-		page.drawRectangle({
-			x,
-			y: y - headerRowHeight,
-			width,
-			height: headerRowHeight,
-			borderColor: rgb(0.2, 0.2, 0.2),
-			borderWidth: 1,
-			color: rgb(0.7, 0.86, 0.94)
-		});
-		const textWidth = fontBold.widthOfTextAtSize(HEADERS[col], headerFontSize);
-		page.drawText(HEADERS[col], {
-			x: x + (width - textWidth) / 2,
-			y: y - 20,
-			size: headerFontSize,
-			font: fontBold,
-			color: rgb(0.06, 0.06, 0.06)
-		});
-		x += width;
-	}
-
-	y -= headerRowHeight;
+	y = drawHeaders(page, y);
 
 	for (const row of dataRows) {
-		if (y - bodyRowHeight < 20) break;
-		x = startX;
+		if (y - bodyRowHeight < 20) {
+			page = pdf.addPage([1200, 700]);
+			y = page.getHeight() - 26;
+			y = drawHeaders(page, y);
+		}
+		let x = marginX;
 		for (let col = 0; col < HEADERS.length; col += 1) {
 			const width = colWidths[col];
 			page.drawRectangle({
@@ -149,10 +168,10 @@ async function buildPdf(rows: string[][], titleYear: string): Promise<Uint8Array
 				borderColor: rgb(0.2, 0.2, 0.2),
 				borderWidth: 1
 			});
-			const value = row[col] ?? '';
+			const value = sanitizePdfText(row[col] ?? '');
 			const textWidth = font.widthOfTextAtSize(value, bodyFontSize);
 			const drawX = col === 6 ? x + 6 : x + Math.max(6, (width - textWidth) / 2);
-			page.drawText(value.slice(0, 80), {
+			page.drawText(value.slice(0, 100), {
 				x: drawX,
 				y: y - 16,
 				size: bodyFontSize,
@@ -176,23 +195,51 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
 	const electromech = url.searchParams.get('electromech') === '1';
 	const format = url.searchParams.get('format') === 'pdf' ? 'pdf' : 'csv';
+	const sort = url.searchParams.get('sort');
+	const order = url.searchParams.get('order') !== 'desc';
+	const filters = parseFilters<keyof typeof _COLUMN_META>(url.searchParams.get('filters'));
 	const table = electromech ? 'trs_prod_plan_emech' : 'trs_prod_plan_main';
 	const year = scheduledMonth.split('-')[0] ?? String(new Date().getFullYear());
 
-	const { data, error } = await supabase
-		.from(table)
-		.select('job_no, customer, model_no, quantity, planned_dispatch, actual_dispatch, remarks')
-		.eq('scheduled_month', scheduledMonth)
-		.order('planned_dispatch', { ascending: true })
-		.order('job_no', { ascending: true });
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const allRows: any[] = [];
+	let from = 0;
+	const step = 1000;
 
-	if (error) {
-		return new Response(toUserError('Could not export production plan data', error.message), {
-			status: 500
-		});
+	while (true) {
+		let query = supabase
+			.from(table)
+			.select('job_no, customer, model_no, quantity, planned_dispatch, actual_dispatch, remarks')
+			.eq('scheduled_month', scheduledMonth);
+
+		if (sort && (sort in _COLUMN_META || sort === 'id')) {
+			query = query.order(sort, { ascending: order }).order('id', { ascending: true });
+		} else {
+			query = query.order('planned_dispatch', { ascending: true }).order('job_no', { ascending: true });
+		}
+
+		for (const [column, filter] of Object.entries(filters) as [keyof typeof _COLUMN_META, Filter][]) {
+			const meta = _COLUMN_META[column];
+			if (!meta || !filter) continue;
+			query = applyFilter(query, column, meta.type, filter);
+		}
+
+		query = query.range(from, from + step - 1);
+		const { data, error } = await query;
+
+		if (error) {
+			return new Response(toUserError('Could not export production plan data', error.message), {
+				status: 500
+			});
+		}
+
+		if (!data || data.length === 0) break;
+		allRows.push(...data);
+		if (data.length < step) break;
+		from += step;
 	}
 
-	const normalizedRows = ((data ?? []) as ExportRow[]).map(normalizeRow);
+	const normalizedRows = (allRows as ExportRow[]).map(normalizeRow);
 	const suffix = electromech ? 'electromech' : 'main';
 
 	if (format === 'pdf') {

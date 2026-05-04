@@ -26,7 +26,8 @@
 		Funnel,
 		Check,
 		FileSpreadsheet,
-		FileText
+		FileText,
+		LoaderCircle
 	} from 'lucide-svelte';
 
 	// Svelte 5: $props() replaces "export let data"
@@ -133,7 +134,9 @@
 	}
 
 	function getExportUrl(format: 'csv' | 'pdf'): string {
-		return `/trs/lc_db/export?format=${format}`;
+		const params = new URLSearchParams(window.location.search);
+		params.set('format', format);
+		return `/trs/lc_db/export?${params.toString()}`;
 	}
 
 	function filenameFromDisposition(contentDisposition: string | null, fallback: string): string {
@@ -238,6 +241,8 @@
 				>
 					{#if downloadState.csv === 'done'}
 						<Check size={24} class="text-green-500" />
+					{:else if downloadState.csv === 'loading'}
+						<LoaderCircle size={24} class="animate-spin text-amber-500" />
 					{:else}
 						<FileSpreadsheet size={24} class="text-cyan-500" />
 					{/if}
@@ -258,6 +263,8 @@
 				>
 					{#if downloadState.pdf === 'done'}
 						<Check size={24} class="text-green-500" />
+					{:else if downloadState.pdf === 'loading'}
+						<LoaderCircle size={24} class="animate-spin text-amber-500" />
 					{:else}
 						<FileText size={24} class="text-cyan-500" />
 					{/if}

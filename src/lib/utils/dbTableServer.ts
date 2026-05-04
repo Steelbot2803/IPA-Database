@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-type ColumnType = 'text' | 'number' | 'date' | 'enum';
+export type ColumnType = 'text' | 'number' | 'date' | 'enum';
 
 type FilterOp =
 	| 'contains'
@@ -14,7 +14,7 @@ type FilterOp =
 	| 'neq'
 	| 'between';
 
-type Filter = {
+export type Filter = {
 	op: FilterOp;
 	value: string | number | [number, number] | [string, string];
 };
@@ -46,7 +46,7 @@ function isFilter(value: unknown): value is Filter {
 	return 'value' in candidate;
 }
 
-function parseFilters<ColumnKey extends string>(rawFilters: string | null): Filters<ColumnKey> {
+export function parseFilters<ColumnKey extends string>(rawFilters: string | null): Filters<ColumnKey> {
 	if (!rawFilters) return {};
 	try {
 		const parsed = JSON.parse(rawFilters) as unknown;
@@ -65,7 +65,7 @@ function parseFilters<ColumnKey extends string>(rawFilters: string | null): Filt
 	}
 }
 
-function applyFilter(query: any, column: string, type: ColumnType, filter: Filter) {
+export function applyFilter(query: any, column: string, type: ColumnType, filter: Filter) {
 	const { op, value } = filter;
 
 	switch (type) {

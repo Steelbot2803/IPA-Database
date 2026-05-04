@@ -2,6 +2,9 @@ import type { RequestHandler } from './$types';
 import { toUserError } from '$lib/utils/userError';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { requireUser } from '$lib/utils/auth';
+import { parseFilters, applyFilter } from '$lib/utils/dbTableServer';
+import { _COLUMN_META } from '../+page.server';
+import type { Filter } from '$lib/utils/dbTableServer';
 
 // Column definitions: [db_column_key, display_label]
 // These must match what trs_prod_status_view actually returns.
@@ -49,6 +52,17 @@ function escapeCsvCell(value: unknown): string {
 	return text;
 }
 
+// Replace common unicode characters with their WinAnsi equivalents
+function sanitizePdfText(text: string): string {
+	return text
+		.replace(/[\u2018\u2019]/g, "'")
+		.replace(/[\u201C\u201D]/g, '"')
+		.replace(/[\u2013\u2014]/g, '-')
+		.replace(/\u2026/g, '...')
+		// Remove any remaining characters outside WinAnsi
+		.replace(/[^\x00-\xFF]/g, '?');
+}
+
 // Takes a row object from Supabase and returns an array of cell strings
 // in the same order as EXPORT_COLUMNS.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,13 +77,11 @@ function normalizeRow(row: Record<string, any>): string[] {
 // The logic here mirrors what prod_plan_db/export does.
 async function buildPdf(rows: string[][], headers: string[]): Promise<Uint8Array> {
 	const pdf = await PDFDocument.create();
-	// Loadcell has many columns, so we use a very wide page
-	const page = pdf.addPage([2400, 700]);
+	let page = pdf.addPage([2400, 700]);
 	const font = await pdf.embedFont(StandardFonts.Helvetica);
 	const fontBold = await pdf.embedFont(StandardFonts.HelveticaBold);
 
 	const pageWidth = page.getWidth();
-	const pageHeight = page.getHeight();
 	const marginX = 30;
 	const tableWidth = pageWidth - marginX * 2;
 	const headerFontSize = 9;
@@ -81,9 +93,9 @@ async function buildPdf(rows: string[][], headers: string[]): Promise<Uint8Array
 	// Measure each column's natural width from its header and data,
 	// then scale all widths proportionally to fill tableWidth.
 	const colNaturalWidths = headers.map((h, ci) => {
-		let widest = fontBold.widthOfTextAtSize(h, headerFontSize) + 12;
+		let widest = fontBold.widthOfTextAtSize(sanitizePdfText(h), headerFontSize) + 12;
 		for (const row of rows) {
-			const w = font.widthOfTextAtSize(row[ci] ?? '', bodyFontSize) + 12;
+			const w = font.widthOfTextAtSize(sanitizePdfText(row[ci] ?? ''), bodyFontSize) + 12;
 			if (w > widest) widest = w;
 		}
 		return widest;
@@ -91,8 +103,36 @@ async function buildPdf(rows: string[][], headers: string[]): Promise<Uint8Array
 	const totalNatural = colNaturalWidths.reduce((a, b) => a + b, 0) || 1;
 	const colWidths = colNaturalWidths.map((w) => (w / totalNatural) * tableWidth);
 
-	// Draw title block at top of page
-	let y = pageHeight - 26;
+	// Helper to draw headers
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const drawHeaders = (pageObj: any, startY: number) => {
+		let x = marginX;
+		for (let ci = 0; ci < headers.length; ci++) {
+			const w = colWidths[ci];
+			pageObj.drawRectangle({
+				x,
+				y: startY - headerRowH,
+				width: w,
+				height: headerRowH,
+				borderColor: rgb(0.2, 0.2, 0.2),
+				borderWidth: 1,
+				color: rgb(0.7, 0.86, 0.94)
+			});
+			const sanitizedHeader = sanitizePdfText(headers[ci]);
+			const tw = fontBold.widthOfTextAtSize(sanitizedHeader, headerFontSize);
+			pageObj.drawText(sanitizedHeader, {
+				x: x + Math.max(4, (w - tw) / 2),
+				y: startY - 18,
+				size: headerFontSize,
+				font: fontBold,
+				color: rgb(0.06, 0.06, 0.06)
+			});
+			x += w;
+		}
+		return startY - headerRowH;
+	};
+
+	let y = page.getHeight() - 26;
 	page.drawRectangle({
 		x: marginX,
 		y: y - titleBlockH,
@@ -113,38 +153,18 @@ async function buildPdf(rows: string[][], headers: string[]): Promise<Uint8Array
 	});
 	y -= titleBlockH;
 
-	// Draw column header row
-	let x = marginX;
-	for (let ci = 0; ci < headers.length; ci++) {
-		const w = colWidths[ci];
-		page.drawRectangle({
-			x,
-			y: y - headerRowH,
-			width: w,
-			height: headerRowH,
-			borderColor: rgb(0.2, 0.2, 0.2),
-			borderWidth: 1,
-			color: rgb(0.7, 0.86, 0.94)
-		});
-		const tw = fontBold.widthOfTextAtSize(headers[ci], headerFontSize);
-		page.drawText(headers[ci], {
-			x: x + Math.max(4, (w - tw) / 2),
-			y: y - 18,
-			size: headerFontSize,
-			font: fontBold,
-			color: rgb(0.06, 0.06, 0.06)
-		});
-		x += w;
-	}
-	y -= headerRowH;
+	y = drawHeaders(page, y);
 
-	// Draw data rows — stop if we'd go off the bottom of the page
 	for (const row of rows) {
-		if (y - bodyRowH < 20) break;
-		x = marginX;
+		if (y - bodyRowH < 20) {
+			page = pdf.addPage([2400, 700]);
+			y = page.getHeight() - 26;
+			y = drawHeaders(page, y);
+		}
+		let x = marginX;
 		for (let ci = 0; ci < headers.length; ci++) {
 			const w = colWidths[ci];
-			const val = row[ci] ?? '';
+			const val = sanitizePdfText(row[ci] ?? '');
 			page.drawRectangle({
 				x,
 				y: y - bodyRowH,
@@ -159,7 +179,7 @@ async function buildPdf(rows: string[][], headers: string[]): Promise<Uint8Array
 					? x + 4 // remarks: left-align
 					: x + Math.max(4, (w - tw) / 2); // others: centre
 			// Truncate long text to avoid overflow
-			page.drawText(val.slice(0, 60), {
+			page.drawText(val.slice(0, 100), {
 				x: drawX,
 				y: y - 14,
 				size: bodyFontSize,
@@ -182,25 +202,48 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	requireUser(locals.user);
 
 	const format = url.searchParams.get('format') === 'pdf' ? 'pdf' : 'csv';
+	const sort = url.searchParams.get('sort');
+	const order = url.searchParams.get('order') !== 'desc';
+	const filters = parseFilters<keyof typeof _COLUMN_META>(url.searchParams.get('filters'));
 
-	// Re-use the same filter/sort params that the DB page uses so the export
-	// matches what the user is currently viewing.
-	// For now we export ALL rows (no pagination limit) — adjust if the table
-	// grows very large and you need to cap it.
-	const { data, error } = await supabase
-		.from('trs_prod_status_view')
-		.select(SELECT_COLUMNS)
-		.order('id', { ascending: false })
-		.limit(5000); // safety cap: prevents enormous exports
+	// Fetch all matching rows via pagination to overcome Supabase's 1000 row max limit
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const allRows: any[] = [];
+	let from = 0;
+	const step = 1000;
 
-	if (error) {
-		return new Response(toUserError('Could not export loadcell data', error.message), {
-			status: 500
-		});
+	while (true) {
+		let query = supabase.from('trs_prod_status_view').select(SELECT_COLUMNS);
+
+		if (sort && (sort in _COLUMN_META || sort === 'id')) {
+			query = query.order(sort, { ascending: order }).order('id', { ascending: true });
+		} else {
+			query = query.order('id', { ascending: false });
+		}
+
+		for (const [column, filter] of Object.entries(filters) as [keyof typeof _COLUMN_META, Filter][]) {
+			const meta = _COLUMN_META[column];
+			if (!meta || !filter) continue;
+			query = applyFilter(query, column, meta.type, filter);
+		}
+
+		query = query.range(from, from + step - 1);
+		const { data, error } = await query;
+
+		if (error) {
+			return new Response(toUserError('Could not export loadcell data', error.message), {
+				status: 500
+			});
+		}
+
+		if (!data || data.length === 0) break;
+		allRows.push(...data);
+		if (data.length < step) break;
+		from += step;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const normalizedRows = ((data ?? []) as Record<string, any>[]).map(normalizeRow);
+	const normalizedRows = allRows.map(normalizeRow);
 	const headers = EXPORT_COLUMNS.map(([, label]) => label);
 
 	if (format === 'pdf') {

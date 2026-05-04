@@ -30,7 +30,8 @@
 		RefreshCw,
 		Check,
 		FileSpreadsheet,
-		FileText
+		FileText,
+		LoaderCircle
 	} from 'lucide-svelte';
 
 	let { data } = $props();
@@ -46,7 +47,11 @@
 	});
 
 	function getExportUrl(format: 'csv' | 'pdf'): string {
-		return `/trs/prod_plan_db/export?scheduled_month=${encodeURIComponent(scheduledMonth)}${electromech ? '&electromech=1' : ''}&format=${format}`;
+		const params = new URLSearchParams(window.location.search);
+		params.set('format', format);
+		if (!params.has('scheduled_month')) params.set('scheduled_month', scheduledMonth);
+		if (electromech) params.set('electromech', '1');
+		return `/trs/prod_plan_db/export?${params.toString()}`;
 	}
 
 	function filenameFromDisposition(contentDisposition: string | null, fallback: string): string {
@@ -295,6 +300,8 @@
 					>
 						{#if downloadState.csv === 'done'}
 							<Check size={24} class="mr-1 inline text-green-500" />
+						{:else if downloadState.csv === 'loading'}
+							<LoaderCircle size={24} class="animate-spin text-amber-500" />
 						{:else}
 							<FileSpreadsheet size={24} class="text-cyan-500" />
 						{/if}
@@ -315,6 +322,8 @@
 					>
 						{#if downloadState.pdf === 'done'}
 							<Check size={24} class="mr-1 inline text-green-500" />
+						{:else if downloadState.pdf === 'loading'}
+							<LoaderCircle size={24} class="animate-spin text-amber-500" />
 						{:else}
 							<FileText size={24} class="text-cyan-500" aria-label="Download PDF Format" />
 						{/if}

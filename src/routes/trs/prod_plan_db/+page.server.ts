@@ -1,6 +1,6 @@
 import { loadTablePage } from '$lib/utils/dbTableServer';
 
-const COLUMN_META = {
+export const _COLUMN_META = {
 	job_no: { type: 'text', label: 'Job No' },
 	model_no: { type: 'text', label: 'Model No' },
 	quantity: { type: 'number', label: 'Quantity' },
@@ -19,7 +19,7 @@ export async function load({ url, locals }) {
 	const result = await loadTablePage({
 		url,
 		table,
-		columnMeta: COLUMN_META,
+		columnMeta: _COLUMN_META,
 		baseQuery: (query) => query.eq('scheduled_month', scheduledMonth),
 		supabase: locals.supabase
 	});
