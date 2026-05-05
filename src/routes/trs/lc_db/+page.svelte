@@ -27,16 +27,18 @@
 		Check,
 		FileSpreadsheet,
 		FileText,
-		LoaderCircle
+		LoaderCircle,
+		Columns3
 	} from 'lucide-svelte';
+	import { _ALL_EXPORT_COLUMNS } from './exportColumns.js';
 
-	// Svelte 5: $props() replaces "export let data"
+	// ─── Props ────────────────────────────────────────────────────────────────
 	let { data } = $props();
 
 	type Job = (typeof data.rows)[number] | null;
 	type DownloadState = 'idle' | 'loading' | 'done';
 
-	// Svelte 5: $state() for all mutable variables
+	// ─── State ────────────────────────────────────────────────────────────────
 	let selectedJob = $state<Job>(null);
 	let sortColumn = $state<string | null>(null);
 	let sortAscending = $state(true);
@@ -45,17 +47,27 @@
 	let popoverEl = $state<HTMLDivElement | null>(null);
 	let columnMeta = $derived<Record<string, ColumnMeta>>(data.columnMeta);
 	let totalPages = $derived(Math.ceil(data.total / data.pageSize));
-	let downloadState: Record<'csv' | 'pdf', DownloadState> = $state({
-		csv: 'idle',
-		pdf: 'idle'
-	});
 
+	let downloadState: Record<'csv' | 'pdf', DownloadState> = $state({ csv: 'idle', pdf: 'idle' });
+
+	// ─── Column picker state ──────────────────────────────────────────────────
+	// selectedExportCols is a Set of column keys the user has ticked.
+	// It starts with all columns selected.
+	let colPickerOpen = $state(false);
+	let colPickerEl = $state<HTMLDivElement | null>(null);
+	let selectedExportCols = $state<Set<string>>(new Set(_ALL_EXPORT_COLUMNS.map(([key]) => key)));
+
+	// ─── Derived ──────────────────────────────────────────────────────────────
+	let isDefaultState = $derived(Object.keys(filters).length === 0 && !sortColumn);
+
+	// ─── Pagination ───────────────────────────────────────────────────────────
 	function gotoPage(page: number) {
 		if (!browser) return;
 		if (page < 1 || page > totalPages) return;
 		goto(buildPageQuery(window.location.search, page));
 	}
 
+	// ─── Sorting ──────────────────────────────────────────────────────────────
 	function toggleSort(column: string) {
 		if (!browser) return;
 		const { query, nextAscending } = buildSortQuery(
@@ -74,6 +86,7 @@
 		({ sortColumn, sortAscending } = getSortState(new URLSearchParams(window.location.search)));
 	}
 
+	// ─── Filtering ────────────────────────────────────────────────────────────
 	function applyFilters() {
 		goto(buildApplyFiltersQuery(window.location.search, filters));
 	}
@@ -96,9 +109,6 @@
 		goto(`?${params.toString()}`, { replaceState: true, noScroll: true });
 		closePopover();
 	}
-
-	// Svelte 5: $derived() replaces $: isDefaultState = ...
-	let isDefaultState = $derived(Object.keys(filters).length === 0 && !sortColumn);
 
 	function ensureFilter(column: string) {
 		if (!filters[column]) {
@@ -125,17 +135,33 @@
 		activeFilter = null;
 	}
 
-	function onKeyDown(event: KeyboardEvent) {
-		if (event.key === 'Escape') closePopover();
+	// ─── Column picker ────────────────────────────────────────────────────────
+	function toggleExportCol(key: string) {
+		const next = new Set(selectedExportCols);
+		if (next.has(key)) {
+			// Don't allow deselecting the last column
+			if (next.size > 1) next.delete(key);
+		} else {
+			next.add(key);
+		}
+		selectedExportCols = next;
 	}
 
-	function onClickOutside(event: MouseEvent) {
-		if (popoverEl && !popoverEl.contains(event.target as Node)) closePopover();
+	function selectAllCols() {
+		selectedExportCols = new Set(_ALL_EXPORT_COLUMNS.map(([key]) => key));
 	}
 
+	function clearAllCols() {
+		// Keep at least the first column so we always export something
+		selectedExportCols = new Set([_ALL_EXPORT_COLUMNS[0][0]]);
+	}
+
+	// ─── Export / download ────────────────────────────────────────────────────
 	function getExportUrl(format: 'csv' | 'pdf'): string {
 		const params = new URLSearchParams(window.location.search);
 		params.set('format', format);
+		// Pass the selected column keys as a comma-separated string
+		params.set('columns', Array.from(selectedExportCols).join(','));
 		return `/trs/lc_db/export?${params.toString()}`;
 	}
 
@@ -166,7 +192,6 @@
 			a.click();
 			a.remove();
 			URL.revokeObjectURL(objectUrl);
-
 			downloadState = { ...downloadState, [format]: 'done' };
 		} catch {
 			downloadState = { ...downloadState, [format]: 'idle' };
@@ -175,6 +200,20 @@
 				downloadState = { ...downloadState, [format]: 'idle' };
 			}, 1200);
 		}
+	}
+
+	// ─── Global event handlers ────────────────────────────────────────────────
+	function onKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			closePopover();
+			colPickerOpen = false;
+		}
+	}
+
+	function onClickOutside(event: MouseEvent) {
+		const target = event.target as Node;
+		if (popoverEl && !popoverEl.contains(target)) closePopover();
+		if (colPickerEl && !colPickerEl.contains(target)) colPickerOpen = false;
 	}
 
 	onMount(() => {
@@ -188,6 +227,7 @@
 		};
 	});
 
+	// ─── Modal detail fields ──────────────────────────────────────────────────
 	const fields: [keyof NonNullable<Job>, string][] = [
 		['derived_status', 'Status'],
 		['received_date', 'Received Date'],
@@ -225,19 +265,82 @@
 		<h1 class={uiStyles.c0021}>Loadcell Database</h1>
 	</div>
 
-	<div class="inline-flex items-center justify-between gap-4">
-		<button disabled={isDefaultState} class={uiStyles.c0115} onclick={() => resetAll()}>
-			Filter Reset
-		</button>
-		<!-- NEW: download buttons -->
-		<div class="flex items-center gap-2">
+	<!-- ── Toolbar: filter reset + export controls ── -->
+	<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+		<div>
+			<button disabled={isDefaultState} class={uiStyles.c0115} onclick={() => resetAll()}>
+				Filter Reset
+			</button>
+		</div>
+		<div class="flex flex-wrap items-center gap-3">
+			<!-- Column picker trigger -->
+			<div class="group relative" bind:this={colPickerEl}>
+				<button
+					type="button"
+					class={uiStyles.c0156}
+					onclick={() => (colPickerOpen = !colPickerOpen)}
+					aria-label="Choose export columns"
+					title="Choose export columns"
+				>
+					<Columns3 size={24} class="text-cyan-400" />
+				</button>
+				<span
+					class="text-s pointer-events-none absolute -top-10 -left-[65%] -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+				>
+					Choose columns
+				</span>
+
+				{#if colPickerOpen}
+					<!--
+					Column picker panel.
+					We render ALL_EXPORT_COLUMNS as checkboxes.
+					Ticking/unticking adds/removes a key from selectedExportCols.
+				-->
+					<div
+						class="absolute top-13 left-0 z-50 w-64 -translate-x-1/2 rounded-md border border-neutral-700 bg-neutral-900 p-3 shadow-xl"
+					>
+						<p class="mb-2 text-sm font-medium text-neutral-300">Export columns</p>
+						<div class="mb-2 flex gap-2 text-xs">
+							<button
+								type="button"
+								class="cursor-pointer rounded-sm px-1 py-0.5 text-cyan-500 hover:bg-cyan-950"
+								onclick={selectAllCols}>All</button
+							>
+							<span class="text-neutral-600">|</span>
+							<button
+								type="button"
+								class="cursor-pointer rounded-sm px-1 py-0.5 text-cyan-500 hover:bg-cyan-950"
+								onclick={clearAllCols}>None</button
+							>
+							<span class="ml-auto text-neutral-500">{selectedExportCols.size} selected</span>
+						</div>
+						<div class="max-h-72 overflow-y-auto">
+							{#each _ALL_EXPORT_COLUMNS as [key, label]}
+								<label
+									class="flex cursor-pointer items-center gap-2 rounded p-1 text-sm text-neutral-200 hover:bg-neutral-800"
+								>
+									<input
+										type="checkbox"
+										checked={selectedExportCols.has(key)}
+										onchange={() => toggleExportCol(key)}
+										class="cursor-pointer rounded bg-neutral-800 accent-cyan-500"
+									/>
+									{label}
+								</label>
+							{/each}
+						</div>
+					</div>
+				{/if}
+			</div>
+
+			<!-- CSV download -->
 			<div class="group relative">
 				<button
 					class={uiStyles.c0156}
 					type="button"
 					onclick={() => handleDownload('csv')}
 					disabled={downloadState.csv === 'loading'}
-					aria-label="Download CSV Format"
+					aria-label="Download CSV"
 				>
 					{#if downloadState.csv === 'done'}
 						<Check size={24} class="text-green-500" />
@@ -248,11 +351,13 @@
 					{/if}
 				</button>
 				<span
-					class="text-s pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+					class="text-s pointer-events-none absolute -top-10 -left-[50%] -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
 				>
 					Download CSV
 				</span>
 			</div>
+
+			<!-- PDF download -->
 			<div class="group relative">
 				<button
 					class={uiStyles.c0156}
@@ -270,7 +375,7 @@
 					{/if}
 				</button>
 				<span
-					class="text-s pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+					class="text-s pointer-events-none absolute -top-10 -left-[50%] -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
 				>
 					Download PDF
 				</span>
@@ -278,6 +383,7 @@
 		</div>
 	</div>
 
+	<!-- ── Data table ── -->
 	<div class={uiStyles.c0116}>
 		<table class={uiStyles.c0117}>
 			<thead>
@@ -372,7 +478,7 @@
 							{/if}
 						</th>
 					{/each}
-					<th class={uiStyles.c0118}></th>
+					<th class={uiStyles.c0118}>Details</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -390,6 +496,7 @@
 		</table>
 	</div>
 
+	<!-- ── Pagination ── -->
 	<div class={uiStyles.c0127}>
 		<button
 			class={uiStyles.c0128}
@@ -419,6 +526,7 @@
 	</div>
 </div>
 
+<!-- ── Detail modal ── -->
 {#if selectedJob}
 	<div class={uiStyles.c0130}>
 		<div class={uiStyles.c0131}>

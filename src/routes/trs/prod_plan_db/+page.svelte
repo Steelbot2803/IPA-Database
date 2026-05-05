@@ -1,3 +1,4 @@
+<!-- PATH: src/routes/trs/prod_plan_db/+page.svelte -->
 <script lang="ts">
 	import { styles as uiStyles } from '$lib/utils/styles';
 	import { goto, afterNavigate, invalidateAll } from '$app/navigation';
@@ -31,26 +32,53 @@
 		Check,
 		FileSpreadsheet,
 		FileText,
-		LoaderCircle
+		LoaderCircle,
+		Columns3
 	} from 'lucide-svelte';
+	import { _ALL_EXPORT_COLUMNS } from './exportColumns.js';
 
+	// ─── Props ────────────────────────────────────────────────────────────────
 	let { data } = $props();
 
 	type ProdPlan = (typeof data.rows)[number] | null;
+
+	// ─── State ────────────────────────────────────────────────────────────────
 	let selectedPlan: ProdPlan = $state(null);
 	let scheduledMonth = $derived(data.scheduledMonth);
 	let loading = $state(false);
 	type DownloadState = 'idle' | 'loading' | 'done';
-	let downloadState: Record<'csv' | 'pdf', DownloadState> = $state({
-		csv: 'idle',
-		pdf: 'idle'
-	});
+	let downloadState: Record<'csv' | 'pdf', DownloadState> = $state({ csv: 'idle', pdf: 'idle' });
 
+	// ─── Column picker state ──────────────────────────────────────────────────
+	let colPickerOpen = $state(false);
+	let colPickerEl = $state<HTMLDivElement | null>(null);
+	let selectedExportCols = $state<Set<string>>(new Set(_ALL_EXPORT_COLUMNS.map(([key]) => key)));
+
+	function toggleExportCol(key: string) {
+		const next = new Set(selectedExportCols);
+		if (next.has(key)) {
+			if (next.size > 1) next.delete(key);
+		} else {
+			next.add(key);
+		}
+		selectedExportCols = next;
+	}
+
+	function selectAllCols() {
+		selectedExportCols = new Set(_ALL_EXPORT_COLUMNS.map(([key]) => key));
+	}
+
+	function clearAllCols() {
+		selectedExportCols = new Set([_ALL_EXPORT_COLUMNS[0][0]]);
+	}
+
+	// ─── Export ───────────────────────────────────────────────────────────────
 	function getExportUrl(format: 'csv' | 'pdf'): string {
 		const params = new URLSearchParams(window.location.search);
 		params.set('format', format);
 		if (!params.has('scheduled_month')) params.set('scheduled_month', scheduledMonth);
 		if (electromech) params.set('electromech', '1');
+		params.set('columns', Array.from(selectedExportCols).join(','));
 		return `/trs/prod_plan_db/export?${params.toString()}`;
 	}
 
@@ -62,7 +90,6 @@
 
 	async function handleDownload(format: 'csv' | 'pdf') {
 		if (downloadState[format] === 'loading') return;
-
 		downloadState = { ...downloadState, [format]: 'loading' };
 
 		try {
@@ -83,7 +110,6 @@
 			a.click();
 			a.remove();
 			URL.revokeObjectURL(objectUrl);
-
 			downloadState = { ...downloadState, [format]: 'done' };
 		} catch {
 			downloadState = { ...downloadState, [format]: 'idle' };
@@ -94,14 +120,16 @@
 		}
 	}
 
+	// ─── Pagination ───────────────────────────────────────────────────────────
 	let totalPages = $derived(Math.ceil(data.total / data.pageSize));
 
-	function gotoPage(page: number) {
+	function gotoPage(p: number) {
 		if (!browser) return;
-		if (page < 1 || page > totalPages) return;
-		goto(buildPageQuery(window.location.search, page));
+		if (p < 1 || p > totalPages) return;
+		goto(buildPageQuery(window.location.search, p));
 	}
 
+	// ─── Month loading ────────────────────────────────────────────────────────
 	async function loadMonth() {
 		loading = true;
 		const params = new URLSearchParams(window.location.search);
@@ -113,44 +141,38 @@
 				await invalidateAll();
 				return;
 			}
-
 			await goto(`?${nextQuery}`);
 		} finally {
 			loading = false;
 		}
 	}
 
+	// ─── Electromech toggle ───────────────────────────────────────────────────
 	let electromech = $derived(data.electromech ?? false);
 
 	function toggleElectromech() {
 		const params = new URLSearchParams(window.location.search);
 		const next = !electromech;
-
-		if (next) {
-			params.set('electromech', '1');
-		} else {
-			params.delete('electromech');
-		}
+		if (next) params.set('electromech', '1');
+		else params.delete('electromech');
 		params.set('page', '1');
 		goto(`?${params.toString()}`);
 	}
 
+	// ─── Sorting ──────────────────────────────────────────────────────────────
 	let sortColumn: string | null = $state(null);
 	let sortAscending = $state(true);
 
 	function toggleSort(column: string) {
 		if (!browser) return;
-
 		const { query, nextAscending } = buildSortQuery(
 			window.location.search,
 			column,
 			sortColumn,
 			sortAscending
 		);
-
 		sortColumn = column;
 		sortAscending = nextAscending;
-
 		goto(query);
 	}
 
@@ -159,6 +181,7 @@
 		({ sortColumn, sortAscending } = getSortState(new URLSearchParams(window.location.search)));
 	}
 
+	// ─── Filtering ────────────────────────────────────────────────────────────
 	let filters: Record<string, Filter> = $derived(data.filters ?? {});
 	let columnMeta: Record<string, ColumnMeta> = $derived(data.columnMeta);
 	let activeFilter: string | null = $state(null);
@@ -176,7 +199,6 @@
 
 	function clearFilter(column: string) {
 		delete filters[column];
-
 		goto(buildApplyFiltersQuery(window.location.search, filters));
 		closePopover();
 	}
@@ -208,13 +230,11 @@
 
 	function normalizeFilterValue(column: string) {
 		if (!filters[column]) return;
-
 		if (columnMeta[column].type === 'date' && filters[column].op === 'between') {
 			const existing = filters[column].value;
 			filters[column].value = [existing?.[0] ?? '', existing?.[1] ?? ''];
 			return;
 		}
-
 		if (Array.isArray(filters[column].value)) {
 			filters[column].value = filters[column].value[0] ?? '';
 		}
@@ -224,19 +244,23 @@
 		activeFilter = null;
 	}
 
+	// ─── Global events ────────────────────────────────────────────────────────
 	function onKeyDown(event: KeyboardEvent) {
-		if (event.key === 'Escape') closePopover();
+		if (event.key === 'Escape') {
+			closePopover();
+			colPickerOpen = false;
+		}
 	}
 
 	function onClickOutside(event: MouseEvent) {
-		if (popoverEl && !popoverEl.contains(event.target as Node)) closePopover();
+		const target = event.target as Node;
+		if (popoverEl && !popoverEl.contains(target)) closePopover();
+		if (colPickerEl && !colPickerEl.contains(target)) colPickerOpen = false;
 	}
 
 	onMount(() => {
 		syncSortStateFromUrl();
-		afterNavigate(() => {
-			syncSortStateFromUrl();
-		});
+		afterNavigate(() => syncSortStateFromUrl());
 		window.addEventListener('keydown', onKeyDown);
 		window.addEventListener('mousedown', onClickOutside, true);
 		return () => {
@@ -245,6 +269,7 @@
 		};
 	});
 
+	// ─── Detail modal fields ──────────────────────────────────────────────────
 	const fields: [keyof ProdPlan, string][] = [
 		['derived_status', 'Status'],
 		['scheduled_month', 'Scheduled Month'],
@@ -265,11 +290,12 @@
 <div class={uiStyles.c0113}>
 	<div class={uiStyles.c0148}>
 		<h1 class={uiStyles.c0021}>Production Plan Database</h1>
-		<button disabled={isDefaultState} class={uiStyles.c0149} onclick={() => resetAll()}
-			>Filter Reset</button
-		>
+		<button disabled={isDefaultState} class={uiStyles.c0149} onclick={() => resetAll()}>
+			Filter Reset
+		</button>
 	</div>
 
+	<!-- ── Controls row ── -->
 	<div class={uiStyles.c0063}>
 		<div class={uiStyles.c0045}>
 			<label for="scheduled_month" class={uiStyles.c0046}>Scheduled Month</label>
@@ -281,62 +307,120 @@
 				bind:value={scheduledMonth}
 			/>
 		</div>
+
 		<div class={uiStyles.c0064}>
+			<!-- Refresh -->
 			<button type="button" onclick={loadMonth} disabled={loading} class={uiStyles.c0065}>
-				{#if loading}
-					<RefreshCw class="animate-spin" size="24" />
-				{:else}
-					<RefreshCw size="24" />
-				{/if}
+				{#if loading}<RefreshCw class="animate-spin" size="24" />{:else}<RefreshCw size="24" />{/if}
 			</button>
-			<div class="ml-12 flex items-center gap-2">
-				<div class="group relative">
-					<button
-						class={uiStyles.c0156}
-						type="button"
-						onclick={() => handleDownload('csv')}
-						disabled={downloadState.csv === 'loading'}
-						aria-label="Download CSV Format"
+
+			<!-- Column picker -->
+			<div class="group relative ml-3" bind:this={colPickerEl}>
+				<button
+					type="button"
+					class={uiStyles.c0156}
+					onclick={() => (colPickerOpen = !colPickerOpen)}
+					aria-label="Choose export columns"
+					title="Choose export columns"
+				>
+					<Columns3 size={24} class="text-cyan-400" />
+				</button>
+				<span
+					class="text-s pointer-events-none absolute -top-10 left-0 -translate-x-0 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+				>
+					Choose columns
+				</span>
+
+				{#if colPickerOpen}
+					<div
+						class="absolute top-13 left-0 z-50 w-64 rounded-md border border-neutral-700 bg-neutral-900 p-3 shadow-xl"
 					>
-						{#if downloadState.csv === 'done'}
-							<Check size={24} class="mr-1 inline text-green-500" />
-						{:else if downloadState.csv === 'loading'}
-							<LoaderCircle size={24} class="animate-spin text-amber-500" />
-						{:else}
-							<FileSpreadsheet size={24} class="text-cyan-500" />
-						{/if}
-					</button>
-					<span
-						class="text-s pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
-					>
-						Download CSV
-					</span>
-				</div>
-				<div class="group relative">
-					<button
-						class={uiStyles.c0156}
-						type="button"
-						onclick={() => handleDownload('pdf')}
-						disabled={downloadState.pdf === 'loading'}
-						aria-label="Download PDF Format"
-					>
-						{#if downloadState.pdf === 'done'}
-							<Check size={24} class="mr-1 inline text-green-500" />
-						{:else if downloadState.pdf === 'loading'}
-							<LoaderCircle size={24} class="animate-spin text-amber-500" />
-						{:else}
-							<FileText size={24} class="text-cyan-500" aria-label="Download PDF Format" />
-						{/if}
-					</button>
-					<span
-						class="text-s pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
-					>
-						Download PDF
-					</span>
-				</div>
+						<p class="mb-2 text-sm font-medium text-neutral-300">Export columns</p>
+						<div class="mb-2 flex gap-2 text-xs">
+							<button
+								type="button"
+								class="cursor-pointer rounded-sm px-1 py-0.5 text-cyan-500 hover:bg-cyan-950"
+								onclick={selectAllCols}>All</button
+							>
+							<span class="text-neutral-600">|</span>
+							<button
+								type="button"
+								class="cursor-pointer rounded-sm px-1 py-0.5 text-cyan-500 hover:bg-cyan-950"
+								onclick={clearAllCols}>None</button
+							>
+							<span class="ml-auto text-neutral-500">{selectedExportCols.size} selected</span>
+						</div>
+						<div class="max-h-60 overflow-y-auto">
+							{#each _ALL_EXPORT_COLUMNS as [key, label]}
+								<label
+									class="flex cursor-pointer items-center gap-2 rounded px-1 py-1 text-sm text-neutral-200 hover:bg-neutral-800"
+								>
+									<input
+										type="checkbox"
+										checked={selectedExportCols.has(key)}
+										onchange={() => toggleExportCol(key)}
+										class="cursor-pointer rounded bg-neutral-800 accent-cyan-500"
+									/>
+									{label}
+								</label>
+							{/each}
+						</div>
+					</div>
+				{/if}
+			</div>
+
+			<!-- CSV download -->
+			<div class="group relative ml-1">
+				<button
+					class={uiStyles.c0156}
+					type="button"
+					onclick={() => handleDownload('csv')}
+					disabled={downloadState.csv === 'loading'}
+					aria-label="Download CSV Format"
+				>
+					{#if downloadState.csv === 'done'}
+						<Check size={24} class="text-green-500" />
+					{:else if downloadState.csv === 'loading'}
+						<LoaderCircle size={24} class="animate-spin text-amber-500" />
+					{:else}
+						<FileSpreadsheet size={24} class="text-cyan-500" />
+					{/if}
+				</button>
+				<span
+					class="text-s pointer-events-none absolute -top-10 left-0 -translate-x-0 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+				>
+					Download CSV
+				</span>
+			</div>
+
+			<!-- PDF download -->
+			<div class="group relative">
+				<button
+					class={uiStyles.c0156}
+					type="button"
+					onclick={() => handleDownload('pdf')}
+					disabled={downloadState.pdf === 'loading'}
+					aria-label="Download PDF Format"
+				>
+					{#if downloadState.pdf === 'done'}
+						<Check size={24} class="text-green-500" />
+					{:else if downloadState.pdf === 'loading'}
+						<LoaderCircle size={24} class="animate-spin text-amber-500" />
+					{:else}
+						<FileText size={24} class="text-cyan-500" />
+					{/if}
+				</button>
+				<span
+					class="text-s pointer-events-none absolute -top-10 left-0 -translate-x-0 rounded-md border-2 border-neutral-700 px-2 py-1 whitespace-nowrap text-neutral-200 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+				>
+					Download PDF
+				</span>
 			</div>
 		</div>
+
 		<div class={uiStyles.c0066}></div>
+
+		<!-- Electromech toggle -->
 		<div class={uiStyles.c0049}>
 			<label for="electromech_toggle" class={uiStyles.c0050}>
 				<span class={uiStyles.c0051}>Main</span>
@@ -354,6 +438,7 @@
 		</div>
 	</div>
 
+	<!-- ── Table ── -->
 	<div class={uiStyles.c0116}>
 		{#key electromech}
 			<div in:slide={{ duration: 180, easing: cubicInOut }} out:slide={{ duration: 120 }}>
@@ -381,12 +466,9 @@
 												class={uiStyles.c0120}
 												onclick={() => toggleSort(column)}
 											>
-												{#if sortColumn !== column}
-													<ChevronsUpDown size="16" />
-												{:else if sortAscending}
-													<ChevronUp size="16" />
-												{:else}
-													<ChevronDown size="16" />
+												{#if sortColumn !== column}<ChevronsUpDown size="16" />
+												{:else if sortAscending}<ChevronUp size="16" />
+												{:else}<ChevronDown size="16" />
 												{/if}
 											</button>
 											<button
@@ -412,7 +494,6 @@
 															<option value={op.value}>{op.label}</option>
 														{/each}
 													</select>
-
 													{#if columnMeta[column].type === 'date' && filters[column]?.op === 'between'}
 														<input
 															id={`filter-start-${column}`}
@@ -448,15 +529,15 @@
 													{/if}
 													<div class={uiStyles.c0124}>
 														<button class={uiStyles.c0100} onclick={applyFilters}>Apply</button>
-														<button class={uiStyles.c0100} onclick={() => clearFilter(column)}
-															>Clear</button
-														>
+														<button class={uiStyles.c0100} onclick={() => clearFilter(column)}>
+															Clear
+														</button>
 													</div>
 												</div>
 											{/if}
 										</th>
 									{/each}
-									<th class={uiStyles.c0118}></th>
+									<th class={uiStyles.c0118}>Details</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -475,6 +556,7 @@
 							</tbody>
 						</table>
 
+						<!-- Pagination -->
 						<div class={uiStyles.c0127}>
 							<button
 								class={uiStyles.c0128}
@@ -488,7 +570,7 @@
 								disabled={data.page === 1}
 								onclick={() => gotoPage(data.page - 1)}><ChevronLeft size="24" /></button
 							>
-							<span class={uiStyles.c0129}> {data.page} / {totalPages} </span>
+							<span class={uiStyles.c0129}>{data.page} / {totalPages}</span>
 							<button
 								class={uiStyles.c0128}
 								aria-label="Next page"
@@ -509,6 +591,7 @@
 	</div>
 </div>
 
+<!-- ── Detail modal ── -->
 {#if selectedPlan}
 	<div class={uiStyles.c0130}>
 		<div class={uiStyles.c0131}>

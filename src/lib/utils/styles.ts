@@ -224,7 +224,7 @@ const miscStyles: StyleMap = {
 	c0155:
 		'flex w-full items-center justify-between px-3 py-2 text-left text-neutral-200 hover:bg-neutral-800',
 	c0156:
-		'rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 justify-center hover:bg-neutral-600 cursor-pointer',
+		'rounded-md border border-neutral-700 bg-neutral-800 px-2 py-2 justify-center hover:bg-neutral-600 cursor-pointer focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:outline-none',
 	c0157: 'kpi blankstock rounded-md border-2 border-blue-600 bg-blue-950 p-4',
 	c0158:
 		'mb-4 w-full rounded-md bg-orange-950 p-4 text-2xl font-medium text-neutral-200 text-center flex justify-between',
